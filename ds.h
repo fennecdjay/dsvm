@@ -14,6 +14,7 @@ typedef enum ds_opcode {
   dsop_add, dsop_sub, dsop_mul,
   dsop_div, dsop_mod,
 
+  dsop_es, dsop_ne,
   dsop_gt, dsop_ge, dsop_lt, dsop_le,
 
   dsop_land, dsop_lor,

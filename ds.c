@@ -72,9 +72,10 @@ void run(reg_t *data) {
     &&_dsop_div_imm, &&_dsop_mod_imm,
 
     &&_dsop_add, &&_dsop_sub, &&_dsop_mul,
-    &&_dsop_div, &&_dsop_mod, &&_dsop_gt,
+    &&_dsop_div, &&_dsop_mod,
 
-    &&_dsop_ge, &&_dsop_lt, &&_dsop_le,
+    &&_dsop_eq, &&_dsop_ne,
+    &&_dsop_gt, &&_dsop_ge, &&_dsop_lt, &&_dsop_le,
 
     &&_dsop_land, &&_dsop_lor,
 
@@ -140,6 +141,10 @@ void run(reg_t *data) {
   _dsop_brshift:
   BINARY(>>);
 
+  _dsop_eq:
+  BINARY(==);
+  _dsop_ne:
+  BINARY(!=);
   _dsop_gt:
   BINARY(>);
   _dsop_ge:
