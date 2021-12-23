@@ -5,6 +5,11 @@
 
 #include "ds.h"
 
+#define BUMP_SIZE 4096
+
+static reg_t _code[BUMP_SIZE];
+static size_t _code_count;
+
 #define RVM_SIZE 4096
 
 #define DISPATCH() goto *dispatch[vm_read()];
@@ -13,57 +18,56 @@
 
 #define BINARY_IMM(op) do                \
 {                                       \
-  register const reg_t lhs = vm_read(); \
-  register const reg_t rhs = vm_read(); \
-  register const reg_t ret = vm_read(); \
-  reg[ret] = reg[lhs] op rhs;           \
+  const reg_t lhs  = vm_read(); \
+  const reg_t rhs  = vm_read(); \
+  const reg_t dest = vm_read(); \
+  reg[dest] = reg[lhs] op rhs;           \
   DISPATCH();                           \
 } while(false)
 
 #define BINARY(op) do                    \
 {                                       \
-  register const reg_t lhs = vm_read(); \
-  register const reg_t rhs = vm_read(); \
-  register const reg_t ret = vm_read(); \
-  reg[ret] = reg[lhs] op reg[rhs];      \
+  const reg_t lhs = vm_read(); \
+  const reg_t rhs = vm_read(); \
+  const reg_t dest = vm_read(); \
+  reg[dest] = reg[lhs] op reg[rhs];      \
   DISPATCH();                           \
 } while(false)
 
 #define UNARY(op) do                    \
 {                                       \
-  register const reg_t lhs = vm_read(); \
-  register const reg_t ret = vm_read(); \
-  reg[ret] = op reg[lhs];               \
+  const reg_t lhs = vm_read(); \
+  const reg_t dest = vm_read(); \
+  reg[dest] = op reg[lhs];               \
   DISPATCH();                           \
 } while(false)
 
 #define BRANCH(op) do                   \
 {                                       \
-  register const reg_t lhs = vm_read(); \
-  register const reg_t ret = vm_read(); \
+  const reg_t lhs = vm_read(); \
+  const reg_t dest = vm_read(); \
   if(reg[lhs] op 0)                     \
-    pc = ret;                           \
+    pc = dest;                           \
   DISPATCH();                           \
 } while(false)
 
 #define BRANCH_CMP(op) do               \
 {                                       \
-  register const reg_t lhs = vm_read(); \
-  register const reg_t rhs = vm_read(); \
-  register const reg_t ret = vm_read(); \
+  const reg_t lhs = vm_read(); \
+  const reg_t rhs = vm_read(); \
+  const reg_t dest = vm_read(); \
   if(!(reg[lhs] op reg[rhs]))           \
-    pc = ret;                           \
+    pc = dest;                           \
   DISPATCH();                           \
 } while(false)
 
-void run(reg_t *data) {
-
+void dsvm_run(reg_t *data) {
   reg_t _reg[RVM_SIZE];
   Frame frames[RVM_SIZE];
 
-  register uint32_t nframe = 0;
-  register reg_t *reg = _reg;
-  register uint32_t pc = 0;
+  reg_t *reg = _reg;
+  uint32_t nframe = 0;
+  uint32_t pc = 0;
 
   static const void *dispatch[dsop_max] = {
     &&_dsop_imm,
@@ -74,16 +78,15 @@ void run(reg_t *data) {
     &&_dsop_add, &&_dsop_sub, &&_dsop_mul,
     &&_dsop_div, &&_dsop_mod,
 
-    &&_dsop_eq, &&_dsop_ne,
-    &&_dsop_gt, &&_dsop_ge, &&_dsop_lt, &&_dsop_le,
+    &&_dsop_eq, &&_dsop_ne, &&_dsop_land, &&_dsop_lor,
 
-    &&_dsop_land, &&_dsop_lor,
+    &&_dsop_gt, &&_dsop_ge, &&_dsop_lt, &&_dsop_le,
 
     &&_dsop_band, &&_dsop_bor, &&_dsop_bxor,
     &&_dsop_blshift, &&_dsop_brshift,
 
     &&_dsop_inc, &&_dsop_dec,
-    &&_dsop_neg, &&_dsop_cmp, &&_dsop_cmp,
+    &&_dsop_neg, &&_dsop_not, &&_dsop_cmp,
 
     &&_dsop_call, &&_dsop_return,
 
@@ -94,13 +97,12 @@ void run(reg_t *data) {
 
     &&_dsop_end,
   };
-
   DISPATCH();
   _dsop_imm:
 {
-  register const reg_t from = vm_read();
-  register const reg_t ret = vm_read();
-  reg[ret] = from;
+  const reg_t lhs = vm_read();
+  const reg_t dest = vm_read();
+  reg[dest] = lhs;
   DISPATCH();
 }
 
@@ -125,11 +127,6 @@ void run(reg_t *data) {
   _dsop_mod:
   BINARY(%);
 
-  _dsop_land:
-  BINARY(&&);
-  _dsop_lor:
-  BINARY(||);
-
   _dsop_band:
   BINARY(&);
   _dsop_bor:
@@ -145,6 +142,11 @@ void run(reg_t *data) {
   BINARY(==);
   _dsop_ne:
   BINARY(!=);
+  _dsop_land:
+  BINARY(&&);
+  _dsop_lor:
+  BINARY(||);
+
   _dsop_gt:
   BINARY(>);
   _dsop_ge:
@@ -167,8 +169,8 @@ void run(reg_t *data) {
 
   _dsop_call:
 {
-  register reg_t *const _data = (reg_t*)vm_read();
-  register const reg_t offset = vm_read();
+  reg_t *const _data = (reg_t*)vm_read();
+  const reg_t offset = vm_read();
   frames[nframe++] = (Frame){ .offset = reg - _reg, .data = data, .pc = pc };
   reg += offset;
   pc = 0;
@@ -186,10 +188,8 @@ void run(reg_t *data) {
 
   _dsop_jump:
 {
-  register const reg_t lhs = vm_read();
-  register const reg_t ret = vm_read();
-  if(!reg[lhs])
-    pc = ret;
+  const reg_t dest = vm_read();
+  pc = dest;
   DISPATCH();
 }
   _dsop_eq_branch:
@@ -206,5 +206,16 @@ void run(reg_t *data) {
   BRANCH_CMP(<=);
 
   _dsop_end:
-  printf("result %u\n", reg[0]);
+  printf("result %lu\n", reg[0]);
+}
+
+reg_t *dscode_start(void) {
+  return _code + _code_count;
+}
+
+reg_t *code_alloc(const ds_opcode op, const unsigned int n) {
+  reg_t *const code = _code + _code_count;
+  *code = op;
+  _code_count += n + 1;
+  return code;
 }
