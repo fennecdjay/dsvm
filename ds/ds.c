@@ -91,9 +91,9 @@ void dsvm_run(reg_t *data) {
     &&_dsop_call, &&_dsop_return,
 
     &&_dsop_jump,
-    &&_dsop_eq_branch, &&_dsop_ne_branch,
-    &&_dsop_gt_branch, &&_dsop_ge_branch,
-    &&_dsop_lt_branch, &&_dsop_le_branch,
+    &&_dsop_eq_jump, &&_dsop_ne_jump,
+    &&_dsop_gt_jump, &&_dsop_ge_jump,
+    &&_dsop_lt_jump, &&_dsop_le_jump,
 
     &&_dsop_end,
   };
@@ -192,17 +192,17 @@ void dsvm_run(reg_t *data) {
   pc = dest;
   DISPATCH();
 }
-  _dsop_eq_branch:
+  _dsop_eq_jump:
   BRANCH_CMP(==);
-  _dsop_ne_branch:
+  _dsop_ne_jump:
   BRANCH_CMP(!=);
-  _dsop_gt_branch:
+  _dsop_gt_jump:
   BRANCH_CMP(>);
-  _dsop_ge_branch:
+  _dsop_ge_jump:
   BRANCH_CMP(>=);
-  _dsop_lt_branch:
+  _dsop_lt_jump:
   BRANCH_CMP(<);
-  _dsop_le_branch:
+  _dsop_le_jump:
   BRANCH_CMP(<=);
 
   _dsop_end:

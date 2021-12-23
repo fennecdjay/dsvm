@@ -699,7 +699,7 @@ static const flex_int16_t yy_chk[134] =
 #define IBINOP(a) do { yylval->op = dsop_##a; return DS_IBINOP; } while(0)
 #define UNOP(a)   do { yylval->op = dsop_##a; return DS_UNOP;   } while(0)
 #define _JUMP()   do { yylval->op = dsop_jump; return DS_JUMP;   } while(0)
-#define JUMP(a)   do { yylval->op = dsop_##a##_branch; return DS_JUMP;   } while(0)
+#define JUMP(a)   do { yylval->op = dsop_##a##_jump; return DS_JUMP;   } while(0)
 #define YYSTYPE DSSTYPE
 #line 704 "generated/dsc_lexer.c"
 #define YY_NO_INPUT 1

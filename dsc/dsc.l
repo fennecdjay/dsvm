@@ -10,7 +10,7 @@ SPACE [ \t\n\r]
 #define IBINOP(a) do { yylval->op = dsop_##a; return DS_IBINOP; } while(0)
 #define UNOP(a)   do { yylval->op = dsop_##a; return DS_UNOP;   } while(0)
 #define _JUMP()   do { yylval->op = dsop_jump; return DS_JUMP;   } while(0)
-#define JUMP(a)   do { yylval->op = dsop_##a##_branch; return DS_JUMP;   } while(0)
+#define JUMP(a)   do { yylval->op = dsop_##a##_jump; return DS_JUMP;   } while(0)
 #define YYSTYPE DSSTYPE
 %}
 %option prefix="ds"

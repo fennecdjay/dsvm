@@ -9,5 +9,5 @@ fib:
   return
 
 main:
-	imm 40 $0
+	imm 35 $0
   call fib 0

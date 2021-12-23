@@ -27,9 +27,9 @@ typedef enum ds_opcode {
   dsop_call, dsop_return,
 
   dsop_jump,
-  dsop_eq_branch, dsop_ne_branch,
-  dsop_gt_branch, dsop_ge_branch,
-  dsop_lt_branch, dsop_le_branch,
+  dsop_eq_jump, dsop_ne_jump,
+  dsop_gt_jump, dsop_ge_jump,
+  dsop_lt_jump, dsop_le_jump,
 
   dsop_end,
   dsop_max,
@@ -112,8 +112,8 @@ dscode_op_imm(mul);
 dscode_op_imm(div);
 dscode_op_imm(mod);
 
-static inline reg_t *dscode_lt_branch(const reg_t src, const reg_t imm, const reg_t dest) {
-  reg_t *const code = code_alloc(dsop_lt_branch, 3);
+static inline reg_t *dscode_lt_jump(const reg_t src, const reg_t imm, const reg_t dest) {
+  reg_t *const code = code_alloc(dsop_lt_jump, 3);
   code[1] = src;
   code[2] = imm;
   code[3] = dest;
