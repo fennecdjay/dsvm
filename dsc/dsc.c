@@ -5,6 +5,19 @@
 #include "dsc_parser.h"
 #include "dsc_lexer.h"
 
+typedef struct {
+  char  *name;
+  reg_t *code;
+} Fun;
+
+#define FUN_SIZE 4096
+static Fun fun_data[FUN_SIZE];
+static uint32_t fun_count;
+
+static void fun_alloc(char *name) {
+  fun_data[fun_count++] = (Fun) { .name = name, .code = dscode_start() };
+}
+
 static void dsc_emit_binary(const DsStmt *stmt) {
   dscode_binary(stmt->op, stmt->num0, stmt->num1, stmt->dest);
 }
@@ -22,24 +35,6 @@ static void dsc_emit_jump(const DsStmt *stmt) {
     dscode_jump(stmt->dest);
   else
     dscode_jump_op(stmt->op, stmt->num0, stmt->num1, stmt->dest);
-}
-/*
-static void dsc_emit_label(const DsStmt *stmt) {
-  dscode_label(stmt->dest);
-}
-*/
-
-typedef struct {
-  char  *name;
-  reg_t *code;
-} Fun;
-
-#define FUN_SIZE 4096
-static Fun fun_data[FUN_SIZE];
-static uint32_t fun_count;
-
-static void fun_alloc(char *name) {
-  fun_data[fun_count++] = (Fun) { .name = name, .code = dscode_start() };
 }
 
 static void dsc_emit_call(const DsStmt *stmt) {
@@ -68,7 +63,6 @@ static const dsc_t functions[dsop_max] = {
   dsc_emit_unary,
   dsc_emit_imm,
   dsc_emit_jump,
-//  dsc_label,
   dsc_emit_call,
   dsc_emit_return,
   dsc_emit_function,

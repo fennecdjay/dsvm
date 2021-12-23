@@ -1,3 +1,4 @@
 *.o
 *.a
-ds_test
+ds/ds_test
+dsc/dsc
