@@ -91,13 +91,12 @@ static inline reg_t *dscode_unary(const ds_opcode op, const reg_t src, const reg
   return code;
 }
 
-ANN static inline reg_t *dscode_jump(const reg_t* new_code) {
-  reg_t *const code = code_alloc(dsop_jump, 1);
-  code[3] = (reg_t)new_code;
-  return code;
-}
-
 ANN static inline reg_t *dscode_jump_op(const ds_opcode op, const reg_t src, const reg_t imm, const reg_t *new_code) {
+  if(op == dsop_max) {
+    reg_t *const code = code_alloc(dsop_jump, 1);
+    code[1] = (reg_t)new_code;
+    return code;
+  }
   reg_t *const code = code_alloc(op, 3);
   code[1] = src;
   code[2] = imm;

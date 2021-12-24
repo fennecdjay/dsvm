@@ -14,40 +14,40 @@ static size_t _code_count;
 
 #define vm_read() (*code++)
 
-#define BINARY_IMM(op) do                \
-{                                       \
-  const reg_t lhs  = vm_read(); \
-  const reg_t rhs  = vm_read(); \
-  const reg_t dest = vm_read(); \
-  reg[dest] = reg[lhs] op rhs;           \
-  DISPATCH();                           \
+#define BINARY_IMM(op) do           \
+{                                   \
+  const reg_t lhs  = vm_read();     \
+  const reg_t rhs  = vm_read();     \
+  const reg_t dest = vm_read();     \
+  reg[dest] = reg[lhs] op rhs;      \
+  DISPATCH();                       \
 } while(0)
 
-#define BINARY(op) do                    \
-{                                       \
-  const reg_t lhs = vm_read(); \
-  const reg_t rhs = vm_read(); \
-  const reg_t dest = vm_read(); \
-  reg[dest] = reg[lhs] op reg[rhs];      \
-  DISPATCH();                           \
+#define BINARY(op) do               \
+{                                   \
+  const reg_t lhs = vm_read();      \
+  const reg_t rhs = vm_read();      \
+  const reg_t dest = vm_read();     \
+  reg[dest] = reg[lhs] op reg[rhs]; \
+  DISPATCH();                       \
 } while(0)
 
-#define UNARY(op) do                    \
-{                                       \
-  const reg_t lhs = vm_read(); \
-  const reg_t dest = vm_read(); \
-  reg[dest] = op reg[lhs];               \
-  DISPATCH();                           \
+#define UNARY(op) do                \
+{                                   \
+  const reg_t lhs = vm_read();      \
+  const reg_t dest = vm_read();     \
+  reg[dest] = op reg[lhs];          \
+  DISPATCH();                       \
 } while(0)
 
-#define JUMP_OP(op) do               \
-{                                       \
-  const reg_t lhs = vm_read(); \
-  const reg_t rhs = vm_read(); \
-  const reg_t dest = vm_read(); \
-  if(!(reg[lhs] op reg[rhs]))           \
-    code = (reg_t*)dest;                           \
-  DISPATCH();                           \
+#define JUMP_OP(op) do              \
+{                                   \
+  const reg_t lhs = vm_read();      \
+  const reg_t rhs = vm_read();      \
+  const reg_t dest = vm_read();     \
+  if(!(reg[lhs] op reg[rhs]))       \
+    code = (reg_t*)dest;            \
+  DISPATCH();                       \
 } while(0)
 
 ANN void dsvm_run(reg_t *code) {

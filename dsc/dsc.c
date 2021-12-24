@@ -32,10 +32,7 @@ static void dsc_emit_imm(const DsStmt *stmt) {
 
 static void dsc_emit_jump(const DsStmt *stmt) {
   reg_t *const code = fun_data[fun_count-1].code + stmt->dest;
-  if(stmt->op == dsop_max)
-    dscode_jump(code);
-  else
-    dscode_jump_op(stmt->op, stmt->num0, stmt->num1, code);
+  dscode_jump_op(stmt->op, stmt->num0, stmt->num1, code);
 }
 
 static void dsc_emit_call(const DsStmt *stmt) {
