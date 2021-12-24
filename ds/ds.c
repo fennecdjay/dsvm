@@ -40,15 +40,6 @@ static size_t _code_count;
   DISPATCH();                           \
 } while(0)
 
-#define BRANCH(op) do                   \
-{                                       \
-  const reg_t lhs = vm_read(); \
-  const reg_t dest = vm_read(); \
-  if(reg[lhs] op 0)                     \
-    code = dest;                           \
-  DISPATCH();                           \
-} while(0)
-
 #define JUMP_OP(op) do               \
 {                                       \
   const reg_t lhs = vm_read(); \

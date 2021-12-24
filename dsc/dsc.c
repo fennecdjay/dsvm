@@ -17,15 +17,19 @@ static uint32_t fun_count;
 static void dsc_emit_binary(const DsStmt *stmt) {
   dscode_binary(stmt->op, stmt->num0, stmt->num1, stmt->dest);
 }
+
 static void dsc_emit_ibinary(const DsStmt *stmt) {
   dscode_ibinary(stmt->op, stmt->num0, stmt->num1, stmt->dest);
 }
+
 static void dsc_emit_unary(const DsStmt *stmt) {
   dscode_unary(stmt->op, stmt->num0, stmt->dest);
 }
+
 static void dsc_emit_imm(const DsStmt *stmt) {
   dscode_imm(stmt->num0, stmt->dest);
 }
+
 static void dsc_emit_jump(const DsStmt *stmt) {
   reg_t *const code = fun_data[fun_count-1].code + stmt->dest;
   if(stmt->op == dsop_max)
@@ -48,6 +52,7 @@ static void dsc_emit_return(const DsStmt *stmt) {
   (void)stmt;
   dscode_return();
 }
+
 static void dsc_emit_function(const DsStmt *stmt) {
   fun_data[fun_count++] = (Fun) { .name = stmt->name, .code = dscode_start() };
 }

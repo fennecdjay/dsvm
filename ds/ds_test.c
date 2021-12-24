@@ -14,13 +14,13 @@ static reg_t *make_main(const char *arg, const reg_t *fib) {
 
 static reg_t *make_fib(void) {
   reg_t *const code = dscode_imm(2, 1);
-  (void)dscode_lt_jump(0, 1, code + 8);
+  (void)dscode_jump_op(dsop_lt_jump, 0, 1, code + 8);
   (void)dscode_return();
-  (void)dscode_sub_imm(0, 2, 1);
+  (void)dscode_ibinary(dsop_sub, 0, 2, 1);
   (void)dscode_call(code, 1);
-  (void)dscode_sub_imm(0, 1, 3);
+  (void)dscode_ibinary(dsop_sub, 0, 1, 3);
   (void)dscode_call(code, 3);
-  (void)dscode_add(1, 3, 0);
+  (void)dscode_binary(dsop_add, 1, 3, 0);
   (void)dscode_return();
   return code;
 }

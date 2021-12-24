@@ -91,102 +91,18 @@ static inline reg_t *dscode_unary(const ds_opcode op, const reg_t src, const reg
   return code;
 }
 
-#define dscode_op_imm(a)\
-static inline reg_t *dscode_##a##_imm(const reg_t src, const reg_t imm, const reg_t dest) {\
-  reg_t *const code = code_alloc(dsop_##a##_imm, 3);\
-  code[1] = src;\
-  code[2] = imm;\
-  code[3] = dest;\
-  return code;\
-}
-
-dscode_op_imm(add);
-dscode_op_imm(sub);
-dscode_op_imm(mul);
-dscode_op_imm(div);
-dscode_op_imm(mod);
-
-static inline reg_t *dscode_lt_jump(const reg_t src, const reg_t imm, const reg_t *new_code) {
-  reg_t *const code = code_alloc(dsop_lt_jump, 3);
-  code[1] = src;
-  code[2] = imm;
-  code[3] = (reg_t)new_code;
-  return code;
-}
-
-#define dscode_op(a) \
-static inline reg_t *dscode_##a(const reg_t src, const reg_t imm, const reg_t dest) {\
-  reg_t *const code = code_alloc(dsop_##a, 3);\
-  code[1] = src;\
-  code[2] = imm;\
-  code[3] = dest;\
-  return code;\
-}
-
-dscode_op(add);
-dscode_op(sub);
-dscode_op(mul);
-dscode_op(div);
-dscode_op(mod);
-
-dscode_op(eq);
-dscode_op(ne);
-dscode_op(land);
-dscode_op(lor);
-
-dscode_op(ge);
-dscode_op(gt);
-dscode_op(lt);
-dscode_op(le);
-
-dscode_op(band);
-dscode_op(bor);
-dscode_op(bxor);
-dscode_op(blshift);
-dscode_op(brshift);
-
-#define _dscode_unary(a) \
-static inline reg_t *dscode_##a(const reg_t src, const reg_t dest) {\
-  reg_t *const code = code_alloc(dsop_##a, 2);\
-  code[1] = src;\
-  code[3] = dest;\
-  return code;\
-}
-
-_dscode_unary(inc);
-_dscode_unary(dec);
-_dscode_unary(neg);
-_dscode_unary(not);
-_dscode_unary(cmp);
-
-static inline reg_t *dscode_jump(const reg_t* new_code) {
+ANN static inline reg_t *dscode_jump(const reg_t* new_code) {
   reg_t *const code = code_alloc(dsop_jump, 1);
   code[3] = (reg_t)new_code;
   return code;
 }
 
-static inline reg_t *dscode_jump_op(const ds_opcode op, const reg_t src, const reg_t imm, const reg_t *new_code) {
+ANN static inline reg_t *dscode_jump_op(const ds_opcode op, const reg_t src, const reg_t imm, const reg_t *new_code) {
   reg_t *const code = code_alloc(op, 3);
   code[1] = src;
   code[2] = imm;
   code[3] = (reg_t)new_code;
   return code;
 }
-
-#define dscode_op_jump(a) \
-static inline reg_t *dscode_jump_##a(const reg_t src, const reg_t imm, const reg_t *new_code) {\
-  reg_t *const code = code_alloc(dsop_##a, 3);\
-  code[1] = src;\
-  code[2] = imm;\
-  code[3] = (reg_t)new_code;\
-  return code;\
-}
-
-dscode_op_jump(eq);
-dscode_op_jump(ne);
-dscode_op_jump(gt);
-dscode_op_jump(ge);
-dscode_op_jump(lt);
-dscode_op_jump(le);
 
 reg_t *dscode_start(void);
