@@ -66,6 +66,7 @@ ANN void dsvm_run(reg_t *code) {
 #if defined(__amd64__)
   register reg_t *reg __asm("r8") = _reg;
 #elif defined(__aarch64__)
+  register reg_t *reg __asm("x8") = _reg;
 #else
   reg_t *reg = _reg;
 #endif

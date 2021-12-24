@@ -1,5 +1,9 @@
 CFLAGS += -Wall -Wextra
-CFLAGS += -O2 -march=native
+CFLAGS += -O2
+
+ifeq ($(shell uname -m), x86_64)
+CFLAGS += -march=native
+endif
 
 all: main
 
