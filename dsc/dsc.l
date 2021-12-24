@@ -22,7 +22,7 @@ SPACE [ \t\n\r]
 
 #.*\n        {}
 
-[a-zA-Z_][a-zA-Z_0-9]*":" { yytext[yyleng-1] = '\0'; yylval->id = bump_alloc(yytext); return DS_FUN; }
+[a-zA-Z_][a-zA-Z_0-9]*":" { yytext[yyleng-1] = '\0'; yylval->id = string_alloc(yytext); return DS_FUN; }
 
 "imm"        { return DS_IMM; }
 
@@ -67,7 +67,7 @@ SPACE [ \t\n\r]
 "$"{NUM}*     { yylval->num = strtol(yytext + 1, NULL, 10); return DS_REG; }
 {NUM}*       { yylval->num = strtol(yytext, NULL, 10); return DS_NUM; }
 
-[a-zA-Z_][a-zA-Z_0-9]* { yylval->id = bump_alloc(yytext); return DS_ID; }
+[a-zA-Z_][a-zA-Z_0-9]* { yylval->id = string_alloc(yytext); return DS_ID; }
 
 {SPACE}*     {}
 .            { puts("unexpected character"); return 1; }

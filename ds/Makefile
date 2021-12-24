@@ -1,8 +1,5 @@
 CFLAGS += -Wall -Wextra
-#CFLAGS += -O2 -flto
-CFLAGS += -O3
-
-#LDFLAGS += -flto
+CFLAGS += -O2 -march=native
 
 all: main
 
@@ -11,7 +8,7 @@ libds.a: ds.c ds.h
 	ar rcs libds.a ds.o
 
 main: libds.a
-	${CC} -flto -O2 ds_test.c libds.a -o ds_test
+	${CC} ${CFLAGS} ds_test.c libds.a -o ds_test
 
 clean:
 	rm -f *.o *.a ds_test

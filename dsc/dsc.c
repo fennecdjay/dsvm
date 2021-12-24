@@ -14,10 +14,6 @@ typedef struct {
 static Fun fun_data[FUN_SIZE];
 static uint32_t fun_count;
 
-static void fun_alloc(char *name) {
-  fun_data[fun_count++] = (Fun) { .name = name, .code = dscode_start() };
-}
-
 static void dsc_emit_binary(const DsStmt *stmt) {
   dscode_binary(stmt->op, stmt->num0, stmt->num1, stmt->dest);
 }
@@ -31,15 +27,16 @@ static void dsc_emit_imm(const DsStmt *stmt) {
   dscode_imm(stmt->num0, stmt->dest);
 }
 static void dsc_emit_jump(const DsStmt *stmt) {
+  reg_t *const code = fun_data[fun_count-1].code + stmt->dest;
   if(stmt->op == dsop_max)
-    dscode_jump(stmt->dest);
+    dscode_jump(code);
   else
-    dscode_jump_op(stmt->op, stmt->num0, stmt->num1, stmt->dest);
+    dscode_jump_op(stmt->op, stmt->num0, stmt->num1, code);
 }
 
 static void dsc_emit_call(const DsStmt *stmt) {
   for(uint32_t i =0; i < fun_count; i++) {
-    if(stmt->id0 == fun_data[i].name) {
+    if(stmt->name == fun_data[i].name) {
       dscode_call(fun_data[i].code, stmt->dest);
       return;
     }
@@ -52,7 +49,7 @@ static void dsc_emit_return(const DsStmt *stmt) {
   dscode_return();
 }
 static void dsc_emit_function(const DsStmt *stmt) {
-  fun_alloc(stmt->id0);
+  fun_data[fun_count++] = (Fun) { .name = stmt->name, .code = dscode_start() };
 }
 
 typedef void (*dsc_t)(const DsStmt*);
@@ -71,7 +68,7 @@ static const dsc_t functions[dsop_max] = {
 #define BUMP_SIZE 4096
 static char _data[BUMP_SIZE];
 
-char* bump_alloc(const char *c) {
+char* string_alloc(const char *c) {
   char *data = _data;
   do {
     if(*data == '\0') break;
@@ -103,14 +100,14 @@ int main(int argc, char **argv) {
   dslex_init(&ds.scanner);
   dsset_extra(&ds, ds.scanner);
   for (int i = 1; i < argc; i++) {
-    ds.file= strcmp(argv[i], "-") ?
+    FILE *file= strcmp(argv[i], "-") ?
       fopen(argv[i], "r"):
       stdin;
-    if(!ds.file) continue;
-    dsset_in(ds.file, ds.scanner);
+    if(!file) continue;
+    dsset_in(file, ds.scanner);
     ds.stmts = stmt_start();
     dsparse(&ds);
-    fclose(ds.file);
+    fclose(file);
     for(size_t i = 0; i < ds.n; i++) {
       const DsStmt stmt = ds.stmts[i];
       functions[stmt.type](&stmt);

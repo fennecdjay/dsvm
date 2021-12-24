@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-
 typedef enum {
   dsc_binary,
   dsc_ibinary,
@@ -15,11 +14,11 @@ typedef enum {
 
 typedef struct {
   union {
-    char     *id0;
-    uintptr_t num0;
+    char  *name;
+    reg_t num0;
   };
-  uintptr_t num1;
-  uintptr_t dest;
+  reg_t num1;
+  reg_t dest;
   dsc_stmt_type type;
   ds_opcode op;
 } DsStmt;
@@ -27,12 +26,11 @@ typedef struct {
 typedef struct DsScanner {
   void *scanner;
   DsStmt *stmts;
-  FILE *file;
-  unsigned int n;
-  unsigned int cap;
+  uint32_t n;
+  uint32_t cap;
 } DsScanner;
 
-char* bump_alloc(const char*);
+char *string_alloc(const char*);
 void stmt_alloc();
 DsStmt *stmt_start(void);
 #define YYSTYPE DSSTYPE

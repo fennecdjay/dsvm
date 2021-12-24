@@ -1,5 +1,8 @@
 CFLAGS += -Wall -Wextra
-CFLAGS += -fPIC -I. -Igenerated -I../ds
+CFLAGS += -fPIC -I. -Igenerated -I../ds -march=native
+CFLAGS += -O3 -flto
+
+LDFLAGS += -flto
 
 all: lib dsc
 

@@ -14,7 +14,7 @@ static reg_t *make_main(const char *arg, const reg_t *fib) {
 
 static reg_t *make_fib(void) {
   reg_t *const code = dscode_imm(2, 1);
-  (void)dscode_lt_jump(0, 1, 8);
+  (void)dscode_lt_jump(0, 1, code + 8);
   (void)dscode_return();
   (void)dscode_sub_imm(0, 2, 1);
   (void)dscode_call(code, 1);

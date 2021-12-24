@@ -1044,7 +1044,7 @@ YY_RULE_SETUP
 case 2:
 YY_RULE_SETUP
 #line 25 "dsc.l"
-{ yytext[yyleng-1] = '\0'; yylval->id = bump_alloc(yytext); return DS_FUN; }
+{ yytext[yyleng-1] = '\0'; yylval->id = string_alloc(yytext); return DS_FUN; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
@@ -1219,7 +1219,7 @@ YY_RULE_SETUP
 case 37:
 YY_RULE_SETUP
 #line 70 "dsc.l"
-{ yylval->id = bump_alloc(yytext); return DS_ID; }
+{ yylval->id = string_alloc(yytext); return DS_ID; }
 	YY_BREAK
 case 38:
 /* rule 38 can match eol */

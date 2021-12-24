@@ -59,9 +59,9 @@ statement:
     { MAKE_STMT(jump,    .op = $1, .num0 = $2,  .num1 = $3, .dest = $4); } |
   "imm"     "<integer>" "<register>"
     { MAKE_STMT(imm,     .num0 = $2,  .dest = $3); } |
-  "<function>" { MAKE_STMT(function, .id0 = $1); } |
+  "<function>" { MAKE_STMT(function, .name = $1); } |
   "call"    "<id>"       "<integer>"
-    { MAKE_STMT(call,    .id0 = $2,   .dest = $3); } |
+    { MAKE_STMT(call,    .name = $2,   .dest = $3); } |
   "return"
     { MAKE_STMT(return); }
 

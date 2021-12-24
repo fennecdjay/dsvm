@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define ANN       __attribute__((nonnull))
+
 typedef uintptr_t reg_t;
 
 typedef enum ds_opcode {
@@ -35,22 +37,14 @@ typedef enum ds_opcode {
   dsop_max,
 } ds_opcode;
 
-typedef struct RvmInstr {
-  reg_t op;
-  reg_t lhs;
-  reg_t rhs;
-  reg_t ret;
-} RvmInstr;
-
 typedef struct {
-  uintptr_t *data;
-  uint32_t  offset;
-  uint32_t  pc;
+  reg_t *code;
+  reg_t  *reg;
 } Frame;
 
-void dsvm_run(reg_t *);
+ANN void dsvm_run(reg_t *);
 
-reg_t *code_alloc(const ds_opcode, const unsigned int);
+reg_t *code_alloc(const ds_opcode, const uint32_t);
 
 static inline reg_t *dscode_imm(const reg_t imm, const reg_t dest) {
   reg_t *const code = code_alloc(dsop_imm, 2);
@@ -59,7 +53,7 @@ static inline reg_t *dscode_imm(const reg_t imm, const reg_t dest) {
   return code;
 }
 
-static inline reg_t *dscode_call(const reg_t *func, const reg_t offset) {
+ANN static inline reg_t *dscode_call(const reg_t *func, const reg_t offset) {
   reg_t *const code = code_alloc(dsop_call, 2);
   code[1] = (reg_t)func;
   code[2] = offset;
@@ -112,11 +106,11 @@ dscode_op_imm(mul);
 dscode_op_imm(div);
 dscode_op_imm(mod);
 
-static inline reg_t *dscode_lt_jump(const reg_t src, const reg_t imm, const reg_t dest) {
+static inline reg_t *dscode_lt_jump(const reg_t src, const reg_t imm, const reg_t *new_code) {
   reg_t *const code = code_alloc(dsop_lt_jump, 3);
   code[1] = src;
   code[2] = imm;
-  code[3] = dest;
+  code[3] = (reg_t)new_code;
   return code;
 }
 
@@ -165,26 +159,26 @@ _dscode_unary(neg);
 _dscode_unary(not);
 _dscode_unary(cmp);
 
-static inline reg_t *dscode_jump(const reg_t dest) {
+static inline reg_t *dscode_jump(const reg_t* new_code) {
   reg_t *const code = code_alloc(dsop_jump, 1);
-  code[3] = dest;
+  code[3] = (reg_t)new_code;
   return code;
 }
 
-static inline reg_t *dscode_jump_op(const ds_opcode op, const reg_t src, const reg_t imm, const reg_t dest) {
+static inline reg_t *dscode_jump_op(const ds_opcode op, const reg_t src, const reg_t imm, const reg_t *new_code) {
   reg_t *const code = code_alloc(op, 3);
   code[1] = src;
   code[2] = imm;
-  code[3] = dest;
+  code[3] = (reg_t)new_code;
   return code;
 }
 
 #define dscode_op_jump(a) \
-static inline reg_t *dscode_jump_##a(const reg_t src, const reg_t imm, const reg_t dest) {\
+static inline reg_t *dscode_jump_##a(const reg_t src, const reg_t imm, const reg_t *new_code) {\
   reg_t *const code = code_alloc(dsop_##a, 3);\
   code[1] = src;\
   code[2] = imm;\
-  code[3] = dest;\
+  code[3] = (reg_t)new_code;\
   return code;\
 }
 

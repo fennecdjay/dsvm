@@ -1,20 +1,18 @@
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
-
 #include "ds.h"
 
-#define BUMP_SIZE 4096
+#define _SIZE 4096
+
+#define BUMP_SIZE _SIZE
 
 static reg_t _code[BUMP_SIZE];
 static size_t _code_count;
 
-#define RVM_SIZE 4096
+#define RVM_SIZE _SIZE
 
 #define DISPATCH() goto *dispatch[vm_read()];
 
-#define vm_read() (data[pc++])
+#define vm_read() (*code++)
 
 #define BINARY_IMM(op) do                \
 {                                       \
@@ -23,7 +21,7 @@ static size_t _code_count;
   const reg_t dest = vm_read(); \
   reg[dest] = reg[lhs] op rhs;           \
   DISPATCH();                           \
-} while(false)
+} while(0)
 
 #define BINARY(op) do                    \
 {                                       \
@@ -32,7 +30,7 @@ static size_t _code_count;
   const reg_t dest = vm_read(); \
   reg[dest] = reg[lhs] op reg[rhs];      \
   DISPATCH();                           \
-} while(false)
+} while(0)
 
 #define UNARY(op) do                    \
 {                                       \
@@ -40,34 +38,39 @@ static size_t _code_count;
   const reg_t dest = vm_read(); \
   reg[dest] = op reg[lhs];               \
   DISPATCH();                           \
-} while(false)
+} while(0)
 
 #define BRANCH(op) do                   \
 {                                       \
   const reg_t lhs = vm_read(); \
   const reg_t dest = vm_read(); \
   if(reg[lhs] op 0)                     \
-    pc = dest;                           \
+    code = dest;                           \
   DISPATCH();                           \
-} while(false)
+} while(0)
 
-#define BRANCH_CMP(op) do               \
+#define JUMP_OP(op) do               \
 {                                       \
   const reg_t lhs = vm_read(); \
   const reg_t rhs = vm_read(); \
   const reg_t dest = vm_read(); \
   if(!(reg[lhs] op reg[rhs]))           \
-    pc = dest;                           \
+    code = (reg_t*)dest;                           \
   DISPATCH();                           \
-} while(false)
+} while(0)
 
-void dsvm_run(reg_t *data) {
-  reg_t _reg[RVM_SIZE];
+ANN void dsvm_run(reg_t *code) {
+  static reg_t _reg[RVM_SIZE];
   Frame frames[RVM_SIZE];
 
+#if defined(__amd64__)
+  register reg_t *reg __asm("r8") = _reg;
+#elif defined(__aarch64__)
+#else
   reg_t *reg = _reg;
+#endif
+
   uint32_t nframe = 0;
-  uint32_t pc = 0;
 
   static const void *dispatch[dsop_max] = {
     &&_dsop_imm,
@@ -169,41 +172,39 @@ void dsvm_run(reg_t *data) {
 
   _dsop_call:
 {
-  reg_t *const _data = (reg_t*)vm_read();
+  reg_t *const new_code = (reg_t*)vm_read();
   const reg_t offset = vm_read();
-  frames[nframe++] = (Frame){ .offset = reg - _reg, .data = data, .pc = pc };
+  frames[nframe++] = (Frame){ .reg = reg, .code = code };
   reg += offset;
-  pc = 0;
-  data = _data;
-  goto *dispatch[vm_read()];
+  code = new_code;
+  DISPATCH();
 }
   _dsop_return:
 {
-  nframe--;
-  data = frames[nframe].data;
-  reg = _reg + frames[nframe].offset;
-  pc = frames[nframe].pc;
+  const Frame frame = frames[--nframe];
+  code = frame.code;
+  reg = frame.reg;
   DISPATCH();
 }
 
   _dsop_jump:
 {
   const reg_t dest = vm_read();
-  pc = dest;
+  code = (reg_t*)dest;
   DISPATCH();
 }
   _dsop_eq_jump:
-  BRANCH_CMP(==);
+  JUMP_OP(==);
   _dsop_ne_jump:
-  BRANCH_CMP(!=);
+  JUMP_OP(!=);
   _dsop_gt_jump:
-  BRANCH_CMP(>);
+  JUMP_OP(>);
   _dsop_ge_jump:
-  BRANCH_CMP(>=);
+  JUMP_OP(>=);
   _dsop_lt_jump:
-  BRANCH_CMP(<);
+  JUMP_OP(<);
   _dsop_le_jump:
-  BRANCH_CMP(<=);
+  JUMP_OP(<=);
 
   _dsop_end:
   printf("result %lu\n", reg[0]);
@@ -213,7 +214,7 @@ reg_t *dscode_start(void) {
   return _code + _code_count;
 }
 
-reg_t *code_alloc(const ds_opcode op, const unsigned int n) {
+reg_t *code_alloc(const ds_opcode op, const uint32_t n) {
   reg_t *const code = _code + _code_count;
   *code = op;
   _code_count += n + 1;

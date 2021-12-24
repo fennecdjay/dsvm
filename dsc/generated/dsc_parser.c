@@ -1159,13 +1159,13 @@ yyreduce:
 
   case 11: /* statement: "<function>"  */
 #line 62 "dsc.y"
-               { MAKE_STMT(function, .id0 = (yyvsp[0].id)); }
+               { MAKE_STMT(function, .name = (yyvsp[0].id)); }
 #line 1164 "generated/dsc_parser.c"
     break;
 
   case 12: /* statement: "call" "<id>" "<integer>"  */
 #line 64 "dsc.y"
-    { MAKE_STMT(call,    .id0 = (yyvsp[-1].id),   .dest = (yyvsp[0].num)); }
+    { MAKE_STMT(call,    .name = (yyvsp[-1].id),   .dest = (yyvsp[0].num)); }
 #line 1170 "generated/dsc_parser.c"
     break;
 
