@@ -117,6 +117,7 @@ int main(int argc, char **argv) {
     ds.n = 0;
   }
   dslex_destroy(ds.scanner);
-  dsvm_run(fun_data[fun_count-1].code);
+  if(fun_count)
+    dsvm_run(fun_data[fun_count-1].code);
   return EXIT_SUCCESS;
 }
