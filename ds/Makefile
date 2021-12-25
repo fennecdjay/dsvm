@@ -1,5 +1,7 @@
 CFLAGS += -Wall -Wextra
 CFLAGS += -O2
+CFLAGS += -falign-labels
+#CFLAGS += -flto
 
 ifeq ($(shell uname -m), x86_64)
 CFLAGS += -march=native

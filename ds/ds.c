@@ -10,7 +10,7 @@ static size_t _code_count;
 
 #define RVM_SIZE _SIZE
 
-#define DISPATCH() goto *dispatch[vm_read()];
+#define DISPATCH() void **addr = *(void***)code;  code++; goto *addr;
 
 #define vm_read() (*code++)
 
@@ -40,7 +40,7 @@ static size_t _code_count;
   DISPATCH();                       \
 } while(0)
 
-#define JUMP_OP(op) do              \
+#define JUMP(op) do              \
 {                                   \
   const reg_t lhs = vm_read();      \
   const reg_t rhs = vm_read();      \
@@ -50,49 +50,16 @@ static size_t _code_count;
   DISPATCH();                       \
 } while(0)
 
-ANN void dsvm_run(reg_t *code) {
+__attribute__((nonnull(1)))
+void dsvm_run(reg_t *code, const reg_t *next) {
   static reg_t _reg[RVM_SIZE];
   Frame frames[RVM_SIZE];
-
-#if defined(__amd64__)
-  register reg_t *reg __asm("r8") = _reg;
-#elif defined(__aarch64__)
-  register reg_t *reg __asm("x8") = _reg;
-#else
   reg_t *reg = _reg;
-#endif
 
   uint32_t nframe = 0;
 
-  static const void *dispatch[dsop_max] = {
-    &&_dsop_imm,
-
-    &&_dsop_add_imm, &&_dsop_sub_imm, &&_dsop_mul_imm,
-    &&_dsop_div_imm, &&_dsop_mod_imm,
-
-    &&_dsop_add, &&_dsop_sub, &&_dsop_mul,
-    &&_dsop_div, &&_dsop_mod,
-
-    &&_dsop_eq, &&_dsop_ne, &&_dsop_land, &&_dsop_lor,
-
-    &&_dsop_gt, &&_dsop_ge, &&_dsop_lt, &&_dsop_le,
-
-    &&_dsop_band, &&_dsop_bor, &&_dsop_bxor,
-    &&_dsop_blshift, &&_dsop_brshift,
-
-    &&_dsop_inc, &&_dsop_dec,
-    &&_dsop_neg, &&_dsop_not, &&_dsop_cmp,
-
-    &&_dsop_call, &&_dsop_return,
-
-    &&_dsop_jump,
-    &&_dsop_eq_jump, &&_dsop_ne_jump,
-    &&_dsop_gt_jump, &&_dsop_ge_jump,
-    &&_dsop_lt_jump, &&_dsop_le_jump,
-
-    &&_dsop_end,
-  };
-  DISPATCH();
+  if(!next) {
+    DISPATCH();
   _dsop_imm:
 {
   const reg_t lhs = vm_read();
@@ -122,17 +89,6 @@ ANN void dsvm_run(reg_t *code) {
   _dsop_mod:
   BINARY(%);
 
-  _dsop_band:
-  BINARY(&);
-  _dsop_bor:
-  BINARY(|);
-  _dsop_bxor:
-  BINARY(^);
-  _dsop_blshift:
-  BINARY(<<);
-  _dsop_brshift:
-  BINARY(>>);
-
   _dsop_eq:
   BINARY(==);
   _dsop_ne:
@@ -151,6 +107,18 @@ ANN void dsvm_run(reg_t *code) {
   _dsop_le:
   BINARY(<=);
 
+
+  _dsop_band:
+  BINARY(&);
+  _dsop_bor:
+  BINARY(|);
+  _dsop_bxor:
+  BINARY(^);
+  _dsop_blshift:
+  BINARY(<<);
+  _dsop_brshift:
+  BINARY(>>);
+
   _dsop_inc:
   UNARY(++);
   _dsop_dec:
@@ -161,6 +129,27 @@ ANN void dsvm_run(reg_t *code) {
   UNARY(!);
   _dsop_cmp:
   UNARY(~);
+
+  _dsop_jump:
+{
+  const reg_t dest = vm_read();
+  code = (reg_t*)dest;
+  DISPATCH();
+}
+  _dsop_eq_jump:
+  JUMP(==);
+  _dsop_ne_jump:
+  JUMP(!=);
+  _dsop_gt_jump:
+  JUMP(>);
+  _dsop_ge_jump:
+  JUMP(>=);
+  _dsop_lt_jump:
+  JUMP(<);
+  _dsop_le_jump:
+  JUMP(<=);
+
+
 
   _dsop_call:
 {
@@ -178,28 +167,75 @@ ANN void dsvm_run(reg_t *code) {
   reg = frame.reg;
   DISPATCH();
 }
-
-  _dsop_jump:
-{
-  const reg_t dest = vm_read();
-  code = (reg_t*)dest;
-  DISPATCH();
-}
-  _dsop_eq_jump:
-  JUMP_OP(==);
-  _dsop_ne_jump:
-  JUMP_OP(!=);
-  _dsop_gt_jump:
-  JUMP_OP(>);
-  _dsop_ge_jump:
-  JUMP_OP(>=);
-  _dsop_lt_jump:
-  JUMP_OP(<);
-  _dsop_le_jump:
-  JUMP_OP(<=);
-
   _dsop_end:
   printf("result %lu\n", reg[0]);
+  return;
+}
+
+  // prepare code
+  #define PREPARE(a, b)       \
+    __dsop_##a:                     \
+    *code = (reg_t)&&_dsop_##a; \
+    code += b;\
+    if(code == next){ return;}            \
+    goto *dispatch[*code];              \
+
+  static const void *dispatch[dsop_max] = {
+     &&__dsop_imm,
+
+     &&__dsop_add_imm, &&__dsop_sub_imm, &&__dsop_mul_imm,
+     &&__dsop_div_imm, &&__dsop_mod_imm,
+
+     &&__dsop_add, &&__dsop_sub, &&__dsop_mul,
+     &&__dsop_div, &&__dsop_mod,
+
+     &&__dsop_eq, &&__dsop_ne, &&__dsop_land, &&__dsop_lor,
+
+     &&__dsop_gt, &&__dsop_ge, &&__dsop_lt, &&__dsop_le,
+
+     &&__dsop_band, &&__dsop_bor, &&__dsop_bxor,
+     &&__dsop_blshift, &&__dsop_brshift,
+
+     &&__dsop_inc, &&__dsop_dec,
+     &&__dsop_neg, &&__dsop_not, &&__dsop_cmp,
+
+     &&__dsop_jump,
+     &&__dsop_eq_jump, &&__dsop_ne_jump,
+     &&__dsop_gt_jump, &&__dsop_ge_jump,
+     &&__dsop_lt_jump, &&__dsop_le_jump,
+
+     &&__dsop_call, &&__dsop_return, &&__dsop_end,
+  };
+  goto *dispatch[*code];
+
+  PREPARE(imm, 3);
+
+  PREPARE(add_imm, 4); PREPARE(sub_imm, 4);
+  PREPARE(mul_imm, 4); PREPARE(div_imm, 4); PREPARE(mod_imm, 4);
+
+  PREPARE(add, 4); PREPARE(sub, 4);
+  PREPARE(mul, 4); PREPARE(div, 4); PREPARE(mod, 4);
+
+  PREPARE(eq, 4); PREPARE(ne, 4); PREPARE(land, 4); PREPARE(lor, 4);
+  PREPARE(gt, 4); PREPARE(ge, 4); PREPARE(lt, 4); PREPARE(le, 4);
+
+  PREPARE(band, 4); PREPARE(bor, 4); PREPARE(bxor, 4);
+  PREPARE(blshift, 4); PREPARE(brshift, 4);
+
+  PREPARE(inc, 3); PREPARE(dec, 3); PREPARE(neg, 3);
+  PREPARE(not, 3); PREPARE(cmp, 3);
+
+  PREPARE(jump, 2);
+  PREPARE(eq_jump, 4);
+  PREPARE(ne_jump, 4);
+  PREPARE(gt_jump, 4);
+  PREPARE(ge_jump, 4);
+  PREPARE(lt_jump, 4);
+  PREPARE(le_jump, 4);
+
+  PREPARE(call, 3);
+  PREPARE(return, 1);
+  PREPARE(end, 1);
 }
 
 reg_t *dscode_start(void) {

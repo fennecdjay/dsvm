@@ -19,20 +19,18 @@ typedef enum ds_opcode {
   dsop_eq, dsop_ne, dsop_land, dsop_lor,
   dsop_gt, dsop_ge, dsop_lt, dsop_le,
 
-
   dsop_band,dsop_bor, dsop_bxor,
   dsop_blshift, dsop_brshift,
 
   dsop_inc, dsop_dec,
   dsop_neg, dsop_not, dsop_cmp,
 
-  dsop_call, dsop_return,
-
   dsop_jump,
   dsop_eq_jump, dsop_ne_jump,
   dsop_gt_jump, dsop_ge_jump,
   dsop_lt_jump, dsop_le_jump,
 
+  dsop_call, dsop_return,
   dsop_end,
   dsop_max,
 } ds_opcode;
@@ -42,7 +40,10 @@ typedef struct {
   reg_t  *reg;
 } Frame;
 
-ANN void dsvm_run(reg_t *);
+//ANN 
+
+__attribute__((nonnull(1)))
+void dsvm_run(reg_t *, const reg_t *);
 
 reg_t *code_alloc(const ds_opcode, const uint32_t);
 
@@ -85,9 +86,9 @@ static inline reg_t *dscode_ibinary(const ds_opcode op, const reg_t src, const r
 }
 
 static inline reg_t *dscode_unary(const ds_opcode op, const reg_t src, const reg_t dest) {
-  reg_t *const code = code_alloc(op - 5, 3);
+  reg_t *const code = code_alloc(op - 5, 2);
   code[1] = src;
-  code[3] = dest;
+  code[2] = dest;
   return code;
 }
 

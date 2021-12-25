@@ -50,8 +50,17 @@ static void dsc_emit_return(const DsStmt *stmt) {
   dscode_return();
 }
 
+static inline void finish(const reg_t *code) {
+  if(fun_count) {
+    reg_t *const former = fun_data[fun_count-1].code;
+    dsvm_run(former, code);
+  }
+}
+
 static void dsc_emit_function(const DsStmt *stmt) {
-  fun_data[fun_count++] = (Fun) { .name = stmt->name, .code = dscode_start() };
+  reg_t *const code = dscode_start();
+  finish(code);
+  fun_data[fun_count++] = (Fun) { .name = stmt->name, .code = code };
 }
 
 typedef void (*dsc_t)(const DsStmt*);
@@ -114,12 +123,13 @@ int main(int argc, char **argv) {
       const DsStmt stmt = ds.stmts[i];
       functions[stmt.type](&stmt);
     }
-    dscode_end();
     stmt_release(ds.n);
+    dscode_end();
+    finish(dscode_start());
     ds.n = 0;
   }
   dslex_destroy(ds.scanner);
   if(fun_count)
-    dsvm_run(fun_data[fun_count-1].code);
+    dsvm_run(fun_data[fun_count-1].code, 0);
   return EXIT_SUCCESS;
 }
