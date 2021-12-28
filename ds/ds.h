@@ -86,14 +86,14 @@ static inline reg_t *dscode_ibinary(const ds_opcode op, const reg_t src, const r
 }
 
 static inline reg_t *dscode_unary(const ds_opcode op, const reg_t src, const reg_t dest) {
-  reg_t *const code = code_alloc(op - 5, 2);
+  reg_t *const code = code_alloc(op, 2);
   code[1] = src;
   code[2] = dest;
   return code;
 }
 
 ANN static inline reg_t *dscode_jump_op(const ds_opcode op, const reg_t src, const reg_t imm, const reg_t *new_code) {
-  if(op == dsop_max) {
+  if(op == dsop_jump) {
     reg_t *const code = code_alloc(dsop_jump, 1);
     code[1] = (reg_t)new_code;
     return code;

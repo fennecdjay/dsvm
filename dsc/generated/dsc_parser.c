@@ -1135,7 +1135,7 @@ yyreduce:
 
   case 7: /* statement: "<unop>" "<register>" "<register>"  */
 #line 55 "dsc.y"
-    { MAKE_STMT(unary,   .op = (yyvsp[-2].op),  .num0 = (yyvsp[-1].num)); }
+    { MAKE_STMT(unary,   .op = (yyvsp[-2].op),  .num0 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
 #line 1140 "generated/dsc_parser.c"
     break;
 

@@ -52,7 +52,7 @@ statement:
   "<ibinop>" "<register>" "<integer>" "<register>"
     { MAKE_STMT(ibinary, .op = $1, .num0 = $2,  .num1 = $3, .dest=$4); } |
   "<unop>"   "<register>" "<register>"
-    { MAKE_STMT(unary,   .op = $1,  .num0 = $2); } |
+    { MAKE_STMT(unary,   .op = $1,  .num0 = $2, .dest = $3); } |
   "<jump>"   "<integer>"
     { MAKE_STMT(jump,    .op = $1, .dest = $2); } |
   "<jump>"    "<register>" "<register>" "<integer>"

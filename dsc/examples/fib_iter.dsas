@@ -1,0 +1,20 @@
+# result is $0
+# base is $1
+# temp is $2
+# 0 is $3
+# n is $4
+
+main:
+  imm 40 $4
+#  imm 35 $4       # 3
+
+  imm 0 $1        # 6
+  imm 1 $0        # 9
+  imm 0 $3        # 12
+
+  -- $4 $4        # 15
+  jump<= $4 $3 33 # !!! goto end
+  + $1 $0 $2      #
+  + $0 0 $1       #
+  + $2 0 $0       # 31
+  jump 12         # 33

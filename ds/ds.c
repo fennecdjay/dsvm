@@ -10,7 +10,7 @@ static size_t _code_count;
 
 #define RVM_SIZE _SIZE
 
-#define DISPATCH() void **addr = *(void***)code;  code++; goto *addr;
+#define DISPATCH() goto **code++
 
 #define vm_read() (*code++)
 
@@ -45,7 +45,7 @@ static size_t _code_count;
   const reg_t lhs = vm_read();      \
   const reg_t rhs = vm_read();      \
   const reg_t dest = vm_read();     \
-  if(!(reg[lhs] op reg[rhs]))       \
+  if((reg[lhs] op reg[rhs]))       \
     code = (reg_t*)dest;            \
   DISPATCH();                       \
 } while(0)
