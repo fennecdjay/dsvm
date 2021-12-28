@@ -14,20 +14,40 @@ typedef struct {
 static Fun fun_data[FUN_SIZE];
 static uint32_t fun_count;
 
+typedef enum dsct_t { dsc_num, dsc_fnum } dsct_t;
+#define TYPE_SIZE 4096
+static dsct_t type_data[TYPE_SIZE];
+
 static void dsc_emit_binary(const DsStmt *stmt) {
-  dscode_binary(stmt->op, stmt->num0, stmt->num1, stmt->dest);
+  const ds_opcode op = type_data[stmt->num0] == dsc_num ?
+    stmt->op : stmt->op + dsop_addf - dsop_add;
+  dscode_binary(op, stmt->num0, stmt->num1, stmt->dest);
+  type_data[stmt->dest] = type_data[stmt->num0];
 }
 
 static void dsc_emit_ibinary(const DsStmt *stmt) {
   dscode_ibinary(stmt->op, stmt->num0, stmt->num1, stmt->dest);
+  type_data[stmt->dest] = dsc_num;
+}
+
+static void dsc_emit_fbinary(const DsStmt *stmt) {
+  dscode_ibinary(stmt->op, stmt->num0, stmt->fnum1, stmt->dest);
+  type_data[stmt->dest] = dsc_fnum;
 }
 
 static void dsc_emit_unary(const DsStmt *stmt) {
   dscode_unary(stmt->op, stmt->num0, stmt->dest);
+  type_data[stmt->dest] = type_data[stmt->num0];
 }
 
 static void dsc_emit_imm(const DsStmt *stmt) {
   dscode_imm(stmt->num0, stmt->dest);
+  type_data[stmt->dest] = dsc_num;
+}
+
+static void dsc_emit_immf(const DsStmt *stmt) {
+  dscode_immf(stmt->fnum0, stmt->dest);
+  type_data[stmt->dest] = dsc_fnum;
 }
 
 static void dsc_emit_jump(const DsStmt *stmt) {
@@ -68,8 +88,10 @@ typedef void (*dsc_t)(const DsStmt*);
 static const dsc_t functions[dsop_max] = {
   dsc_emit_binary,
   dsc_emit_ibinary,
+  dsc_emit_fbinary,
   dsc_emit_unary,
   dsc_emit_imm,
+  dsc_emit_immf,
   dsc_emit_jump,
   dsc_emit_call,
   dsc_emit_return,

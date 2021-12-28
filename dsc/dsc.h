@@ -3,8 +3,10 @@
 typedef enum {
   dsc_binary,
   dsc_ibinary,
+  dsc_fbinary,
   dsc_unary,
   dsc_imm,
+  dsc_immf,
   dsc_jump,
   dsc_call,
   dsc_return,
@@ -16,8 +18,12 @@ typedef struct {
   union {
     char  *name;
     reg_t num0;
+    float fnum0;
   };
-  reg_t num1;
+  union {
+    reg_t num1;
+    float fnum1;
+  };
   reg_t dest;
   dsc_stmt_type type;
   ds_opcode op;

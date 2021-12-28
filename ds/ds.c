@@ -13,6 +13,7 @@ static size_t _code_count;
 #define DISPATCH() goto **code++
 
 #define vm_read() (*code++)
+#define vm_readf() (*(float*)code++)
 
 #define BINARY_IMM(op) do           \
 {                                   \
@@ -47,6 +48,24 @@ static size_t _code_count;
   const reg_t dest = vm_read();     \
   if((reg[lhs] op reg[rhs]))       \
     code = (reg_t*)dest;            \
+  DISPATCH();                       \
+} while(0)
+
+#define BINARY_IMMF(op) do          \
+{                                   \
+  const reg_t lhs  = vm_read();     \
+  const float rhs  = vm_readf();     \
+  const reg_t dest = vm_read();     \
+  *(float*)(reg + dest) = *(float*)(reg+lhs) op rhs;      \
+  DISPATCH();                       \
+} while(0)
+
+#define BINARYF(op) do               \
+{                                   \
+  const reg_t lhs = vm_read();      \
+  const reg_t rhs = vm_read();      \
+  const reg_t dest = vm_read();     \
+  *(float*)(reg + dest) = *(float*)(reg + lhs) op *(float*)(reg + rhs); \
   DISPATCH();                       \
 } while(0)
 
@@ -123,6 +142,13 @@ void dsvm_run(reg_t *code, const reg_t *next) {
   UNARY(++);
   _dsop_dec:
   UNARY(--);
+  _dsop_mov:
+{
+  const reg_t lhs = vm_read();
+  const reg_t dest = vm_read();
+  reg[dest] = reg[lhs];
+  DISPATCH();
+}
   _dsop_neg:
   UNARY(-);
   _dsop_not:
@@ -167,6 +193,32 @@ void dsvm_run(reg_t *code, const reg_t *next) {
   reg = frame.reg;
   DISPATCH();
 }
+  _dsop_immf:
+{
+  const float f = vm_readf();
+  const reg_t dest = vm_read();
+  *(float*)(reg + dest) = f;
+printf("f %f\n", f);
+  DISPATCH();
+}
+  _dsop_add_immf:
+  BINARY_IMMF(+);
+  _dsop_sub_immf:
+  BINARY_IMMF(-);
+  _dsop_mul_immf:
+  BINARY_IMMF(*);
+  _dsop_div_immf:
+  BINARY_IMMF(/);
+
+  _dsop_addf:
+  BINARYF(+);
+  _dsop_subf:
+  BINARYF(-);
+  _dsop_mulf:
+  BINARYF(*);
+  _dsop_divf:
+  BINARYF(/);
+
   _dsop_end:
   printf("result %lu\n", reg[0]);
   return;
@@ -196,7 +248,7 @@ void dsvm_run(reg_t *code, const reg_t *next) {
      &&__dsop_band, &&__dsop_bor, &&__dsop_bxor,
      &&__dsop_blshift, &&__dsop_brshift,
 
-     &&__dsop_inc, &&__dsop_dec,
+     &&__dsop_inc, &&__dsop_dec, &&__dsop_mov,
      &&__dsop_neg, &&__dsop_not, &&__dsop_cmp,
 
      &&__dsop_jump,
@@ -204,7 +256,17 @@ void dsvm_run(reg_t *code, const reg_t *next) {
      &&__dsop_gt_jump, &&__dsop_ge_jump,
      &&__dsop_lt_jump, &&__dsop_le_jump,
 
-     &&__dsop_call, &&__dsop_return, &&__dsop_end,
+     &&__dsop_call, &&__dsop_return,
+
+     &&__dsop_immf,
+
+     &&__dsop_add_immf, &&__dsop_sub_immf,
+     &&__dsop_mul_immf, &&__dsop_div_immf,
+
+     &&__dsop_addf, &&__dsop_subf,
+     &&__dsop_mulf, &&__dsop_divf,
+
+     &&__dsop_end,
   };
   goto *dispatch[*code];
 
@@ -222,8 +284,8 @@ void dsvm_run(reg_t *code, const reg_t *next) {
   PREPARE(band, 4); PREPARE(bor, 4); PREPARE(bxor, 4);
   PREPARE(blshift, 4); PREPARE(brshift, 4);
 
-  PREPARE(inc, 3); PREPARE(dec, 3); PREPARE(neg, 3);
-  PREPARE(not, 3); PREPARE(cmp, 3);
+  PREPARE(inc, 3); PREPARE(dec, 3); PREPARE(mov, 3);
+  PREPARE(neg, 3); PREPARE(not, 3); PREPARE(cmp, 3);
 
   PREPARE(jump, 2);
   PREPARE(eq_jump, 4);
@@ -235,6 +297,17 @@ void dsvm_run(reg_t *code, const reg_t *next) {
 
   PREPARE(call, 3);
   PREPARE(return, 1);
+
+  PREPARE(immf, 3);
+  PREPARE(add_immf, 4);
+  PREPARE(sub_immf, 4);
+  PREPARE(mul_immf, 4);
+  PREPARE(div_immf, 4);
+  PREPARE(addf, 4);
+  PREPARE(subf, 4);
+  PREPARE(mulf, 4);
+  PREPARE(divf, 4);
+
   PREPARE(end, 1);
 }
 

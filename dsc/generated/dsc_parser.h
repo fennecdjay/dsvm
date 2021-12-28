@@ -71,8 +71,9 @@ extern int dsdebug;
     DS_UNOP = 264,                 /* "<unop>"  */
     DS_NUM = 265,                  /* "<integer>"  */
     DS_REG = 266,                  /* "<register>"  */
-    DS_ID = 267,                   /* "<id>"  */
-    DS_FUN = 268                   /* "<function>"  */
+    DS_FNUM = 267,                 /* "<float>"  */
+    DS_ID = 268,                   /* "<id>"  */
+    DS_FUN = 269                   /* "<function>"  */
   };
   typedef enum dstokentype dstoken_kind_t;
 #endif
@@ -85,9 +86,10 @@ union DSSTYPE
 
   char     *id;
   uintptr_t num;
+  float     fnum;
   ds_opcode op;
 
-#line 91 "generated/dsc_parser.h"
+#line 93 "generated/dsc_parser.h"
 
 };
 typedef union DSSTYPE DSSTYPE;

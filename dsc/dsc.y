@@ -25,6 +25,7 @@ static inline void dserror(void *scanner, const char *str) { (void)scanner; puts
 %union {
   char     *id;
   uintptr_t num;
+  float     fnum;
   ds_opcode op;
 };
 
@@ -37,6 +38,7 @@ static inline void dserror(void *scanner, const char *str) { (void)scanner; puts
   DS_UNOP "<unop>"
 
 %token<num> DS_NUM "<integer>" DS_REG "<register>"
+%token<fnum> DS_FNUM "<float>"
 
 %token<id>  DS_ID "<id>" DS_FUN "<function>"
 %%
@@ -49,8 +51,10 @@ statement:
     { MAKE_STMT(binary,  .op = $1, .num0 = $2,  .num1 = $3, .dest=$4); } |
   "<ibinop>" "<register>" "<register>" "<register>"
     { MAKE_STMT(binary,  .op = $1, .num0 = $2,  .num1 = $3, .dest=$4); } |
+  "<ibinop>" "<register>" "<float>" "<register>"
+    { MAKE_STMT(binary,  .op = $1, .fnum0 = $2,  .num1 = $3, .dest=$4); } |
   "<ibinop>" "<register>" "<integer>" "<register>"
-    { MAKE_STMT(ibinary, .op = $1, .num0 = $2,  .num1 = $3, .dest=$4); } |
+    { MAKE_STMT(ibinary, .op = $1, .fnum0 = $2,  .num1 = $3, .dest=$4); } |
   "<unop>"   "<register>" "<register>"
     { MAKE_STMT(unary,   .op = $1,  .num0 = $2, .dest = $3); } |
   "<jump>"   "<integer>"
@@ -59,6 +63,8 @@ statement:
     { MAKE_STMT(jump,    .op = $1, .num0 = $2,  .num1 = $3, .dest = $4); } |
   "imm"     "<integer>" "<register>"
     { MAKE_STMT(imm,     .num0 = $2,  .dest = $3); } |
+  "immf"     "<float>" "<register>"
+    { MAKE_STMT(immf,     .num0 = $2,  .dest = $3); } |
   "<function>" { MAKE_STMT(function, .name = $1); } |
   "call"    "<id>"       "<integer>"
     { MAKE_STMT(call,    .name = $2,   .dest = $3); } |

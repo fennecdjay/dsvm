@@ -64,8 +64,9 @@ SPACE [ \t\n\r]
 "jump<"      { JUMP(lt); }
 "jump<="     { JUMP(le); }
 
-"$"{NUM}*     { yylval->num = strtol(yytext + 1, NULL, 10); return DS_REG; }
-{NUM}*       { yylval->num = strtol(yytext, NULL, 10); return DS_NUM; }
+"$"{NUM}*      { yylval->num  = strtol(yytext + 1, NULL, 10); return DS_REG; }
+{NUM}*\.{NUM}* { yylval->fnum = strtof(yytext, NULL); return DS_FNUM; }
+{NUM}*         { yylval->num  = strtol(yytext, NULL, 10); return DS_NUM; }
 
 [a-zA-Z_][a-zA-Z_0-9]* { yylval->id = string_alloc(yytext); return DS_ID; }
 

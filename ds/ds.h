@@ -22,7 +22,7 @@ typedef enum ds_opcode {
   dsop_band,dsop_bor, dsop_bxor,
   dsop_blshift, dsop_brshift,
 
-  dsop_inc, dsop_dec,
+  dsop_inc, dsop_dec, dsop_mov,
   dsop_neg, dsop_not, dsop_cmp,
 
   dsop_jump,
@@ -31,6 +31,15 @@ typedef enum ds_opcode {
   dsop_lt_jump, dsop_le_jump,
 
   dsop_call, dsop_return,
+
+  dsop_immf,
+
+  dsop_add_immf, dsop_sub_immf,
+  dsop_mul_immf, dsop_div_immf,
+
+  dsop_addf, dsop_subf,
+  dsop_mulf, dsop_divf,
+
   dsop_end,
   dsop_max,
 } ds_opcode;
@@ -104,5 +113,13 @@ ANN static inline reg_t *dscode_jump_op(const ds_opcode op, const reg_t src, con
   code[3] = (reg_t)new_code;
   return code;
 }
+
+static inline reg_t *dscode_immf(const float imm, const reg_t dest) {
+  reg_t *const code = code_alloc(dsop_immf, 2);
+  *(float*)(code + 1) = imm;
+  code[2] = dest;
+  return code;
+}
+
 
 reg_t *dscode_start(void);

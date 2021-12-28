@@ -712,7 +712,7 @@ extern int yylex \
 #undef yyTABLES_NAME
 #endif
 
-#line 74 "dsc.l"
+#line 75 "dsc.l"
 
 
 #line 718 "generated/dsc_lexer.h"
