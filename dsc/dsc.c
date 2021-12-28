@@ -31,7 +31,7 @@ static void dsc_emit_ibinary(const DsStmt *stmt) {
 }
 
 static void dsc_emit_fbinary(const DsStmt *stmt) {
-  dscode_ibinary(stmt->op, stmt->num0, stmt->fnum1, stmt->dest);
+  dscode_ibinary(stmt->op + dsop_addf - dsop_add, stmt->num0, stmt->fnum1, stmt->dest);
   type_data[stmt->dest] = dsc_fnum;
 }
 
