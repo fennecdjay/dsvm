@@ -4,17 +4,18 @@
 # 0 is $3
 # n is $4
 
-main:
-  imm 40 $4
-#  imm 35 $4       # 3
+main: void
+  imm 20 $4
+#  imm 40 $4       # 3
 
   imm 0 $1        # 6
   imm 1 $0        # 9
   imm 0 $3        # 12
-
+  :0
   -- $4 $4        # 15
-  jump<= $4 $3 33 # !!! goto end
+  jump<= $4 $3 :1 # !!! goto end
   + $1 $0 $2      #
   + $0 0 $1       #
   + $2 0 $0       # 31
-  jump 12         # 33
+  jump :0          # 33
+  :1

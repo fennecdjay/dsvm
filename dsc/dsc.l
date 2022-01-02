@@ -6,12 +6,15 @@ SPACE [ \t\n\r]
 #include "dsc.h"
 #include "dsc_parser.h"
 
+#define OP(a)     do { yylval->op = dsop_##a; return DS_OP;  } while(0)
 #define BINOP(a)  do { yylval->op = dsop_##a; return DS_BINOP;  } while(0)
 #define IBINOP(a) do { yylval->op = dsop_##a; return DS_IBINOP; } while(0)
 #define UNOP(a)   do { yylval->op = dsop_##a; return DS_UNOP;   } while(0)
 #define _JUMP()   do { yylval->op = dsop_jump; return DS_JUMP;   } while(0)
 #define JUMP(a)   do { yylval->op = dsop_##a##_jump; return DS_JUMP;   } while(0)
 #define YYSTYPE DSSTYPE
+#define BUMP_SIZE 4096
+static char* string_alloc(const char *c);
 %}
 %option prefix="ds"
 %option bison-bridge
@@ -26,18 +29,18 @@ SPACE [ \t\n\r]
 
 "imm"        { return DS_IMM; }
 
-"+"          { IBINOP(add); }
-"-"          { IBINOP(sub); }
+"+"          { OP(add); }
+"-"          { OP(sub); }
 "*"          { IBINOP(mul); }
 "/"          { IBINOP(div); }
 "%"          { IBINOP(mod); }
 
 "=="         { BINOP(eq); }
 "!="         { BINOP(ne); }
-">"          { BINOP(gt); }
-">="         { BINOP(ge); }
 "<"          { BINOP(lt); }
 "<="         { BINOP(le); }
+">"          { BINOP(gt); }
+">="         { BINOP(ge); }
 
 "&&"         { BINOP(land); }
 "||"         { BINOP(lor);  }
@@ -50,6 +53,7 @@ SPACE [ \t\n\r]
 
 "++"         { UNOP(inc); }
 "--"         { UNOP(dec); }
+"="          { UNOP(mov); }
 "!"          { UNOP(not); }
 "~"          { UNOP(cmp); }
 
@@ -59,12 +63,13 @@ SPACE [ \t\n\r]
 "jump"       { _JUMP(); }
 "jump=="     { JUMP(eq); }
 "jump!="     { JUMP(ne); }
-"jump>"      { JUMP(gt); }
-"jump>="     { JUMP(ge); }
 "jump<"      { JUMP(lt); }
 "jump<="     { JUMP(le); }
+"jump>"      { JUMP(gt); }
+"jump>="     { JUMP(ge); }
 
 "$"{NUM}*      { yylval->num  = strtol(yytext + 1, NULL, 10); return DS_REG; }
+":"{NUM}*      { yylval->num  = strtol(yytext + 1, NULL, 10); return DS_LABEL; }
 {NUM}*\.{NUM}* { yylval->fnum = strtof(yytext, NULL); return DS_FNUM; }
 {NUM}*         { yylval->num  = strtol(yytext, NULL, 10); return DS_NUM; }
 
@@ -73,3 +78,17 @@ SPACE [ \t\n\r]
 {SPACE}*     {}
 .            { puts("unexpected character"); return 1; }
 %%
+#define BUMP_SIZE 4096
+static char _data[BUMP_SIZE];
+
+static char* string_alloc(const char *c) {
+  char *data = _data;
+  do {
+    if(*data == '\0') break;
+    if(!strcmp(c, data))
+      return data;
+  } while((data = strchr(data, '\0') + 1));
+  if(data - _data >= BUMP_SIZE)exit(3);
+  strcpy(data, c);
+  return data;
+}

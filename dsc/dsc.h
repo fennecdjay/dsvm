@@ -11,6 +11,8 @@ typedef enum {
   dsc_call,
   dsc_return,
   dsc_function,
+  dsc_arg,
+  dsc_label,
   dsc_stmt_max
 } dsc_stmt_type;
 
@@ -36,7 +38,8 @@ typedef struct DsScanner {
   uint32_t cap;
 } DsScanner;
 
-char *string_alloc(const char*);
+//char *string_alloc(const char*);
 void stmt_alloc();
 DsStmt *stmt_start(void);
+void stmt_release(const unsigned int n);
 #define YYSTYPE DSSTYPE
