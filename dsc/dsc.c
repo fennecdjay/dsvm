@@ -33,6 +33,7 @@ static void dsc_emit_binary(const DsStmt *stmt) {
   const ds_opcode op = type_data[stmt->num0] == dsc_num ?
     stmt->op : stmt->op + dsop_addf - dsop_add;
   dscode_binary(op, stmt->num0, stmt->num1, stmt->dest);
+  dscode_binary(stmt->op, stmt->num0, stmt->num1, stmt->dest);
   type_data[stmt->dest] = type_data[stmt->num0];
 }
 
@@ -66,7 +67,7 @@ static void dsc_emit_immf(const DsStmt *stmt) {
 
 static void dsc_emit_jump(const DsStmt *stmt) {
   Label label = label_data[stmt->dest];
-  reg_t *addr = dscode_start() +3;
+  reg_t *addr = dscode_start() + (sizeof(DsInfo3) / sizeof(reg_t)); // arch (was 2)
   if(!label.code)
     goto_data[goto_count++] = (Label) { addr, stmt->dest };
   dscode_jump_op(stmt->op, stmt->num0, stmt->num1, label.code);

@@ -7,49 +7,45 @@ typedef reg_t (*dscall2)(reg_t, reg_t);
 
 #define RVM_SIZE _SIZE
 
-//#define DISPATCH() goto *(void*)*code++
+//#define DISPATCH() goto **code++
 #define DISPATCH() { void *next = *(void**)code; code+= sizeof(void*); goto *next;}
 
-//#define vm_read() (*((reg_t*)code)++)
 #define vm_read() *(reg_t*)code;  code += sizeof(reg_t);
-#define vm_read32() *(uint32_t*)code;  code += sizeof(uint32_t);
-//#define vm_readf() (*(float*)code++)
 #define vm_readf() *(float*)code;  code += sizeof(reg_t);
 
 #define BINARY_IMM(op) do           \
 {                                   \
-  const reg_t lhs  = vm_read();     \
-  const reg_t rhs  = vm_read();     \
-  const reg_t dest = vm_read();     \
-  reg[dest] = reg[lhs] op rhs;      \
-  DISPATCH();                       \
+  const DsInfo3j info = *(DsInfo3j*)code;\
+  code += sizeof(DsInfo3j);\
+  reg[info.rhs] = reg[info.lhs] op info.ptr;     \
+	goto *info.addr;\
 } while(0)
 
 #define BINARY(op) do               \
 {                                   \
-  const reg_t lhs = vm_read();      \
-  const reg_t rhs = vm_read();      \
-  const reg_t dest = vm_read();     \
-  reg[dest] = reg[lhs] op reg[rhs]; \
-  DISPATCH();                       \
+  const DsInfo3j info = *(DsInfo3j*)code;\
+  code += sizeof(DsInfo3j);\
+  reg[info.ptr] = reg[info.lhs] op reg[info.rhs]; \
+	goto *info.addr;\
 } while(0)
 
 #define UNARY(op) do                \
 {                                   \
-  const reg_t lhs = vm_read();      \
-  const reg_t dest = vm_read();     \
-  reg[dest] = op reg[lhs];          \
-  DISPATCH();                       \
+  const DsInfoj info = *(DsInfoj*)code;\
+  code += sizeof(DsInfoj);\
+  reg[info.rhs] = op reg[info.lhs];          \
+  goto *info.addr;\
 } while(0)
 
-#define JUMP(op) do              \
+#define JUMP(op) do                 \
 {                                   \
-  const reg_t lhs = vm_read();      \
-  const reg_t rhs = vm_read();      \
-  const reg_t dest = vm_read();     \
-  if((reg[lhs] op reg[rhs]))       \
-    code = (reg_t*)dest;            \
-  DISPATCH();                       \
+  const DsInfo3j info = *(DsInfo3j*)code;\
+  if(reg[info.lhs] op reg[info.rhs])          {\
+    code = (reg_t*)info.ptr;            \
+    DISPATCH();\
+  };                       \
+  code += sizeof(DsInfo3j);\
+	goto *info.addr;\
 } while(0)
 
 #define BINARY_IMMF(op) do          \
@@ -63,11 +59,10 @@ typedef reg_t (*dscall2)(reg_t, reg_t);
 
 #define BINARYF(op) do               \
 {                                   \
-  const reg_t lhs = vm_read();      \
-  const reg_t rhs = vm_read();      \
-  const reg_t dest = vm_read();     \
-  *(float*)(reg + dest) = *(float*)(reg + lhs) op *(float*)(reg + rhs); \
-  DISPATCH();                       \
+  const DsInfo3j info = *(DsInfo3j*)code;\
+  code += sizeof(DsInfo3j);\
+  *(float*)(reg + info.ptr) = *(float*)(reg + info.lhs) op *(float*)(reg + info.rhs); \
+  goto *info.addr;\
 } while(0)
 
 __attribute__((nonnull(1)))
@@ -76,7 +71,7 @@ void dsvm_run(char *code, const char *next) {
   static reg_t _reg[RVM_SIZE];
   Frame frames[RVM_SIZE];
   reg_t *reg = _reg;
-reg_t ret;
+//reg_t ret;
   uint32_t nframe = 0;
 
   if(!next) {
@@ -84,8 +79,7 @@ reg_t ret;
   _dsop_imm:
 {
   const reg_t lhs = vm_read();
-//  const reg_t dest = vm_read();
-  const reg_t dest = vm_read32();
+  const reg_t dest = vm_read();
   reg[dest] = lhs;
   DISPATCH();
 }
@@ -183,26 +177,19 @@ reg_t ret;
 
   _dsop_call:
 {
-  reg_t *const new_code = (reg_t*)vm_read();
-  const reg_t offset = vm_read32();
-  const reg_t out = vm_read32();
-  frames[nframe++] = (Frame){ .reg = reg, .code = code, .out = out };
-  reg += offset;
-  code = new_code;
-  DISPATCH();
+  const DsInfo3 info = *(DsInfo3*)code;
+  frames[nframe++] = (Frame){ .reg = reg, .code = code + sizeof(DsInfo3), .out = info.rhs };
+  reg += info.lhs;
+  code = info.ptr;
+  DISPATCH();                       \
 }
   _dsop_return:
 {
-  const reg_t _out = vm_read();
-  const reg_t out = reg[_out];
   const Frame frame = frames[--nframe];
+  const reg_t _out = vm_read();
+  reg[frame.out] = reg[_out];
   code = frame.code;
   reg = frame.reg;
-
-  reg[frame.out] = out;
-//  *(reg_t*)frame.out = out;
-//  ret = out;
-
   DISPATCH();
 }
   _dsop_call2:
@@ -244,7 +231,6 @@ reg_t ret;
   printf("result %lu\n", reg[0]);
   return;
 }
-
   // prepare code
   #define PREPARE(a, b)       \
     __dsop_##a:                     \
@@ -256,7 +242,7 @@ reg_t ret;
   #define PREPARE2(a, b)       \
     __dsop_##a:                     \
     *(void**)code = &&_dsop_##a; \
-    code += b;\
+    code += sizeof(void*) + sizeof(b);\
     if(code == next){ return;}            \
     goto *dispatch[*(reg_t*)code];              \
 
@@ -286,7 +272,6 @@ reg_t ret;
 
      &&__dsop_call, &&__dsop_return,
      &&__dsop_call2,
-
      &&__dsop_immf,
 
      &&__dsop_add_immf, &&__dsop_sub_immf,
@@ -299,38 +284,47 @@ reg_t ret;
   };
   goto *dispatch[*code];
 
-//  PREPARE(imm, 3);
-//  PREPARE2(imm, 3  *sizeof(reg_t));
-  PREPARE2(imm, 2 * sizeof(reg_t) + sizeof(uint32_t));
+  PREPARE(imm, 3);
 
-  PREPARE(add_imm, 4); PREPARE(sub_imm, 4);
-  PREPARE(mul_imm, 4); PREPARE(div_imm, 4); PREPARE(mod_imm, 4);
+  PREPARE2(add_imm, DsInfo3);
+  PREPARE2(sub_imm, DsInfo3);
+  PREPARE2(mul_imm, DsInfo3);
+  PREPARE2(div_imm, DsInfo3);
+  PREPARE2(mod_imm, DsInfo3);
 
-  PREPARE(add, 4); PREPARE(sub, 4);
-  PREPARE(mul, 4); PREPARE(div, 4); PREPARE(mod, 4);
+  PREPARE2(add, DsInfo3);
+  PREPARE2(sub, DsInfo3);
+  PREPARE2(mul, DsInfo3);
+  PREPARE2(div, DsInfo3);
+  PREPARE2(mod, DsInfo3);
 
-  PREPARE(eq, 4); PREPARE(ne, 4);
-  PREPARE(lt, 4); PREPARE(le, 4);
-  PREPARE(gt, 4); PREPARE(ge, 4);
+  PREPARE2(eq, DsInfo3);
+  PREPARE2(ne, DsInfo3);
+  PREPARE2(lt, DsInfo3);
+  PREPARE2(le, DsInfo3);
+  PREPARE2(gt, DsInfo3);
+  PREPARE2(ge, DsInfo3);
 
-  PREPARE(land, 4); PREPARE(lor, 4);
-  PREPARE(band, 4); PREPARE(bor, 4); PREPARE(bxor, 4);
-  PREPARE(blshift, 4); PREPARE(brshift, 4);
+  PREPARE2(land, DsInfo3); PREPARE2(lor, DsInfo3);
+  PREPARE2(band, DsInfo3); PREPARE2(bor, DsInfo3); PREPARE2(bxor, DsInfo3);
+  PREPARE2(blshift, DsInfo3); PREPARE2(brshift, DsInfo3);
 
   PREPARE(inc, 3); PREPARE(dec, 3); PREPARE(mov, 3);
   PREPARE(neg, 3); PREPARE(not, 3); PREPARE(cmp, 3);
 
   PREPARE(jump, 2);
-  PREPARE(eq_jump, 4);
-  PREPARE(ne_jump, 4);
-  PREPARE(lt_jump, 4);
-  PREPARE(le_jump, 4);
-  PREPARE(gt_jump, 4);
-  PREPARE(ge_jump, 4);
 
-//  PREPARE(call, 4);
-  PREPARE2(call, 2 * sizeof(reg_t*) + 2 * sizeof(uint32_t));
+
+  PREPARE2(eq_jump, DsInfo3);
+  PREPARE2(ne_jump, DsInfo3);
+  PREPARE2(lt_jump, DsInfo3);
+  PREPARE2(le_jump, DsInfo3);
+  PREPARE2(gt_jump, DsInfo3);
+  PREPARE2(ge_jump, DsInfo3);
+
+  PREPARE2(call, DsInfo3);
   PREPARE(return, 2);
+//  PREPARE(return, 1);
 
   PREPARE(call2, 5);
 
@@ -362,13 +356,13 @@ reg_t *code_alloc(const ds_opcode op, const uint32_t n) {
   reg_t *const code = c + _code_count;
   *(reg_t*)code = op;
   _code_count += (n + 1) * sizeof(reg_t);
-  return code;
+  return (reg_t)code;
 }
 
-reg_t *code_alloc2(const ds_opcode op, const uint32_t n) {
+char *code_alloc2(const ds_opcode op, const uint32_t n) {
   char *const c = _code;
   reg_t *const code = c + _code_count;
   *(reg_t*)code = op;
   _code_count += (n + sizeof(void*));
-  return code;
+  return (reg_t)code;
 }
