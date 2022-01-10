@@ -13,6 +13,7 @@ typedef enum {
   dsc_function,
   dsc_arg,
   dsc_label,
+  dsc_if,
   dsc_stmt_max
 } dsc_stmt_type;
 

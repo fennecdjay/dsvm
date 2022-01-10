@@ -1,13 +1,13 @@
 CFLAGS += -Wall -Wextra
 CFLAGS += -fPIC -I. -Igenerated -I../ds
 CFLAGS += -O3
-# -flto
+CFLAGS += -flto
 
 ifeq ($(shell uname -m), x86_64)
 CFLAGS += -march=native
 endif
 
-#LDFLAGS += -flto
+LDFLAGS += -flto
 
 all: lib dsc
 

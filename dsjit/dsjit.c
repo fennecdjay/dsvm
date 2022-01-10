@@ -158,7 +158,8 @@ value_data[stmt->dest] =
       gcc_jit_context_new_call(ctx,
         NULL /*gcc_jit_location *loc*/,
         fun_data[i].code,
-        fun_data[i].narg, value_data + stmt->dest); // use num2?
+//        fun_data[i].narg, value_data + stmt->dest); // use num2?
+        fun_data[i].narg, value_data + stmt->num1); // use num2?
       return;
    }
   }

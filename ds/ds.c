@@ -1,13 +1,10 @@
 #include <stdio.h>
 #include "ds.h"
 
+#define RVM_SIZE 256
+
 typedef reg_t (*dscall2)(reg_t, reg_t);
 
-#define _SIZE 4096
-
-#define RVM_SIZE _SIZE
-
-//#define DISPATCH() goto **code++
 #define DISPATCH() { void *next = *(void**)code; code+= sizeof(void*); goto *next;}
 
 #define vm_read() *(reg_t*)code;  code += sizeof(reg_t);
@@ -41,7 +38,7 @@ typedef reg_t (*dscall2)(reg_t, reg_t);
 {                                   \
   const DsInfo3j info = *(DsInfo3j*)code;\
   if(reg[info.lhs] op reg[info.rhs])          {\
-    code = (reg_t*)info.ptr;            \
+    code = info.code;            \
     DISPATCH();\
   };                       \
   code += sizeof(DsInfo3j);\
@@ -66,12 +63,10 @@ typedef reg_t (*dscall2)(reg_t, reg_t);
 } while(0)
 
 __attribute__((nonnull(1)))
-//void dsvm_run(reg_t *code, const reg_t *next) {
-void dsvm_run(char *code, const char *next) {
-  static reg_t _reg[RVM_SIZE];
-  Frame frames[RVM_SIZE];
+void dsvm_run(dscode_t *code, const dscode_t *next) {
+  /*static */reg_t _reg[RVM_SIZE];
+  /*static */Frame frames[RVM_SIZE];
   reg_t *reg = _reg;
-//reg_t ret;
   uint32_t nframe = 0;
 
   if(!next) {
@@ -156,8 +151,7 @@ void dsvm_run(char *code, const char *next) {
 
   _dsop_jump:
 {
-  const reg_t dest = vm_read();
-  code = (reg_t*)dest;
+  code = (dscode_t*)vm_read();
   DISPATCH();
 }
   _dsop_eq_jump:
@@ -180,16 +174,16 @@ void dsvm_run(char *code, const char *next) {
   const DsInfo3 info = *(DsInfo3*)code;
   frames[nframe++] = (Frame){ .reg = reg, .code = code + sizeof(DsInfo3), .out = info.rhs };
   reg += info.lhs;
-  code = info.ptr;
+  code = info.code;
   DISPATCH();                       \
 }
   _dsop_return:
 {
   const Frame frame = frames[--nframe];
-  const reg_t _out = vm_read();
-  reg[frame.out] = reg[_out];
+  const reg_t _out = reg[*(reg_t*)code];
   code = frame.code;
   reg = frame.reg;
+  reg[frame.out] = _out;
   DISPATCH();
 }
   _dsop_call2:
@@ -282,28 +276,20 @@ void dsvm_run(char *code, const char *next) {
 
      &&__dsop_end,
   };
-  goto *dispatch[*code];
+  goto *dispatch[*(reg_t*)code];
 
   PREPARE(imm, 3);
 
-  PREPARE2(add_imm, DsInfo3);
-  PREPARE2(sub_imm, DsInfo3);
-  PREPARE2(mul_imm, DsInfo3);
-  PREPARE2(div_imm, DsInfo3);
-  PREPARE2(mod_imm, DsInfo3);
+  PREPARE2(add_imm, DsInfo3); PREPARE2(sub_imm, DsInfo3);
+  PREPARE2(mul_imm, DsInfo3); PREPARE2(div_imm, DsInfo3);
+  PREPARE2(mod_imm, DsInfo3); PREPARE2(add, DsInfo3);
 
-  PREPARE2(add, DsInfo3);
-  PREPARE2(sub, DsInfo3);
-  PREPARE2(mul, DsInfo3);
-  PREPARE2(div, DsInfo3);
-  PREPARE2(mod, DsInfo3);
+  PREPARE2(sub, DsInfo3); PREPARE2(mul, DsInfo3);
+  PREPARE2(div, DsInfo3); PREPARE2(mod, DsInfo3);
 
-  PREPARE2(eq, DsInfo3);
-  PREPARE2(ne, DsInfo3);
-  PREPARE2(lt, DsInfo3);
-  PREPARE2(le, DsInfo3);
-  PREPARE2(gt, DsInfo3);
-  PREPARE2(ge, DsInfo3);
+  PREPARE2(eq, DsInfo3); PREPARE2(ne, DsInfo3);
+  PREPARE2(lt, DsInfo3); PREPARE2(le, DsInfo3);
+  PREPARE2(gt, DsInfo3); PREPARE2(ge, DsInfo3);
 
   PREPARE2(land, DsInfo3); PREPARE2(lor, DsInfo3);
   PREPARE2(band, DsInfo3); PREPARE2(bor, DsInfo3); PREPARE2(bxor, DsInfo3);
@@ -315,54 +301,44 @@ void dsvm_run(char *code, const char *next) {
   PREPARE(jump, 2);
 
 
-  PREPARE2(eq_jump, DsInfo3);
-  PREPARE2(ne_jump, DsInfo3);
-  PREPARE2(lt_jump, DsInfo3);
-  PREPARE2(le_jump, DsInfo3);
-  PREPARE2(gt_jump, DsInfo3);
-  PREPARE2(ge_jump, DsInfo3);
+  PREPARE2(eq_jump, DsInfo3); PREPARE2(ne_jump, DsInfo3);
+  PREPARE2(lt_jump, DsInfo3); PREPARE2(le_jump, DsInfo3);
+  PREPARE2(gt_jump, DsInfo3); PREPARE2(ge_jump, DsInfo3);
 
   PREPARE2(call, DsInfo3);
   PREPARE(return, 2);
-//  PREPARE(return, 1);
 
   PREPARE(call2, 5);
 
   PREPARE(immf, 3);
-  PREPARE(add_immf, 4);
-  PREPARE(sub_immf, 4);
-  PREPARE(mul_immf, 4);
-  PREPARE(div_immf, 4);
-  PREPARE(addf, 4);
-  PREPARE(subf, 4);
-  PREPARE(mulf, 4);
-  PREPARE(divf, 4);
+  PREPARE(add_immf, 4); PREPARE(sub_immf, 4);
+  PREPARE(mul_immf, 4); PREPARE(div_immf, 4);
+
+  PREPARE(addf, 4); PREPARE(subf, 4);
+  PREPARE(mulf, 4); PREPARE(divf, 4);
 
   PREPARE(end, 1);
 }
 
-#define BUMP_SIZE _SIZE
+#define BUMP_SIZE 4096
 
-static reg_t _code[BUMP_SIZE];
-static size_t _code_count = 0;
+static dscode_t _code[BUMP_SIZE];
+static uint32_t _code_count;
 
-reg_t *dscode_start(void) {
-  char *const c = _code;
-  return c + _code_count;
+dscode_t *dscode_start(void) {
+  return _code + _code_count;
 }
 
-reg_t *code_alloc(const ds_opcode op, const uint32_t n) {
-  char *const c = _code;
-  reg_t *const code = c + _code_count;
+dscode_t *code_alloc(const ds_opcode op, const uint32_t n) {
+  dscode_t *const code = _code + _code_count;
   *(reg_t*)code = op;
   _code_count += (n + 1) * sizeof(reg_t);
-  return (reg_t)code;
+  return code;
 }
 
-char *code_alloc2(const ds_opcode op, const uint32_t n) {
-  char *const c = _code;
-  reg_t *const code = c + _code_count;
+dscode_t *code_alloc2(const ds_opcode op, const uint32_t n) {
+  dscode_t *const code = _code + _code_count;
   *(reg_t*)code = op;
   _code_count += (n + sizeof(void*));
-  return (reg_t)code;
+  return code;
 }

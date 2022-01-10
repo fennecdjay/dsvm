@@ -67,6 +67,7 @@ static char* string_alloc(const char *c);
 "jump<="     { JUMP(le); }
 "jump>"      { JUMP(gt); }
 "jump>="     { JUMP(ge); }
+"if"     { return DS_IF; }
 
 "$"{NUM}*      { yylval->num  = strtol(yytext + 1, NULL, 10); return DS_REG; }
 ":"{NUM}*      { yylval->num  = strtol(yytext + 1, NULL, 10); return DS_LABEL; }

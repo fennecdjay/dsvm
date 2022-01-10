@@ -65,17 +65,18 @@ extern int dsdebug;
     DS_IMM = 258,                  /* "imm"  */
     DS_CALL = 259,                 /* "call"  */
     DS_RETURN = 260,               /* "return"  */
-    DS_BINOP = 261,                /* "<binop>"  */
-    DS_IBINOP = 262,               /* "<ibinop>"  */
-    DS_JUMP = 263,                 /* "<jump>"  */
-    DS_UNOP = 264,                 /* "<unop>"  */
-    DS_OP = 265,                   /* "<op>"  */
-    DS_NUM = 266,                  /* "<integer>"  */
-    DS_REG = 267,                  /* "<register>"  */
-    DS_LABEL = 268,                /* "<label>"  */
-    DS_FNUM = 269,                 /* "<float>"  */
-    DS_ID = 270,                   /* "<id>"  */
-    DS_FUN = 271                   /* "<function>"  */
+    DS_IF = 261,                   /* "if"  */
+    DS_BINOP = 262,                /* "<binop>"  */
+    DS_IBINOP = 263,               /* "<ibinop>"  */
+    DS_JUMP = 264,                 /* "<jump>"  */
+    DS_UNOP = 265,                 /* "<unop>"  */
+    DS_OP = 266,                   /* "<op>"  */
+    DS_NUM = 267,                  /* "<integer>"  */
+    DS_REG = 268,                  /* "<register>"  */
+    DS_LABEL = 269,                /* "<label>"  */
+    DS_FNUM = 270,                 /* "<float>"  */
+    DS_ID = 271,                   /* "<id>"  */
+    DS_FUN = 272                   /* "<function>"  */
   };
   typedef enum dstokentype dstoken_kind_t;
 #endif
@@ -91,7 +92,7 @@ union DSSTYPE
   float     fnum;
   ds_opcode op;
 
-#line 95 "generated/dsc_parser.h"
+#line 96 "generated/dsc_parser.h"
 
 };
 typedef union DSSTYPE DSSTYPE;

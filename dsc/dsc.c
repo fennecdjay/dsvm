@@ -7,26 +7,27 @@
 
 typedef struct {
   char  *name;
-  reg_t *code;
+  dscode_t *code;
   uint32_t nlabel;
 } Fun;
 
-#define FUN_SIZE 4096
+#define FUN_SIZE 256
 static Fun fun_data[FUN_SIZE];
 static uint32_t fun_count;
 
 typedef struct {
-  reg_t *code;
+  dscode_t *code;
   uint32_t n;
 } Label;
 
-#define LABEL_SIZE 4096
-static Label label_data[LABEL_SIZE] = {};
+#define LABEL_SIZE 256
+static Label label_data[LABEL_SIZE];
+
 static uint32_t goto_count;
-static Label goto_data[LABEL_SIZE] = {};
+static Label goto_data[LABEL_SIZE];
 
 typedef enum dsct_t { dsc_num, dsc_fnum } dsct_t;
-#define TYPE_SIZE 4096
+#define TYPE_SIZE 256
 static dsct_t type_data[TYPE_SIZE];
 
 static void dsc_emit_binary(const DsStmt *stmt) {
@@ -67,7 +68,7 @@ static void dsc_emit_immf(const DsStmt *stmt) {
 
 static void dsc_emit_jump(const DsStmt *stmt) {
   Label label = label_data[stmt->dest];
-  reg_t *addr = dscode_start() + (sizeof(DsInfo3) / sizeof(reg_t)); // arch (was 2)
+  dscode_t *addr = dscode_start() + sizeof(DsInfo3); // arch (was 2)
   if(!label.code)
     goto_data[goto_count++] = (Label) { addr, stmt->dest };
   dscode_jump_op(stmt->op, stmt->num0, stmt->num1, label.code);
@@ -83,25 +84,23 @@ static void dsc_emit_call(const DsStmt *stmt) {
   exit(13);
 }
 
-
 static void dsc_emit_return(const DsStmt *stmt) {
   (void)stmt;
   dscode_return(stmt->dest);
-//  dscode_return();
 }
 
-static inline void finish(const reg_t *code) {
+static inline void finish(const dscode_t *code) {
   if(fun_count) {
     for(uint32_t i = 0; i < goto_count; i++)
-      *(reg_t**)goto_data[i].code = label_data[goto_data[i].n].code;
-    reg_t *const former = fun_data[fun_count-1].code;
+      *(dscode_t**)goto_data[i].code = label_data[goto_data[i].n].code;
+    dscode_t *const former = fun_data[fun_count-1].code;
     dsvm_run(former, code);
   }
   goto_count = 0;
 }
 
 static void dsc_emit_function(const DsStmt *stmt) {
-  reg_t *const code = dscode_start();
+  dscode_t *const code = dscode_start();
   finish(code);
   fun_data[fun_count++] = (Fun) { .name = stmt->name, .code = code };
 }
@@ -133,7 +132,7 @@ static const dsc_t functions[dsop_max] = {
   dsc_emit_label
 };
 
-#define BUMP_SIZE 4096
+#define BUMP_SIZE 1024
 static char _data[BUMP_SIZE];
 
 char* string_alloc(const char *c) {
@@ -169,30 +168,23 @@ int main(int argc, char **argv) {
   DsScanner ds = {};
   dslex_init(&ds.scanner);
   dsset_extra(&ds, ds.scanner);
-//  for (int i = 1; i < argc; i++) {
-    memset(label_data, 0, sizeof(label_data));
-//    FILE *file= strcmp(argv[i], "-") ?
-//      fopen(argv[i], "r"):
-    FILE *file= argv[1] ?
+  FILE *file= argc > 1 ?
       fopen(argv[1], "r"):
       stdin;
-    if(!file) return EXIT_FAILURE; //continue;
-    dsset_in(file, ds.scanner);
-    ds.stmts = stmt_start();
-    dsparse(&ds);
-    fclose(file);
-    set_funcs_and_labels(&ds);
-    for(size_t i = 0; i < ds.n; i++) {
-      const DsStmt stmt = ds.stmts[i];
-      functions[stmt.type](&stmt);
-    }
-//    stmt_release(ds.n);
-    dscode_end();
-    finish(dscode_start());
-    if(fun_count)
-      dsvm_run(fun_data[fun_count-1].code, 0);
-//    ds.n = 0;
-//  }
+  if(!file) return EXIT_FAILURE;
+  dsset_in(file, ds.scanner);
+  ds.stmts = stmt_start();
+  dsparse(&ds);
+  fclose(file);
+  set_funcs_and_labels(&ds);
+  for(size_t i = 0; i < ds.n; i++) {
+    const DsStmt stmt = ds.stmts[i];
+    functions[stmt.type](&stmt);
+  }
+  dscode_end();
+  finish(dscode_start());
+  if(fun_count)
+    dsvm_run(fun_data[fun_count-1].code, 0);
   dslex_destroy(ds.scanner);
   return EXIT_SUCCESS;
 }

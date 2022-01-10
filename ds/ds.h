@@ -6,6 +6,8 @@
 #define ANN       __attribute__((nonnull))
 
 typedef uintptr_t reg_t;
+typedef uint8_t dscode_t;
+typedef uint32_t dsidx_t;
 
 typedef enum ds_opcode {
   dsop_imm,
@@ -48,60 +50,63 @@ typedef enum ds_opcode {
 } ds_opcode;
 
 typedef struct {
-  reg_t *code;
+  dscode_t *code;
   reg_t  *reg;
-  reg_t  out;
-//  uint32_t  out;
+//  reg_t  out;
+  dsidx_t  out;
 } Frame;
 
 //ANN 
 typedef struct DsInfo {
-  uint32_t lhs;
-  uint32_t rhs;
+  dsidx_t lhs;
+  dsidx_t rhs;
 } DsInfo;
 typedef struct DsInfoj {
-  uint32_t lhs;
-  uint32_t rhs;
+  dsidx_t lhs;
+  dsidx_t rhs;
   void *addr;
 } DsInfoj;
 
 typedef struct DsInfo3 {
-  uint32_t lhs;
-  uint32_t rhs;
-  reg_t ptr;
-//  uint16_t lhs;
-//  uint16_t rhs;
-// union
+  dsidx_t lhs;
+  dsidx_t rhs;
+  union {
+    reg_t ptr;
+    dscode_t *code;
+  };
 } DsInfo3;
 
 typedef struct DsInfo3j {
-  uint32_t lhs;
-  uint32_t rhs;
-  reg_t ptr;
+  dsidx_t lhs;
+  dsidx_t rhs;
+  union {
+    reg_t ptr;
+    dscode_t *code;
+  };
   void *addr;
 } DsInfo3j;
 
 __attribute__((nonnull(1)))
-void dsvm_run(char *, const char *);
+void dsvm_run(dscode_t *, const dscode_t *);
 
-reg_t *code_alloc(const ds_opcode, const uint32_t);
-char *code_alloc2(const ds_opcode, const uint32_t);
+dscode_t *code_alloc(const ds_opcode, const uint32_t);
+dscode_t *code_alloc2(const ds_opcode, const uint32_t);
 
-static inline reg_t *dscode_imm(const reg_t imm, const uint32_t dest) {
-  reg_t *const code = code_alloc(dsop_imm, 2);
-  code[1] = imm;
-  code[2] = dest;
+static inline dscode_t *dscode_imm(const reg_t imm, const dsidx_t dest) {
+  dscode_t *const code = code_alloc(dsop_imm, 2);
+  *(reg_t*)(code + sizeof(void*)) = imm;
+  *(dsidx_t*)(code + sizeof(void*) + sizeof(reg_t)) = dest;
   return code;
 }
 
-ANN static inline reg_t *dscode_call(const reg_t *func, const uint32_t offset, const uint32_t dest) {
-  char *const code = code_alloc2(dsop_call, sizeof(DsInfo3));
-  *(DsInfo3*)(code + sizeof(void*)) = (DsInfo3){ .ptr = func, .lhs = offset, .rhs = dest };
-  return (reg_t*)code;
+ANN static inline dscode_t *dscode_call(const dscode_t *func, const dsidx_t offset, const dsidx_t dest) {
+  dscode_t *const code = code_alloc2(dsop_call, sizeof(DsInfo3));
+  *(DsInfo3*)(code + sizeof(void*)) = (DsInfo3){ .ptr = (reg_t)func, .lhs = offset, .rhs = dest };
+  return code;
 }
 
 ANN static inline reg_t *dscode_call2(const reg_t *func, const reg_t arg1, const reg_t arg2, const reg_t out ) {
-  reg_t *const code = code_alloc(dsop_call2, 4);
+  reg_t *const code = (reg_t*)code_alloc(dsop_call2, 4);
   code[1] = (reg_t)func;
   code[2] = arg1;
   code[3] = arg2;
@@ -109,52 +114,51 @@ ANN static inline reg_t *dscode_call2(const reg_t *func, const reg_t arg1, const
   return code;
 }
 
-static inline reg_t *dscode_return(const reg_t dest) {
-  reg_t *const code = code_alloc(dsop_return, 1);
-  code[1] = dest;
-//  reg_t *const code = code_alloc(dsop_return, 0);
+static inline dscode_t *dscode_return(const reg_t dest) {
+  dscode_t *const code = code_alloc(dsop_return, 1);
+  *(reg_t*)(code + sizeof(void*)) = dest;
   return code;
 }
 
-static inline reg_t *dscode_end(void) {
+static inline dscode_t *dscode_end(void) {
   return code_alloc(dsop_end, 0);
 }
 
-static inline reg_t *dscode_binary(const ds_opcode op, const uint32_t src, const uint32_t imm, const reg_t dest) {\
-  char *const code = code_alloc2(op, sizeof(DsInfo3));
+static inline dscode_t *dscode_binary(const ds_opcode op, const dsidx_t src, const dsidx_t imm, const reg_t dest) {\
+  dscode_t *const code = code_alloc2(op, sizeof(DsInfo3));
   *(DsInfo3*)(code + sizeof(void*)) = (DsInfo3){ .ptr=dest, .lhs=src, .rhs=imm };
-  return (reg_t*)code;
-
+  return code;
 }
 
-static inline reg_t *dscode_ibinary(const ds_opcode op, const uint32_t src, const reg_t imm, const uint32_t dest) {\
-  char *const code = code_alloc2(op - dsop_add + dsop_add_imm, sizeof(DsInfo3));
+static inline dscode_t *dscode_ibinary(const ds_opcode op, const dsidx_t src, const reg_t imm, const dsidx_t dest) {\
+  dscode_t *const code = code_alloc2(op - dsop_add + dsop_add_imm, sizeof(DsInfo3));
   *(DsInfo3*)(code + sizeof(void*)) = (DsInfo3){ .ptr = imm, .lhs=src, .rhs=dest };
-  return (reg_t*)code;
+  return code;
 }
 
-static inline reg_t *dscode_unary(const ds_opcode op, const reg_t src, const reg_t dest) {
-  char *const code = code_alloc2(op, sizeof(DsInfo));
+static inline dscode_t *dscode_unary(const ds_opcode op, const reg_t src, const reg_t dest) {
+  dscode_t *const code = code_alloc2(op, sizeof(DsInfo));
   *(DsInfo*)(code + sizeof(void*)) = (DsInfo){ .lhs=src, .rhs=dest };
-  return (reg_t*)code;
+  return code;
 }
 
-ANN static inline reg_t *dscode_jump_op(const ds_opcode op, const uint32_t src, const uint32_t imm, const reg_t *new_code) {
+ANN static inline dscode_t *dscode_jump_op(const ds_opcode op, const dsidx_t src, const dsidx_t imm, const dscode_t *new_code) {
   if(op == dsop_jump) {
-    reg_t *const code = code_alloc(dsop_jump, 1);
-    code[1] = (reg_t)new_code;
+    dscode_t *const code = code_alloc(dsop_jump, 1);
+    *(const dscode_t**)(code + sizeof(void*)) = new_code;
     return code;
   }
-  char *const code = code_alloc2(op, sizeof(DsInfo3));
-  *(DsInfo3*)(code + sizeof(void*)) = (DsInfo3){ .ptr = new_code, .lhs=src, .rhs=imm };
-  return (reg_t*)code;
+  dscode_t *const code = code_alloc2(op, sizeof(DsInfo3));
+  *(DsInfo3*)(code + sizeof(void*)) = (DsInfo3){ .ptr = (reg_t)new_code, .lhs=src, .rhs=imm };
+  return code;
 }
 
-static inline reg_t *dscode_immf(const float imm, const reg_t dest) {
-  reg_t *const code = code_alloc(dsop_immf, 2);
-  *(float*)(code + 1) = imm;
+static inline dscode_t *dscode_immf(const float imm, const reg_t dest) {
+  dscode_t *const code = code_alloc(dsop_immf, 2);
+  *(float*)(code + sizeof(void*)) = imm;
+  *(reg_t*)(code + sizeof(void*) + sizeof(float)) = dest;
   code[2] = dest;
   return code;
 }
 
-reg_t *dscode_start(void);
+dscode_t *dscode_start(void);

@@ -34,7 +34,7 @@ static inline void dserror(void *scanner, const char *str) { (void)scanner; puts
 #include "dsc_lexer.h"
 %}
 
-%token DS_IMM "imm" DS_CALL "call" DS_RETURN "return"
+%token DS_IMM "imm" DS_CALL "call" DS_RETURN "return" DS_IF "if"
 %token<op> DS_BINOP "<binop>" DS_IBINOP "<ibinop>" DS_JUMP "<jump>"
   DS_UNOP "<unop>" DS_OP "<op>"
 
@@ -85,7 +85,9 @@ statement:
   "return" "<register>"
     { MAKE_STMT(return, .dest = $2); } |
   "<label>"
-    { MAKE_STMT(label, .dest = $1); }
+    { MAKE_STMT(label, .dest = $1); } |
+  "if" "<register>" "<label>" "<label>"
+    { MAKE_STMT(if, .num0 = $2, .num1 = $3, .dest = $4); }
 
 argument:
   argument "<id>" { stmt_last()->num1 = 1; MAKE_STMT(arg,    .name = $2); } |
