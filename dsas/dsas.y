@@ -1,6 +1,6 @@
 %define api.pure full
 %define api.prefix {dsas}
-%parse-param { DsScanner* arg }
+%parse-param { DsAs* arg }
 %lex-param   { void *scan }
 
 %{
@@ -10,11 +10,11 @@
 
 #define scan arg->scanner
 
-DscStmt *stmt_last(void);
+DsAsStmt *stmt_last(void);
 static inline void dsaserror(void *scanner, const char *str) { (void)scanner; puts(str); }
 void stmt_alloc();
 #define MAKE_STMT(t, ...) do { \
-    arg->stmts[arg->n++]  = (DscStmt) { .type = dsc_##t, __VA_ARGS__ }; \
+    arg->stmts[arg->n++]  = (DsAsStmt) { .type = dsas_##t, __VA_ARGS__ }; \
     stmt_alloc(arg);                                                \
   } while(0)
 %}
@@ -49,8 +49,6 @@ statement:
     { MAKE_STMT(binary,  .op = $1, .num0 = $2,  .num1 = $3, .dest=$4); } |
   "<op>" "<register>" "<register>" "<register>"
     { MAKE_STMT(binary,  .op = $1, .num0 = $2,  .num1 = $3, .dest=$4); } |
-  "<op>" "<register>" "<float>" "<register>"
-    { MAKE_STMT(binary,  .op = $1, .fnum0 = $2,  .num1 = $3, .dest=$4); } |
   "<op>"   "<register>" "<register>"
     { MAKE_STMT(unary,   .op = $1,  .num0 = $2, .dest = $3); } |
   "<unop>"   "<register>" "<register>"
@@ -79,14 +77,14 @@ argument:
 %%
 
 #define BUMP_SIZE 4096
-static DscStmt stmt_data[BUMP_SIZE];
+static DsAsStmt stmt_data[BUMP_SIZE];
 static unsigned int stmt_offset;
 
-DscStmt *stmt_start(void) {
+DsAsStmt *stmt_start(void) {
   return stmt_data + stmt_offset;
 }
 
-DscStmt *stmt_last(void) {
+DsAsStmt *stmt_last(void) {
   return stmt_data + stmt_offset - 1;
 }
 

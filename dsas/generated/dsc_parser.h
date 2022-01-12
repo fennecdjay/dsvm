@@ -101,6 +101,6 @@ typedef union DSASSTYPE DSASSTYPE;
 
 
 
-int dsasparse (DsScanner* arg);
+int dsasparse (DsAs* arg);
 
 #endif /* !YY_DSAS_GENERATED_DSC_PARSER_H_INCLUDED  */

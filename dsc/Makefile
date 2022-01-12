@@ -1,6 +1,6 @@
 CFLAGS += -Wall -Wextra
 CFLAGS += -fPIC -I. -Igenerated -I../ds -I../dsas
-CFLAGS += -O3
+CFLAGS += -O2
 #CFLAGS += -flto
 
 ifeq ($(shell uname -m), x86_64)

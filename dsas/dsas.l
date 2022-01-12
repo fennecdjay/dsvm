@@ -42,10 +42,8 @@ static char* string_alloc(const char *c);
 ">"          { BINOP(gt); }
 ">="         { BINOP(ge); }
 
-%{/*
 "&&"         { BINOP(land); }
 "||"         { BINOP(lor);  }
-*/%}
 
 "&"          { BINOP(band); }
 "|"          { BINOP(bor);  }
@@ -90,24 +88,28 @@ static char* string_alloc(const char *c) {
   return data;
 }
 
-void dsas_init(DsScanner *dsas) {
+void dsas_init(DsAs *dsas) {
   dsaslex_init(&dsas->scanner);
   dsasset_extra(&dsas, dsas->scanner);
 }
 
-bool dsas_compile(DsScanner *dsas) {
+bool dsas_compile(DsAs *dsas) {
   dsas->stmts = stmt_start();
   return dsasparse(dsas);
 }
 
-bool dsas_file(DsScanner *dsas, FILE *file) {
+bool dsas_file(DsAs *dsas, FILE *file) {
   dsasset_in(file, dsas->scanner);
   const bool ret = dsas_compile(dsas);
   fclose(file);
   return ret;
 }
 
-bool dsas_filename(DsScanner *dsas, char* path) {
+bool dsas_filename(DsAs *dsas, char* path) {
   FILE *file= path ? fopen(path, "r") : stdin;
   return file ? dsas_file(dsas, file) :false;
+}
+
+void dsas_destroy(DsAs *const dsas) {
+  dsaslex_destroy(dsas->scanner);
 }

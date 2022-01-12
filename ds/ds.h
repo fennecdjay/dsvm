@@ -15,18 +15,17 @@ typedef enum ds_opcode {
   dsop_add, dsop_sub, dsop_mul,
   dsop_div, dsop_mod,
 
-//  dsop_eq, dsop_ne,
+  dsop_eq, dsop_ne,
   dsop_lt, dsop_le,
   dsop_gt, dsop_ge,
 
-//  dsop_land, dsop_lor,
+  dsop_land, dsop_lor,
 
   dsop_band, dsop_bor, dsop_bxor,
   dsop_shl, dsop_shr,
 
-//  dsop_inc, dsop_dec, dsop_mov,
-//  dsop_neg, dsop_not, dsop_cmp,
-// miss abs
+  /* unary ops */
+//  dsop_neg, dsop_lnot, dsop_bnot, dsop_abs
 
   dsop_if, dsop_goto,
   dsop_call, dsop_return,
@@ -43,7 +42,7 @@ typedef struct {
   reg_t  *reg;
 //  reg_t  out;
   dsidx_t  out;
-} Frame;
+} DsFrame;
 
 //ANN 
 typedef struct DsInfo {
@@ -78,7 +77,7 @@ typedef struct DsInfo3j {
 typedef struct DsThread {
   dscode_t *code;
   reg_t *reg;
-  Frame *frames;
+  DsFrame *frames;
   uint32_t nframe;
 } DsThread;
 

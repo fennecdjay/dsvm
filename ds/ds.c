@@ -35,7 +35,7 @@ __attribute__((nonnull(1)))
 void dsvm_run(DsThread *thread, const dscode_t *next) {
   dscode_t *code = thread->code;
   reg_t *reg = thread->reg;
-  Frame *frames = thread->frames;
+  DsFrame *frames = thread->frames;
   uint32_t nframe = thread->nframe;
 
   if(!next) {
@@ -59,10 +59,10 @@ void dsvm_run(DsThread *thread, const dscode_t *next) {
   _dsop_mod:
   BINARY(%);
 
-//  _dsop_eq:
-//  BINARY(==);
-//  _dsop_ne:
-//  BINARY(!=);
+  _dsop_eq:
+  BINARY(==);
+  _dsop_ne:
+  BINARY(!=);
 
   _dsop_lt:
   BINARY(<);
@@ -74,10 +74,10 @@ void dsvm_run(DsThread *thread, const dscode_t *next) {
   BINARY(>=);
 
 
-//  _dsop_land:
-//  BINARY(&&);
-//  _dsop_lor:
-//  BINARY(||);
+  _dsop_land:
+  BINARY(&&);
+  _dsop_lor:
+  BINARY(||);
 
   _dsop_band:
   BINARY(&);
@@ -126,15 +126,15 @@ void dsvm_run(DsThread *thread, const dscode_t *next) {
 {
   const DsInfo3 info = *(DsInfo3*)code;
   if(nframe == RVM_SIZE - 1) exit(3);
-  frames[nframe++] = (Frame){ .reg = reg, .code = code + sizeof(DsInfo3), .out = info.rhs };
+  frames[nframe++] = (DsFrame){ .reg = reg, .code = code + sizeof(DsInfo3), .out = info.rhs };
   reg += info.lhs;
   code = info.code;
   DISPATCH();                       \
 }
   _dsop_return:
 {
-  const Frame frame = frames[--nframe];
-  const reg_t _out = reg[*(reg_t*)code];
+  const DsFrame frame = frames[--nframe];
+  const reg_t _out    = reg[*(reg_t*)code];
   code = frame.code;
   reg = frame.reg;
   reg[frame.out] = _out;
@@ -182,11 +182,11 @@ _dsop_end:
      &&__dsop_add, &&__dsop_sub, &&__dsop_mul,
      &&__dsop_div, &&__dsop_mod,
 
-//     &&__dsop_eq, &&__dsop_ne,
+     &&__dsop_eq, &&__dsop_ne,
      &&__dsop_lt, &&__dsop_le,
      &&__dsop_gt, &&__dsop_ge,
 
-//     &&__dsop_land, &&__dsop_lor,
+     &&__dsop_land, &&__dsop_lor,
      &&__dsop_band, &&__dsop_bor, &&__dsop_bxor,
      &&__dsop_shl, &&__dsop_shr,
 
@@ -212,11 +212,11 @@ _dsop_end:
   PREPARE2(sub, DsInfo3); PREPARE2(mul, DsInfo3);
   PREPARE2(div, DsInfo3); PREPARE2(mod, DsInfo3);
 
-//  PREPARE2(eq, DsInfo3); PREPARE2(ne, DsInfo3);
+  PREPARE2(eq, DsInfo3); PREPARE2(ne, DsInfo3);
   PREPARE2(lt, DsInfo3); PREPARE2(le, DsInfo3);
   PREPARE2(gt, DsInfo3); PREPARE2(ge, DsInfo3);
 
-//  PREPARE2(land, DsInfo3); PREPARE2(lor, DsInfo3);
+  PREPARE2(land, DsInfo3); PREPARE2(lor, DsInfo3);
   PREPARE2(band, DsInfo3); PREPARE2(bor, DsInfo3); PREPARE2(bxor, DsInfo3);
   PREPARE2(shl, DsInfo3); PREPARE2(shr, DsInfo3);
 

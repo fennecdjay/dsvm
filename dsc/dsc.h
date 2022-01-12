@@ -12,4 +12,4 @@ typedef struct Dsc {
   uint32_t fun_count;
 } Dsc;
 
-void dsc_compile(Dsc *const dsc, const DsScanner *ds);
+void dsc_compile(Dsc *const dsc, const DsAs *ds);

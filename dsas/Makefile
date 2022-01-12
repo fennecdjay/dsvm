@@ -1,6 +1,6 @@
 CFLAGS += -Wall -Wextra
 CFLAGS += -fPIC -I. -Igenerated -I../ds
-CFLAGS += -O3
+CFLAGS += -Os -flto=full -fomit-frame-pointer -ffast-math
 CFLAGS += -flto
 
 ifeq ($(shell uname -m), x86_64)

@@ -3,15 +3,19 @@
 #include "dsc.h"
 
 int main(int argc, char **argv) {
-  DsScanner ds = {};
+
+  if (argc < 2) exit(EXIT_FAILURE);
+
+  DsAs ds = {};
   dsas_init(&ds);
-  dsas_filename(&ds, argv[1]);
+  if(dsas_filename(&ds, argv[1]))
+    exit(EXIT_FAILURE);
 
   Dsc dsc = {};
   dsc_compile(&dsc, &ds);
   if(dsc.fun_count) {
     reg_t reg[256];
-    Frame frames[256];
+    DsFrame frames[256];
     reg_t end_code[2] = { dsop_end };
     DsThread _thread = { .code = (dscode_t*)end_code };
     dsvm_run(&_thread, (dscode_t*)(end_code + 1));
@@ -23,10 +27,10 @@ int main(int argc, char **argv) {
       .nframe = 1
     };
     frames->reg =  reg;
-    frames->code = end_code;
+    frames->code = (dscode_t*)end_code;
     dsvm_run(&thread, 0);
     printf("result: %lu\n", reg[frames->out]);
   }
-  dsaslex_destroy(ds.scanner);
+  dsas_destroy(&ds);
   return EXIT_SUCCESS;
 }

@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
   dscode_t *const fib = make_fib(),
        *const main = make_main(argv[1], fib);
   reg_t reg[256];
-  Frame frames[256];
+  DsFrame frames[256];
 
   DsThread thread = { .code = main, .reg = reg, .frames = frames };
   dsvm_run(&thread, 0);

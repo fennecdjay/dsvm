@@ -1,19 +1,19 @@
 #include <stdio.h>
 
 typedef enum {
-  dsc_binary,
-  dsc_unary,
-  dsc_imm,
-//  dsc_immf,
-  dsc_label,
-  dsc_if,
-  dsc_goto,
-  dsc_call,
-  dsc_return,
-  dsc_function,
-  dsc_arg,
-  dsc_stmt_max
-} dsc_stmt_type;
+  dsas_binary,
+  dsas_unary,
+  dsas_imm,
+//  dsas_immf,
+  dsas_label,
+  dsas_if,
+  dsas_goto,
+  dsas_call,
+  dsas_return,
+  dsas_function,
+  dsas_arg,
+  dsas_max
+} dsas_type;
 
 typedef struct {
   union {
@@ -26,23 +26,24 @@ typedef struct {
     float fnum1;
   };
   reg_t dest;
-  dsc_stmt_type type;
+  dsas_type type;
   ds_opcode op;
-} DscStmt;
+} DsAsStmt;
 
-typedef struct DsScanner {
+typedef struct DsAs {
   void *scanner;
-  DscStmt *stmts;
+  DsAsStmt *stmts;
   uint32_t n;
   uint32_t cap;
-} DsScanner;
+} DsAs;
 
 
-void dsas_init(DsScanner *dsas);
-bool dsas_compile(DsScanner *dsas);
-bool dsas_file(DsScanner *dsas, FILE *file);
-bool dsas_filename(DsScanner *dsas, char* path);
+void dsas_init(DsAs *dsas);
+bool dsas_compile(DsAs *dsas);
+bool dsas_file(DsAs *dsas, FILE *file);
+bool dsas_filename(DsAs *dsas, char* path);
 
-DscStmt *stmt_start(void);
+void dsas_destroy(DsAs *const dsas);
+DsAsStmt *stmt_start(void);
 //void stmt_release(const unsigned int n);
 #define YYSTYPE DSASSTYPE
