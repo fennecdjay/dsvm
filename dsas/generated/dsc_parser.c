@@ -64,36 +64,32 @@
 #define YYPULL 1
 
 /* Substitute the type names.  */
-#define YYSTYPE         DSSTYPE
+#define YYSTYPE         DSASSTYPE
 /* Substitute the variable and function names.  */
-#define yyparse         dsparse
-#define yylex           dslex
-#define yyerror         dserror
-#define yydebug         dsdebug
-#define yynerrs         dsnerrs
+#define yyparse         dsasparse
+#define yylex           dsaslex
+#define yyerror         dsaserror
+#define yydebug         dsasdebug
+#define yynerrs         dsasnerrs
 
 /* First part of user prologue.  */
-#line 6 "dsc.y"
+#line 6 "dsas.y"
 
 #include <stdint.h>
 #include "ds.h"
-#include "dsc.h"
+#include "dsas.h"
 
 #define scan arg->scanner
 
-DsStmt *stmt_last(void);
-static inline void dserror(void *scanner, const char *str) { (void)scanner; puts(str); }
-
+DscStmt *stmt_last(void);
+static inline void dsaserror(void *scanner, const char *str) { (void)scanner; puts(str); }
+void stmt_alloc();
 #define MAKE_STMT(t, ...) do { \
-    arg->stmts[arg->n++]  = (DsStmt) { .type = dsc_##t, __VA_ARGS__ }; \
-    stmt_alloc(arg);                                                \
-  } while(0)
-#define DS_STMT(t, ...) do { \
-    arg->stmts[arg->n++]  = (DsStmt) { __VA_ARGS__ }; \
+    arg->stmts[arg->n++]  = (DscStmt) { .type = dsc_##t, __VA_ARGS__ }; \
     stmt_alloc(arg);                                                \
   } while(0)
 
-#line 97 "generated/dsc_parser.c"
+#line 93 "generated/dsc_parser.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -128,33 +124,32 @@ enum yysymbol_kind_t
   YYSYMBOL_DS_CALL = 4,                    /* "call"  */
   YYSYMBOL_DS_RETURN = 5,                  /* "return"  */
   YYSYMBOL_DS_IF = 6,                      /* "if"  */
-  YYSYMBOL_DS_BINOP = 7,                   /* "<binop>"  */
-  YYSYMBOL_DS_IBINOP = 8,                  /* "<ibinop>"  */
-  YYSYMBOL_DS_JUMP = 9,                    /* "<jump>"  */
-  YYSYMBOL_DS_UNOP = 10,                   /* "<unop>"  */
-  YYSYMBOL_DS_OP = 11,                     /* "<op>"  */
-  YYSYMBOL_DS_NUM = 12,                    /* "<integer>"  */
-  YYSYMBOL_DS_REG = 13,                    /* "<register>"  */
-  YYSYMBOL_DS_LABEL = 14,                  /* "<label>"  */
-  YYSYMBOL_DS_FNUM = 15,                   /* "<float>"  */
-  YYSYMBOL_DS_ID = 16,                     /* "<id>"  */
-  YYSYMBOL_DS_FUN = 17,                    /* "<function>"  */
-  YYSYMBOL_18_immf_ = 18,                  /* "immf"  */
-  YYSYMBOL_YYACCEPT = 19,                  /* $accept  */
-  YYSYMBOL_program = 20,                   /* program  */
-  YYSYMBOL_statement = 21,                 /* statement  */
-  YYSYMBOL_22_1 = 22,                      /* $@1  */
-  YYSYMBOL_argument = 23                   /* argument  */
+  YYSYMBOL_DS_GOTO = 7,                    /* "goto"  */
+  YYSYMBOL_DS_BINOP = 8,                   /* "<binop>"  */
+  YYSYMBOL_DS_UNOP = 9,                    /* "<unop>"  */
+  YYSYMBOL_DS_OP = 10,                     /* "<op>"  */
+  YYSYMBOL_DS_NUM = 11,                    /* "<integer>"  */
+  YYSYMBOL_DS_REG = 12,                    /* "<register>"  */
+  YYSYMBOL_DS_LABEL = 13,                  /* "<label>"  */
+  YYSYMBOL_DS_FNUM = 14,                   /* "<float>"  */
+  YYSYMBOL_DS_ID = 15,                     /* "<id>"  */
+  YYSYMBOL_DS_FUN = 16,                    /* "<function>"  */
+  YYSYMBOL_17_immf_ = 17,                  /* "immf"  */
+  YYSYMBOL_YYACCEPT = 18,                  /* $accept  */
+  YYSYMBOL_program = 19,                   /* program  */
+  YYSYMBOL_statement = 20,                 /* statement  */
+  YYSYMBOL_21_1 = 21,                      /* $@1  */
+  YYSYMBOL_argument = 22                   /* argument  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
 
 /* Second part of user prologue.  */
-#line 33 "dsc.y"
+#line 29 "dsas.y"
 
 #include "dsc_lexer.h"
 
-#line 158 "generated/dsc_parser.c"
+#line 153 "generated/dsc_parser.c"
 
 
 #ifdef short
@@ -405,7 +400,7 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 
 #if (! defined yyoverflow \
      && (! defined __cplusplus \
-         || (defined DSSTYPE_IS_TRIVIAL && DSSTYPE_IS_TRIVIAL)))
+         || (defined DSASSTYPE_IS_TRIVIAL && DSASSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
@@ -464,21 +459,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  27
+#define YYFINAL  22
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   66
+#define YYLAST   44
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  19
+#define YYNTOKENS  18
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  5
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  25
+#define YYNRULES  19
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  55
+#define YYNSTATES  40
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   273
+#define YYMAXUTOK   272
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -519,23 +514,22 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18
+      15,    16,    17
 };
 
-#if DSDEBUG
+#if DSASDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    50,    50,    50,    53,    55,    57,    59,    61,    63,
-      65,    67,    69,    71,    73,    75,    77,    79,    79,    81,
-      83,    85,    87,    89,    93,    94
+       0,    45,    45,    45,    48,    50,    52,    54,    56,    58,
+      60,    62,    62,    64,    66,    68,    70,    72,    76,    77
 };
 #endif
 
 /** Accessing symbol of state STATE.  */
 #define YY_ACCESSING_SYMBOL(State) YY_CAST (yysymbol_kind_t, yystos[State])
 
-#if DSDEBUG || 0
+#if DSASDEBUG || 0
 /* The user-facing name of the symbol whose (internal) number is
    YYSYMBOL.  No bounds checking.  */
 static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
@@ -545,10 +539,10 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
 static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "\"imm\"", "\"call\"",
-  "\"return\"", "\"if\"", "\"<binop>\"", "\"<ibinop>\"", "\"<jump>\"",
-  "\"<unop>\"", "\"<op>\"", "\"<integer>\"", "\"<register>\"",
-  "\"<label>\"", "\"<float>\"", "\"<id>\"", "\"<function>\"", "\"immf\"",
-  "$accept", "program", "statement", "$@1", "argument", YY_NULLPTR
+  "\"return\"", "\"if\"", "\"goto\"", "\"<binop>\"", "\"<unop>\"",
+  "\"<op>\"", "\"<integer>\"", "\"<register>\"", "\"<label>\"",
+  "\"<float>\"", "\"<id>\"", "\"<function>\"", "\"immf\"", "$accept",
+  "program", "statement", "$@1", "argument", YY_NULLPTR
 };
 
 static const char *
@@ -564,11 +558,11 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 static const yytype_int16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273
+     265,   266,   267,   268,   269,   270,   271,   272
 };
 #endif
 
-#define YYPACT_NINF (-13)
+#define YYPACT_NINF (-14)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -582,12 +576,10 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      16,     1,    -4,     2,     3,    15,    18,   -12,    19,    24,
-     -13,   -13,    14,     0,   -13,    28,    30,   -13,    31,    33,
-      23,    34,   -13,    35,    27,    36,    37,   -13,   -13,   -13,
-      38,    39,    41,    42,    43,    44,    45,   -13,    47,    48,
-      49,   -13,    50,   -13,   -13,   -13,   -13,   -13,   -13,   -13,
-     -13,   -13,   -13,   -13,   -13
+      15,   -10,   -13,    -5,    -1,     2,     3,    10,   -14,   -14,
+      -2,     0,   -14,    14,    17,   -14,    23,    18,    22,    21,
+      12,    25,   -14,   -14,   -14,    26,    27,    29,   -14,    30,
+      31,   -14,    24,   -14,   -14,   -14,   -14,   -14,   -14,   -14
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -595,24 +587,22 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,    20,     0,     0,     0,     0,     0,     0,
-      22,    17,     0,     0,     2,     0,     0,    21,     0,     0,
-       0,     0,    13,     0,     0,     0,     0,     1,     3,    15,
-       0,     0,     0,     0,     0,     0,     0,    12,     0,    11,
-       0,    25,    18,    16,    19,    23,     4,     7,     5,     6,
-      14,    10,     8,     9,    24
+       0,     0,     0,    14,     0,     0,     0,     0,    16,    11,
+       0,     0,     2,     0,     0,    15,     0,     0,     0,     0,
+       0,     0,     1,     3,     9,     0,     0,     0,     8,     7,
+       0,    19,    12,    10,    13,    17,     4,     5,     6,    18
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -13,   -13,    51,   -13,   -13
+     -14,   -14,    33,   -14,   -14
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,    13,    14,    25,    42
+      -1,    11,    12,    20,    32
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -620,59 +610,51 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      27,    21,    22,     1,     2,     3,     4,     5,     6,     7,
-       8,     9,    16,    15,    10,    17,    18,    11,    12,     1,
-       2,     3,     4,     5,     6,     7,     8,     9,    19,    26,
-      10,    20,    23,    11,    12,    33,    34,    24,    35,    38,
-      39,    29,    40,    30,     0,    31,    32,    36,    37,     0,
-      43,    44,    41,    45,    46,    47,    48,    49,     0,    50,
-      51,    52,    53,     0,    28,     0,    54
+      22,    13,    14,     1,     2,     3,     4,    15,     5,     6,
+       7,    16,    21,     8,    17,    18,     9,    10,     1,     2,
+       3,     4,    19,     5,     6,     7,    24,    31,     8,    25,
+      27,     9,    10,    29,    28,    30,    26,    33,    34,    39,
+      35,    36,    37,    38,    23
 };
 
 static const yytype_int8 yycheck[] =
 {
-       0,    13,    14,     3,     4,     5,     6,     7,     8,     9,
-      10,    11,    16,    12,    14,    13,    13,    17,    18,     3,
-       4,     5,     6,     7,     8,     9,    10,    11,    13,    15,
-      14,    13,    13,    17,    18,    12,    13,    13,    15,    12,
-      13,    13,    15,    13,    -1,    14,    13,    13,    13,    -1,
-      13,    13,    16,    14,    13,    13,    13,    13,    -1,    14,
-      13,    13,    13,    -1,    13,    -1,    16
+       0,    11,    15,     3,     4,     5,     6,    12,     8,     9,
+      10,    12,    14,    13,    12,    12,    16,    17,     3,     4,
+       5,     6,    12,     8,     9,    10,    12,    15,    13,    12,
+      12,    16,    17,    12,    12,    14,    13,    12,    12,    15,
+      13,    12,    12,    12,    11
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,     4,     5,     6,     7,     8,     9,    10,    11,
-      14,    17,    18,    20,    21,    12,    16,    13,    13,    13,
-      13,    13,    14,    13,    13,    22,    15,     0,    21,    13,
-      13,    14,    13,    12,    13,    15,    13,    13,    12,    13,
-      15,    16,    23,    13,    13,    14,    13,    13,    13,    13,
-      14,    13,    13,    13,    16
+       0,     3,     4,     5,     6,     8,     9,    10,    13,    16,
+      17,    19,    20,    11,    15,    12,    12,    12,    12,    12,
+      21,    14,     0,    20,    12,    12,    13,    12,    12,    12,
+      14,    15,    22,    12,    12,    13,    12,    12,    12,    15
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    19,    20,    20,    21,    21,    21,    21,    21,    21,
-      21,    21,    21,    21,    21,    21,    21,    22,    21,    21,
-      21,    21,    21,    21,    23,    23
+       0,    18,    19,    19,    20,    20,    20,    20,    20,    20,
+      20,    21,    20,    20,    20,    20,    20,    20,    22,    22
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     2,     4,     4,     4,     4,     4,     4,
-       4,     3,     3,     2,     4,     3,     3,     0,     3,     4,
-       1,     2,     1,     4,     2,     1
+       0,     2,     1,     2,     4,     4,     4,     3,     3,     3,
+       3,     0,     3,     4,     1,     2,     1,     4,     2,     1
 };
 
 
 enum { YYENOMEM = -2 };
 
 #define yyerrok         (yyerrstatus = 0)
-#define yyclearin       (yychar = DSEMPTY)
+#define yyclearin       (yychar = DSASEMPTY)
 
 #define YYACCEPT        goto yyacceptlab
 #define YYABORT         goto yyabortlab
@@ -683,7 +665,7 @@ enum { YYENOMEM = -2 };
 
 #define YYBACKUP(Token, Value)                                    \
   do                                                              \
-    if (yychar == DSEMPTY)                                        \
+    if (yychar == DSASEMPTY)                                        \
       {                                                           \
         yychar = (Token);                                         \
         yylval = (Value);                                         \
@@ -699,12 +681,12 @@ enum { YYENOMEM = -2 };
   while (0)
 
 /* Backward compatibility with an undocumented macro.
-   Use DSerror or DSUNDEF. */
-#define YYERRCODE DSUNDEF
+   Use DSASerror or DSASUNDEF. */
+#define YYERRCODE DSASUNDEF
 
 
 /* Enable debugging if requested.  */
-#if DSDEBUG
+#if DSASDEBUG
 
 # ifndef YYFPRINTF
 #  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
@@ -830,12 +812,12 @@ do {                                    \
 /* Nonzero means print parse trace.  It is left uninitialized so that
    multiple parsers can coexist.  */
 int yydebug;
-#else /* !DSDEBUG */
+#else /* !DSASDEBUG */
 # define YYDPRINTF(Args) ((void) 0)
 # define YY_SYMBOL_PRINT(Title, Kind, Value, Location)
 # define YY_STACK_PRINT(Bottom, Top)
 # define YY_REDUCE_PRINT(Rule)
-#endif /* !DSDEBUG */
+#endif /* !DSASDEBUG */
 
 
 /* YYINITDEPTH -- initial size of the parser's stacks.  */
@@ -942,7 +924,7 @@ YYSTYPE yylval YY_INITIAL_VALUE (= yyval_default);
 
   YYDPRINTF ((stderr, "Starting parse\n"));
 
-  yychar = DSEMPTY; /* Cause a token to be read.  */
+  yychar = DSASEMPTY; /* Cause a token to be read.  */
   goto yysetstate;
 
 
@@ -1050,25 +1032,25 @@ yybackup:
   /* Not known => get a lookahead token if don't already have one.  */
 
   /* YYCHAR is either empty, or end-of-input, or a valid lookahead.  */
-  if (yychar == DSEMPTY)
+  if (yychar == DSASEMPTY)
     {
       YYDPRINTF ((stderr, "Reading a token\n"));
       yychar = yylex (&yylval, scan);
     }
 
-  if (yychar <= DSEOF)
+  if (yychar <= DSASEOF)
     {
-      yychar = DSEOF;
+      yychar = DSASEOF;
       yytoken = YYSYMBOL_YYEOF;
       YYDPRINTF ((stderr, "Now at end of input.\n"));
     }
-  else if (yychar == DSerror)
+  else if (yychar == DSASerror)
     {
       /* The scanner already issued an error message, process directly
          to error recovery.  But do not keep the error token as
          lookahead, it is too special and may lead us to an endless
          loop in error recovery. */
-      yychar = DSUNDEF;
+      yychar = DSASUNDEF;
       yytoken = YYSYMBOL_YYerror;
       goto yyerrlab1;
     }
@@ -1105,7 +1087,7 @@ yybackup:
   YY_IGNORE_MAYBE_UNINITIALIZED_END
 
   /* Discard the shifted token.  */
-  yychar = DSEMPTY;
+  yychar = DSASEMPTY;
   goto yynewstate;
 
 
@@ -1141,133 +1123,97 @@ yyreduce:
   switch (yyn)
     {
   case 4: /* statement: "<binop>" "<register>" "<register>" "<register>"  */
-#line 54 "dsc.y"
+#line 49 "dsas.y"
     { MAKE_STMT(binary,  .op = (yyvsp[-3].op), .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
+#line 1129 "generated/dsc_parser.c"
+    break;
+
+  case 5: /* statement: "<op>" "<register>" "<register>" "<register>"  */
+#line 51 "dsas.y"
+    { MAKE_STMT(binary,  .op = (yyvsp[-3].op), .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
+#line 1135 "generated/dsc_parser.c"
+    break;
+
+  case 6: /* statement: "<op>" "<register>" "<float>" "<register>"  */
+#line 53 "dsas.y"
+    { MAKE_STMT(binary,  .op = (yyvsp[-3].op), .fnum0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].fnum), .dest=(yyvsp[0].num)); }
+#line 1141 "generated/dsc_parser.c"
+    break;
+
+  case 7: /* statement: "<op>" "<register>" "<register>"  */
+#line 55 "dsas.y"
+    { MAKE_STMT(unary,   .op = (yyvsp[-2].op),  .num0 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
 #line 1147 "generated/dsc_parser.c"
     break;
 
-  case 5: /* statement: "<ibinop>" "<register>" "<register>" "<register>"  */
-#line 56 "dsc.y"
-    { MAKE_STMT(binary,  .op = (yyvsp[-3].op), .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
+  case 8: /* statement: "<unop>" "<register>" "<register>"  */
+#line 57 "dsas.y"
+    { MAKE_STMT(unary,   .op = (yyvsp[-2].op),  .num0 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
 #line 1153 "generated/dsc_parser.c"
     break;
 
-  case 6: /* statement: "<ibinop>" "<register>" "<float>" "<register>"  */
-#line 58 "dsc.y"
-    { MAKE_STMT(binary,  .op = (yyvsp[-3].op), .fnum0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].fnum), .dest=(yyvsp[0].num)); }
+  case 9: /* statement: "imm" "<integer>" "<register>"  */
+#line 59 "dsas.y"
+    { MAKE_STMT(imm,     .num0 = (yyvsp[-1].num),  .dest = (yyvsp[0].num)); }
 #line 1159 "generated/dsc_parser.c"
     break;
 
-  case 7: /* statement: "<ibinop>" "<register>" "<integer>" "<register>"  */
-#line 60 "dsc.y"
-    { MAKE_STMT(ibinary, .op = (yyvsp[-3].op), .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
+  case 10: /* statement: "immf" "<float>" "<register>"  */
+#line 61 "dsas.y"
+    { /*MAKE_STMT(immf,     .num0 = $2,  .dest = $3); */}
 #line 1165 "generated/dsc_parser.c"
     break;
 
-  case 8: /* statement: "<op>" "<register>" "<register>" "<register>"  */
-#line 62 "dsc.y"
-    { MAKE_STMT(binary,  .op = (yyvsp[-3].op), .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
+  case 11: /* $@1: %empty  */
+#line 62 "dsas.y"
+               { MAKE_STMT(function, .name = (yyvsp[0].id)); }
 #line 1171 "generated/dsc_parser.c"
     break;
 
-  case 9: /* statement: "<op>" "<register>" "<float>" "<register>"  */
-#line 64 "dsc.y"
-    { MAKE_STMT(binary,  .op = (yyvsp[-3].op), .fnum0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].fnum), .dest=(yyvsp[0].num)); }
+  case 13: /* statement: "call" "<id>" "<register>" "<register>"  */
+#line 65 "dsas.y"
+    { MAKE_STMT(call,    .name = (yyvsp[-2].id), .num1 = (yyvsp[-1].num),  .dest = (yyvsp[0].num)); }
 #line 1177 "generated/dsc_parser.c"
     break;
 
-  case 10: /* statement: "<op>" "<register>" "<integer>" "<register>"  */
-#line 66 "dsc.y"
-    { MAKE_STMT(ibinary, .op = (yyvsp[-3].op), .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
+  case 14: /* statement: "return"  */
+#line 67 "dsas.y"
+    { MAKE_STMT(return, .num0 = 1); }
 #line 1183 "generated/dsc_parser.c"
     break;
 
-  case 11: /* statement: "<op>" "<register>" "<register>"  */
-#line 68 "dsc.y"
-    { MAKE_STMT(unary,   .op = (yyvsp[-2].op),  .num0 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
+  case 15: /* statement: "return" "<register>"  */
+#line 69 "dsas.y"
+    { MAKE_STMT(return, .dest = (yyvsp[0].num)); }
 #line 1189 "generated/dsc_parser.c"
     break;
 
-  case 12: /* statement: "<unop>" "<register>" "<register>"  */
-#line 70 "dsc.y"
-    { MAKE_STMT(unary,   .op = (yyvsp[-2].op),  .num0 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
+  case 16: /* statement: "<label>"  */
+#line 71 "dsas.y"
+    { MAKE_STMT(label, .dest = (yyvsp[0].num)); }
 #line 1195 "generated/dsc_parser.c"
     break;
 
-  case 13: /* statement: "<jump>" "<label>"  */
-#line 72 "dsc.y"
-    { MAKE_STMT(jump,    .op = (yyvsp[-1].op), .dest = (yyvsp[0].num)); }
+  case 17: /* statement: "if" "<register>" "<label>" "<label>"  */
+#line 73 "dsas.y"
+    { MAKE_STMT(if, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
 #line 1201 "generated/dsc_parser.c"
     break;
 
-  case 14: /* statement: "<jump>" "<register>" "<register>" "<label>"  */
-#line 74 "dsc.y"
-    { MAKE_STMT(jump,    .op = (yyvsp[-3].op), .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
+  case 18: /* argument: argument "<id>"  */
+#line 76 "dsas.y"
+                  { stmt_last()->num1 = 1; MAKE_STMT(arg,    .name = (yyvsp[0].id)); }
 #line 1207 "generated/dsc_parser.c"
     break;
 
-  case 15: /* statement: "imm" "<integer>" "<register>"  */
-#line 76 "dsc.y"
-    { MAKE_STMT(imm,     .num0 = (yyvsp[-1].num),  .dest = (yyvsp[0].num)); }
+  case 19: /* argument: "<id>"  */
+#line 77 "dsas.y"
+         { MAKE_STMT(arg,    .name = (yyvsp[0].id));}
 #line 1213 "generated/dsc_parser.c"
     break;
 
-  case 16: /* statement: "immf" "<float>" "<register>"  */
-#line 78 "dsc.y"
-    { MAKE_STMT(immf,     .num0 = (yyvsp[-1].fnum),  .dest = (yyvsp[0].num)); }
-#line 1219 "generated/dsc_parser.c"
-    break;
 
-  case 17: /* $@1: %empty  */
-#line 79 "dsc.y"
-               { MAKE_STMT(function, .name = (yyvsp[0].id)); }
-#line 1225 "generated/dsc_parser.c"
-    break;
-
-  case 19: /* statement: "call" "<id>" "<register>" "<register>"  */
-#line 82 "dsc.y"
-    { MAKE_STMT(call,    .name = (yyvsp[-2].id), .num1 = (yyvsp[-1].num),  .dest = (yyvsp[0].num)); }
-#line 1231 "generated/dsc_parser.c"
-    break;
-
-  case 20: /* statement: "return"  */
-#line 84 "dsc.y"
-    { MAKE_STMT(return, .num0 = 1); }
-#line 1237 "generated/dsc_parser.c"
-    break;
-
-  case 21: /* statement: "return" "<register>"  */
-#line 86 "dsc.y"
-    { MAKE_STMT(return, .dest = (yyvsp[0].num)); }
-#line 1243 "generated/dsc_parser.c"
-    break;
-
-  case 22: /* statement: "<label>"  */
-#line 88 "dsc.y"
-    { MAKE_STMT(label, .dest = (yyvsp[0].num)); }
-#line 1249 "generated/dsc_parser.c"
-    break;
-
-  case 23: /* statement: "if" "<register>" "<label>" "<label>"  */
-#line 90 "dsc.y"
-    { MAKE_STMT(if, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1255 "generated/dsc_parser.c"
-    break;
-
-  case 24: /* argument: argument "<id>"  */
-#line 93 "dsc.y"
-                  { stmt_last()->num1 = 1; MAKE_STMT(arg,    .name = (yyvsp[0].id)); }
-#line 1261 "generated/dsc_parser.c"
-    break;
-
-  case 25: /* argument: "<id>"  */
-#line 94 "dsc.y"
-         { MAKE_STMT(arg,    .name = (yyvsp[0].id));}
-#line 1267 "generated/dsc_parser.c"
-    break;
-
-
-#line 1271 "generated/dsc_parser.c"
+#line 1217 "generated/dsc_parser.c"
 
       default: break;
     }
@@ -1309,7 +1255,7 @@ yyreduce:
 yyerrlab:
   /* Make sure we have latest lookahead translation.  See comments at
      user semantic actions for why this is necessary.  */
-  yytoken = yychar == DSEMPTY ? YYSYMBOL_YYEMPTY : YYTRANSLATE (yychar);
+  yytoken = yychar == DSASEMPTY ? YYSYMBOL_YYEMPTY : YYTRANSLATE (yychar);
   /* If not already recovering from an error, report this error.  */
   if (!yyerrstatus)
     {
@@ -1322,17 +1268,17 @@ yyerrlab:
       /* If just tried and failed to reuse lookahead token after an
          error, discard it.  */
 
-      if (yychar <= DSEOF)
+      if (yychar <= DSASEOF)
         {
           /* Return failure if at end of input.  */
-          if (yychar == DSEOF)
+          if (yychar == DSASEOF)
             YYABORT;
         }
       else
         {
           yydestruct ("Error: discarding",
                       yytoken, &yylval, arg);
-          yychar = DSEMPTY;
+          yychar = DSASEMPTY;
         }
     }
 
@@ -1435,7 +1381,7 @@ yyexhaustedlab:
 | yyreturn -- parsing is finished, clean up and return.  |
 `-------------------------------------------------------*/
 yyreturn:
-  if (yychar != DSEMPTY)
+  if (yychar != DSASEMPTY)
     {
       /* Make sure we have latest lookahead translation.  See comments at
          user semantic actions for why this is necessary.  */
@@ -1461,18 +1407,18 @@ yyreturn:
   return yyresult;
 }
 
-#line 96 "dsc.y"
+#line 79 "dsas.y"
 
 
 #define BUMP_SIZE 4096
-static DsStmt stmt_data[BUMP_SIZE];
+static DscStmt stmt_data[BUMP_SIZE];
 static unsigned int stmt_offset;
 
-DsStmt *stmt_start(void) {
+DscStmt *stmt_start(void) {
   return stmt_data + stmt_offset;
 }
 
-DsStmt *stmt_last(void) {
+DscStmt *stmt_last(void) {
   return stmt_data + stmt_offset - 1;
 }
 

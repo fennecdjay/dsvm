@@ -1,8 +1,8 @@
 CFLAGS += -Wall -Wextra
 CFLAGS += -O2
 #CFLAGS += -falign-labels
-CFLAGS += -flto
-LDFLAGS += -flto
+#CFLAGS += -flto
+#LDFLAGS += -flto
 
 ifeq ($(shell uname -m), x86_64)
 CFLAGS += -march=native
@@ -16,7 +16,6 @@ libds.a: ds.c ds.h
 
 main: libds.a
 	${CC} ${CFLAGS} ds_test.c libds.a -o ds_test
-	${CC} ${CFLAGS} ds_test2.c libds.a -o ds_test2
 
 clean:
 	rm -f *.o *.a ds_test

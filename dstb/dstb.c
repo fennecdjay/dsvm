@@ -1,51 +1,220 @@
-#include "tb/tb.h"
-#include <time.h>
-
 #include "ds.h"
-#include "dsc.h"
-#include "generated/dsc_parser.h"
-#include "generated/dsc_lexer.h"
+#include "dsas.h"
+#include "dstb.h"
 
-TB_Function *dtb_compile(TB_Module* module, DsScanner *ds);
+typedef struct {
+  char  *name;
+  TB_Function *code;
+  TB_DataType ret_type;
+  uint32_t narg;
+} Fun;
 
-int main(int argc, char** argv) {
-  DsScanner ds = {};
-  dslex_init(&ds.scanner);
-  dsset_extra(&ds, ds.scanner);
+#define FUN_SIZE 2
+static Fun fun_data[FUN_SIZE];
+static uint32_t fun_count;
 
-	TB_FeatureSet features = { 0 };
+#define LABEL_SIZE 2
+TB_Label label_data[LABEL_SIZE];
 
-#if _WIN32
-	TB_Module* m = tb_module_create(TB_ARCH_X86_64, TB_SYSTEM_WINDOWS, &features);
-#else
-	TB_Module* m = tb_module_create(TB_ARCH_X86_64, TB_SYSTEM_LINUX, &features);
-#endif
+#define VALUE_SIZE 16
+TB_Register value_data[VALUE_SIZE];
 
+typedef struct DsTB {
+  Fun *curr;
+  TB_Module *module;
+} DsTB;
 
-{   // get the AST
-    FILE *file= strcmp(argv[1], "-") ?
-      fopen(argv[1], "r"):
-      stdin;
-    dsset_in(file, ds.scanner);
-    ds.stmts = stmt_start();
-    bool ret = dsparse(&ds);
-    fclose(file);
-    if(ret) exit(1);
+static inline void set(const TB_Register reg, const uint32_t n) {
+  value_data[n] = reg;
+}
+#define PARAM_SIZE 8
+TB_DataType param_data[PARAM_SIZE];
+
+static TB_Register get_reg(DsTB *const dstb, const uint32_t reg) {
+  if(reg < dstb->curr->narg && !value_data[reg]) {
+    set(tb_inst_param(dstb->curr->code, reg), reg);
+  }  return value_data[reg];
 }
 
-{
-  TB_Function *fib_func = dtb_compile(m, &ds);
-	tb_module_compile_func(m, fib_func);
-	tb_module_compile(m);
-	tb_module_export_jit(m);
+static TB_Register get_binary(DsTB *const dstb, const DscStmt *stmt, TB_Register rhs) {
+  TB_Function *code = dstb->curr->code;
+  const TB_Register lhs = get_reg(dstb, stmt->num0);
+  switch(stmt->op) {
+    case dsop_add:
+      if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
+        return tb_inst_add(code, value_data[5], value_data[8], TB_ASSUME_NUW);
+      return tb_inst_fadd(code, lhs, rhs);
+    case dsop_sub:
+      if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
+        return tb_inst_sub(code, lhs, rhs, TB_ASSUME_NUW);
+      return tb_inst_fsub(code, lhs, rhs);
+    case dsop_mul:
+      if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
+        return tb_inst_mul(code, lhs, rhs, TB_ASSUME_NUW);
+      return tb_inst_fmul(code, lhs, rhs);
+    case dsop_div:
+      if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
+        return tb_inst_div(code, lhs, rhs, TB_ASSUME_NUW);
+      return tb_inst_fdiv(code, lhs, rhs);
+    case dsop_mod:
+      return tb_inst_mod(code, lhs, rhs, TB_ASSUME_NUW);
 
-  typedef int(*FibFunction)(int n);
-  FibFunction compiled_fib_func = (FibFunction)tb_module_get_jit_func(m, fib_func);
-  int t = compiled_fib_func(2);
+//    case dsop_eq:
+//      return tb_inst_cmp_eq(code, lhs, rhs);
+//    case dsop_ne:
+//      return tb_inst_cmp_ne(code, lhs, rhs);
+    case dsop_lt:
+      if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
+        return tb_inst_cmp_ilt(code, lhs, rhs, TB_ASSUME_NUW);
+      return tb_inst_cmp_flt(code, lhs, rhs);
+    case dsop_le:
+      if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
+        return tb_inst_cmp_ile(code, lhs, rhs, TB_ASSUME_NUW);
+      return tb_inst_cmp_fle(code, lhs, rhs);
+    case dsop_gt:
+      if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
+        return tb_inst_cmp_igt(code, lhs, rhs, TB_ASSUME_NUW);
+      return tb_inst_cmp_fgt(code, lhs, rhs);
+    case dsop_ge:
+      if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
+        return tb_inst_cmp_ige(code, lhs, rhs, TB_ASSUME_NUW);
+      return tb_inst_cmp_fge(code, lhs, rhs);
 
+//    case dsop_land:
+//    case dsop_lor:
+
+    case dsop_band:
+      return tb_inst_and(code, lhs, rhs);
+  case dsop_bor:
+      return tb_inst_or(code, lhs, rhs);
+  case dsop_bxor:
+      return tb_inst_xor(code, lhs, rhs);
+  case dsop_shl:
+      return tb_inst_shl(code, lhs, rhs, TB_ASSUME_NUW);
+  case dsop_shr:
+      return tb_inst_shr(code, lhs, rhs);
+  default: exit(12);
+  }
 }
 
-	tb_module_destroy(m);
-  dslex_destroy(ds.scanner);
-	return 0;
+static void emit_binary(DsTB *const dstb, const DscStmt *stmt) {
+  set(get_binary(dstb, stmt, get_reg(dstb, stmt->num1)), stmt->dest);
+}
+/*
+static TB_Register get_unary(const ds_opcode op, const TB_Register val) {
+//  if(op == dsop_not) return tb_inst_not(code, val);
+//  if(op == dsop_cmp) return tb_inst_neg(code, val);
+  exit(12);
+}
+*/
+static void emit_unary(DsTB *const dstb, const DscStmt *stmt) {
+//  const TB_Register reg = get_unary(stmt->op, get_reg(stmt->num0));
+//  set(reg, stmt->dest);
+}
+
+static void emit_imm(DsTB *const dstb, const DscStmt *stmt) {
+  const TB_Register reg = tb_inst_sint(dstb->curr->code, TB_TYPE_I32, stmt->num0);
+  set(reg, stmt->dest);
+}
+
+/*
+static void dsjit_emit_immf(const DscStmt *stmt) {
+  const TB_Register reg = tb_inst_float(code, TB_TYPE_F32 , stmt->fnum0);
+  set(reg, stmt->dest);
+}
+*/
+
+static void emit_call(DsTB *const dstb, const DscStmt *stmt) {
+  for(uint32_t i =0; i < fun_count; i++) {
+    if(stmt->name == fun_data[i].name) {
+      Fun fun = fun_data[i];
+      set(tb_inst_call(dstb->curr->code, fun.ret_type, fun.code, fun.narg, (TB_Register[]){value_data[stmt->num1]}), stmt->dest);
+      return;
+   }
+  }
+  exit(33);
+}
+
+static void emit_return(DsTB *const dstb, const DscStmt *stmt) {
+  if(!stmt->num0)
+    tb_inst_ret(dstb->curr->code, get_reg(dstb, stmt->dest));
+  else
+    tb_inst_ret(dstb->curr->code, TB_NULL_REG);
+}
+
+static TB_DataType get_type(const char c) {
+  if(c == 'v') return TB_TYPE_VOID;
+  if(c == 'i') return TB_TYPE_I32;
+  if(c == 'f') return TB_TYPE_F32;
+  exit(34);
+}
+
+static void emit_label(DsTB *const dstb, const DscStmt *stmt) {
+  tb_inst_label(dstb->curr->code, label_data[stmt->dest]);
+}
+
+static void emit_if(DsTB *const dstb, const DscStmt *stmt) {
+  tb_inst_if(dstb->curr->code, get_reg(dstb, stmt->num0), label_data[stmt->num1], label_data[stmt->dest]);
+}
+
+static void emit_goto(DsTB *const dstb, const DscStmt *stmt) {
+  tb_inst_goto(dstb->curr->code, label_data[stmt->dest]);
+}
+
+typedef void (*dsc_t)(DsTB *const dstb, const DscStmt*);
+
+static const dsc_t functions[dsc_function] = {
+  emit_binary,
+  emit_unary,
+  emit_imm,
+//  emit_immf,
+  emit_label,
+  emit_if,
+  emit_goto,
+  emit_call,
+  emit_return,
+};
+
+ANN static void compile(DsTB *const dstb, DscStmt *stmts, uint32_t start, uint32_t end) {
+  for(size_t j = start; j < end; j++) {
+    const DscStmt stmt = stmts[j];
+    functions[stmt.type](dstb, &stmt);
+  }
+  tb_module_compile_func(dstb->module, dstb->curr->code);
+}
+
+static void first_pass(DsTB *const dstb, DsScanner *ds) {
+  uint32_t start = 0;
+  Fun *fun = NULL;
+  for(size_t i = 0; i < ds->n; i++) {
+    const DscStmt stmt = ds->stmts[i];
+    if(stmt.type == dsc_function) {
+      fun = &fun_data[fun_count];
+      fun_data[fun_count].name = stmt.name;
+      if(start)
+        compile(dstb, ds->stmts, start, i);
+    } else if(stmt.type == dsc_arg) {
+      const TB_DataType t = get_type(*stmt.name);
+      if(stmt.num1)
+        param_data[fun->narg++]  = t;
+      else {
+        TB_FunctionPrototype* proto = tb_prototype_create(dstb->module, TB_STDCALL, t, fun->narg, false);
+        tb_prototype_add_params(proto, fun->narg, param_data);
+        dstb->curr = fun;
+        fun->code =
+          tb_prototype_build(dstb->module, proto, fun->name, TB_LINKAGE_PUBLIC);
+        fun->ret_type = t;
+        fun_count++;
+        start = i + 1;
+      }
+    } else if(stmt.type == dsc_label)
+      label_data[stmt.dest] = tb_inst_new_label_id(fun->code);
+  }
+  compile(dstb, ds->stmts, start, ds->n);
+}
+
+TB_Function *dstb_compile(TB_Module* module, DsScanner *ds) {
+  DsTB dstb = { .module = module };
+  first_pass(&dstb, ds);
+  return dstb.curr->code;
 }

@@ -3,20 +3,17 @@ SPACE [ \t\n\r]
 %{
 #include <ctype.h>
 #include "ds.h"
-#include "dsc.h"
+#include "dsas.h"
 #include "dsc_parser.h"
 
 #define OP(a)     do { yylval->op = dsop_##a; return DS_OP;  } while(0)
 #define BINOP(a)  do { yylval->op = dsop_##a; return DS_BINOP;  } while(0)
-#define IBINOP(a) do { yylval->op = dsop_##a; return DS_IBINOP; } while(0)
 #define UNOP(a)   do { yylval->op = dsop_##a; return DS_UNOP;   } while(0)
-#define _JUMP()   do { yylval->op = dsop_jump; return DS_JUMP;   } while(0)
-#define JUMP(a)   do { yylval->op = dsop_##a##_jump; return DS_JUMP;   } while(0)
-#define YYSTYPE DSSTYPE
+#define YYSTYPE DSASSTYPE
 #define BUMP_SIZE 4096
 static char* string_alloc(const char *c);
 %}
-%option prefix="ds"
+%option prefix="dsas"
 %option bison-bridge
 %option reentrant
 %option noyywrap noinput nounput
@@ -31,43 +28,42 @@ static char* string_alloc(const char *c);
 
 "+"          { OP(add); }
 "-"          { OP(sub); }
-"*"          { IBINOP(mul); }
-"/"          { IBINOP(div); }
-"%"          { IBINOP(mod); }
+"*"          { OP(mul); }
+"/"          { OP(div); }
+"%"          { OP(mod); }
 
+%{/*
 "=="         { BINOP(eq); }
 "!="         { BINOP(ne); }
+*/%}
+
 "<"          { BINOP(lt); }
 "<="         { BINOP(le); }
 ">"          { BINOP(gt); }
 ">="         { BINOP(ge); }
 
+%{/*
 "&&"         { BINOP(land); }
 "||"         { BINOP(lor);  }
+*/%}
 
 "&"          { BINOP(band); }
 "|"          { BINOP(bor);  }
 "^"          { BINOP(bxor); }
-"<<"         { BINOP(blshift); }
-">>"         { BINOP(brshift);   }
-
+"<<"         { BINOP(shl); }
+">>"         { BINOP(shr);   }
+%{/*
 "++"         { UNOP(inc); }
 "--"         { UNOP(dec); }
 "="          { UNOP(mov); }
 "!"          { UNOP(not); }
 "~"          { UNOP(cmp); }
-
+*/%}
 "call"       { return DS_CALL; }
 "return"     { return DS_RETURN; }
 
-"jump"       { _JUMP(); }
-"jump=="     { JUMP(eq); }
-"jump!="     { JUMP(ne); }
-"jump<"      { JUMP(lt); }
-"jump<="     { JUMP(le); }
-"jump>"      { JUMP(gt); }
-"jump>="     { JUMP(ge); }
 "if"     { return DS_IF; }
+"goto"     { return DS_GOTO; }
 
 "$"{NUM}*      { yylval->num  = strtol(yytext + 1, NULL, 10); return DS_REG; }
 ":"{NUM}*      { yylval->num  = strtol(yytext + 1, NULL, 10); return DS_LABEL; }
@@ -92,4 +88,26 @@ static char* string_alloc(const char *c) {
   if(data - _data >= BUMP_SIZE)exit(3);
   strcpy(data, c);
   return data;
+}
+
+void dsas_init(DsScanner *dsas) {
+  dsaslex_init(&dsas->scanner);
+  dsasset_extra(&dsas, dsas->scanner);
+}
+
+bool dsas_compile(DsScanner *dsas) {
+  dsas->stmts = stmt_start();
+  return dsasparse(dsas);
+}
+
+bool dsas_file(DsScanner *dsas, FILE *file) {
+  dsasset_in(file, dsas->scanner);
+  const bool ret = dsas_compile(dsas);
+  fclose(file);
+  return ret;
+}
+
+bool dsas_filename(DsScanner *dsas, char* path) {
+  FILE *file= path ? fopen(path, "r") : stdin;
+  return file ? dsas_file(dsas, file) :false;
 }

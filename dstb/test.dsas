@@ -1,5 +1,0 @@
-main: int
-  imm 5 $0
-  imm 3 $1
-  + $1 $2 $3
-  return $0

@@ -35,73 +35,72 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_DS_GENERATED_DSC_PARSER_H_INCLUDED
-# define YY_DS_GENERATED_DSC_PARSER_H_INCLUDED
+#ifndef YY_DSAS_GENERATED_DSC_PARSER_H_INCLUDED
+# define YY_DSAS_GENERATED_DSC_PARSER_H_INCLUDED
 /* Debug traces.  */
-#ifndef DSDEBUG
+#ifndef DSASDEBUG
 # if defined YYDEBUG
 #if YYDEBUG
-#   define DSDEBUG 1
+#   define DSASDEBUG 1
 #  else
-#   define DSDEBUG 0
+#   define DSASDEBUG 0
 #  endif
 # else /* ! defined YYDEBUG */
-#  define DSDEBUG 0
+#  define DSASDEBUG 0
 # endif /* ! defined YYDEBUG */
-#endif  /* ! defined DSDEBUG */
-#if DSDEBUG
-extern int dsdebug;
+#endif  /* ! defined DSASDEBUG */
+#if DSASDEBUG
+extern int dsasdebug;
 #endif
 
 /* Token kinds.  */
-#ifndef DSTOKENTYPE
-# define DSTOKENTYPE
-  enum dstokentype
+#ifndef DSASTOKENTYPE
+# define DSASTOKENTYPE
+  enum dsastokentype
   {
-    DSEMPTY = -2,
-    DSEOF = 0,                     /* "end of file"  */
-    DSerror = 256,                 /* error  */
-    DSUNDEF = 257,                 /* "invalid token"  */
+    DSASEMPTY = -2,
+    DSASEOF = 0,                   /* "end of file"  */
+    DSASerror = 256,               /* error  */
+    DSASUNDEF = 257,               /* "invalid token"  */
     DS_IMM = 258,                  /* "imm"  */
     DS_CALL = 259,                 /* "call"  */
     DS_RETURN = 260,               /* "return"  */
     DS_IF = 261,                   /* "if"  */
-    DS_BINOP = 262,                /* "<binop>"  */
-    DS_IBINOP = 263,               /* "<ibinop>"  */
-    DS_JUMP = 264,                 /* "<jump>"  */
-    DS_UNOP = 265,                 /* "<unop>"  */
-    DS_OP = 266,                   /* "<op>"  */
-    DS_NUM = 267,                  /* "<integer>"  */
-    DS_REG = 268,                  /* "<register>"  */
-    DS_LABEL = 269,                /* "<label>"  */
-    DS_FNUM = 270,                 /* "<float>"  */
-    DS_ID = 271,                   /* "<id>"  */
-    DS_FUN = 272                   /* "<function>"  */
+    DS_GOTO = 262,                 /* "goto"  */
+    DS_BINOP = 263,                /* "<binop>"  */
+    DS_UNOP = 264,                 /* "<unop>"  */
+    DS_OP = 265,                   /* "<op>"  */
+    DS_NUM = 266,                  /* "<integer>"  */
+    DS_REG = 267,                  /* "<register>"  */
+    DS_LABEL = 268,                /* "<label>"  */
+    DS_FNUM = 269,                 /* "<float>"  */
+    DS_ID = 270,                   /* "<id>"  */
+    DS_FUN = 271                   /* "<function>"  */
   };
-  typedef enum dstokentype dstoken_kind_t;
+  typedef enum dsastokentype dsastoken_kind_t;
 #endif
 
 /* Value type.  */
-#if ! defined DSSTYPE && ! defined DSSTYPE_IS_DECLARED
-union DSSTYPE
+#if ! defined DSASSTYPE && ! defined DSASSTYPE_IS_DECLARED
+union DSASSTYPE
 {
-#line 26 "dsc.y"
+#line 22 "dsas.y"
 
   char     *id;
   uintptr_t num;
   float     fnum;
   ds_opcode op;
 
-#line 96 "generated/dsc_parser.h"
+#line 95 "generated/dsc_parser.h"
 
 };
-typedef union DSSTYPE DSSTYPE;
-# define DSSTYPE_IS_TRIVIAL 1
-# define DSSTYPE_IS_DECLARED 1
+typedef union DSASSTYPE DSASSTYPE;
+# define DSASSTYPE_IS_TRIVIAL 1
+# define DSASSTYPE_IS_DECLARED 1
 #endif
 
 
 
-int dsparse (DsScanner* arg);
+int dsasparse (DsScanner* arg);
 
-#endif /* !YY_DS_GENERATED_DSC_PARSER_H_INCLUDED  */
+#endif /* !YY_DSAS_GENERATED_DSC_PARSER_H_INCLUDED  */

@@ -1,6 +1,6 @@
-#ifndef dsHEADER_H
-#define dsHEADER_H 1
-#define dsIN_HEADER 1
+#ifndef dsasHEADER_H
+#define dsasHEADER_H 1
+#define dsasIN_HEADER 1
 
 #line 5 "generated/dsc_lexer.h"
 
@@ -19,225 +19,225 @@
 #endif
 
 #ifdef yy_create_buffer
-#define ds_create_buffer_ALREADY_DEFINED
+#define dsas_create_buffer_ALREADY_DEFINED
 #else
-#define yy_create_buffer ds_create_buffer
+#define yy_create_buffer dsas_create_buffer
 #endif
 
 #ifdef yy_delete_buffer
-#define ds_delete_buffer_ALREADY_DEFINED
+#define dsas_delete_buffer_ALREADY_DEFINED
 #else
-#define yy_delete_buffer ds_delete_buffer
+#define yy_delete_buffer dsas_delete_buffer
 #endif
 
 #ifdef yy_scan_buffer
-#define ds_scan_buffer_ALREADY_DEFINED
+#define dsas_scan_buffer_ALREADY_DEFINED
 #else
-#define yy_scan_buffer ds_scan_buffer
+#define yy_scan_buffer dsas_scan_buffer
 #endif
 
 #ifdef yy_scan_string
-#define ds_scan_string_ALREADY_DEFINED
+#define dsas_scan_string_ALREADY_DEFINED
 #else
-#define yy_scan_string ds_scan_string
+#define yy_scan_string dsas_scan_string
 #endif
 
 #ifdef yy_scan_bytes
-#define ds_scan_bytes_ALREADY_DEFINED
+#define dsas_scan_bytes_ALREADY_DEFINED
 #else
-#define yy_scan_bytes ds_scan_bytes
+#define yy_scan_bytes dsas_scan_bytes
 #endif
 
 #ifdef yy_init_buffer
-#define ds_init_buffer_ALREADY_DEFINED
+#define dsas_init_buffer_ALREADY_DEFINED
 #else
-#define yy_init_buffer ds_init_buffer
+#define yy_init_buffer dsas_init_buffer
 #endif
 
 #ifdef yy_flush_buffer
-#define ds_flush_buffer_ALREADY_DEFINED
+#define dsas_flush_buffer_ALREADY_DEFINED
 #else
-#define yy_flush_buffer ds_flush_buffer
+#define yy_flush_buffer dsas_flush_buffer
 #endif
 
 #ifdef yy_load_buffer_state
-#define ds_load_buffer_state_ALREADY_DEFINED
+#define dsas_load_buffer_state_ALREADY_DEFINED
 #else
-#define yy_load_buffer_state ds_load_buffer_state
+#define yy_load_buffer_state dsas_load_buffer_state
 #endif
 
 #ifdef yy_switch_to_buffer
-#define ds_switch_to_buffer_ALREADY_DEFINED
+#define dsas_switch_to_buffer_ALREADY_DEFINED
 #else
-#define yy_switch_to_buffer ds_switch_to_buffer
+#define yy_switch_to_buffer dsas_switch_to_buffer
 #endif
 
 #ifdef yypush_buffer_state
-#define dspush_buffer_state_ALREADY_DEFINED
+#define dsaspush_buffer_state_ALREADY_DEFINED
 #else
-#define yypush_buffer_state dspush_buffer_state
+#define yypush_buffer_state dsaspush_buffer_state
 #endif
 
 #ifdef yypop_buffer_state
-#define dspop_buffer_state_ALREADY_DEFINED
+#define dsaspop_buffer_state_ALREADY_DEFINED
 #else
-#define yypop_buffer_state dspop_buffer_state
+#define yypop_buffer_state dsaspop_buffer_state
 #endif
 
 #ifdef yyensure_buffer_stack
-#define dsensure_buffer_stack_ALREADY_DEFINED
+#define dsasensure_buffer_stack_ALREADY_DEFINED
 #else
-#define yyensure_buffer_stack dsensure_buffer_stack
+#define yyensure_buffer_stack dsasensure_buffer_stack
 #endif
 
 #ifdef yylex
-#define dslex_ALREADY_DEFINED
+#define dsaslex_ALREADY_DEFINED
 #else
-#define yylex dslex
+#define yylex dsaslex
 #endif
 
 #ifdef yyrestart
-#define dsrestart_ALREADY_DEFINED
+#define dsasrestart_ALREADY_DEFINED
 #else
-#define yyrestart dsrestart
+#define yyrestart dsasrestart
 #endif
 
 #ifdef yylex_init
-#define dslex_init_ALREADY_DEFINED
+#define dsaslex_init_ALREADY_DEFINED
 #else
-#define yylex_init dslex_init
+#define yylex_init dsaslex_init
 #endif
 
 #ifdef yylex_init_extra
-#define dslex_init_extra_ALREADY_DEFINED
+#define dsaslex_init_extra_ALREADY_DEFINED
 #else
-#define yylex_init_extra dslex_init_extra
+#define yylex_init_extra dsaslex_init_extra
 #endif
 
 #ifdef yylex_destroy
-#define dslex_destroy_ALREADY_DEFINED
+#define dsaslex_destroy_ALREADY_DEFINED
 #else
-#define yylex_destroy dslex_destroy
+#define yylex_destroy dsaslex_destroy
 #endif
 
 #ifdef yyget_debug
-#define dsget_debug_ALREADY_DEFINED
+#define dsasget_debug_ALREADY_DEFINED
 #else
-#define yyget_debug dsget_debug
+#define yyget_debug dsasget_debug
 #endif
 
 #ifdef yyset_debug
-#define dsset_debug_ALREADY_DEFINED
+#define dsasset_debug_ALREADY_DEFINED
 #else
-#define yyset_debug dsset_debug
+#define yyset_debug dsasset_debug
 #endif
 
 #ifdef yyget_extra
-#define dsget_extra_ALREADY_DEFINED
+#define dsasget_extra_ALREADY_DEFINED
 #else
-#define yyget_extra dsget_extra
+#define yyget_extra dsasget_extra
 #endif
 
 #ifdef yyset_extra
-#define dsset_extra_ALREADY_DEFINED
+#define dsasset_extra_ALREADY_DEFINED
 #else
-#define yyset_extra dsset_extra
+#define yyset_extra dsasset_extra
 #endif
 
 #ifdef yyget_in
-#define dsget_in_ALREADY_DEFINED
+#define dsasget_in_ALREADY_DEFINED
 #else
-#define yyget_in dsget_in
+#define yyget_in dsasget_in
 #endif
 
 #ifdef yyset_in
-#define dsset_in_ALREADY_DEFINED
+#define dsasset_in_ALREADY_DEFINED
 #else
-#define yyset_in dsset_in
+#define yyset_in dsasset_in
 #endif
 
 #ifdef yyget_out
-#define dsget_out_ALREADY_DEFINED
+#define dsasget_out_ALREADY_DEFINED
 #else
-#define yyget_out dsget_out
+#define yyget_out dsasget_out
 #endif
 
 #ifdef yyset_out
-#define dsset_out_ALREADY_DEFINED
+#define dsasset_out_ALREADY_DEFINED
 #else
-#define yyset_out dsset_out
+#define yyset_out dsasset_out
 #endif
 
 #ifdef yyget_leng
-#define dsget_leng_ALREADY_DEFINED
+#define dsasget_leng_ALREADY_DEFINED
 #else
-#define yyget_leng dsget_leng
+#define yyget_leng dsasget_leng
 #endif
 
 #ifdef yyget_text
-#define dsget_text_ALREADY_DEFINED
+#define dsasget_text_ALREADY_DEFINED
 #else
-#define yyget_text dsget_text
+#define yyget_text dsasget_text
 #endif
 
 #ifdef yyget_lineno
-#define dsget_lineno_ALREADY_DEFINED
+#define dsasget_lineno_ALREADY_DEFINED
 #else
-#define yyget_lineno dsget_lineno
+#define yyget_lineno dsasget_lineno
 #endif
 
 #ifdef yyset_lineno
-#define dsset_lineno_ALREADY_DEFINED
+#define dsasset_lineno_ALREADY_DEFINED
 #else
-#define yyset_lineno dsset_lineno
+#define yyset_lineno dsasset_lineno
 #endif
 
 #ifdef yyget_column
-#define dsget_column_ALREADY_DEFINED
+#define dsasget_column_ALREADY_DEFINED
 #else
-#define yyget_column dsget_column
+#define yyget_column dsasget_column
 #endif
 
 #ifdef yyset_column
-#define dsset_column_ALREADY_DEFINED
+#define dsasset_column_ALREADY_DEFINED
 #else
-#define yyset_column dsset_column
+#define yyset_column dsasset_column
 #endif
 
 #ifdef yywrap
-#define dswrap_ALREADY_DEFINED
+#define dsaswrap_ALREADY_DEFINED
 #else
-#define yywrap dswrap
+#define yywrap dsaswrap
 #endif
 
 #ifdef yyget_lval
-#define dsget_lval_ALREADY_DEFINED
+#define dsasget_lval_ALREADY_DEFINED
 #else
-#define yyget_lval dsget_lval
+#define yyget_lval dsasget_lval
 #endif
 
 #ifdef yyset_lval
-#define dsset_lval_ALREADY_DEFINED
+#define dsasset_lval_ALREADY_DEFINED
 #else
-#define yyset_lval dsset_lval
+#define yyset_lval dsasset_lval
 #endif
 
 #ifdef yyalloc
-#define dsalloc_ALREADY_DEFINED
+#define dsasalloc_ALREADY_DEFINED
 #else
-#define yyalloc dsalloc
+#define yyalloc dsasalloc
 #endif
 
 #ifdef yyrealloc
-#define dsrealloc_ALREADY_DEFINED
+#define dsasrealloc_ALREADY_DEFINED
 #else
-#define yyrealloc dsrealloc
+#define yyrealloc dsasrealloc
 #endif
 
 #ifdef yyfree
-#define dsfree_ALREADY_DEFINED
+#define dsasfree_ALREADY_DEFINED
 #else
-#define yyfree dsfree
+#define yyfree dsasfree
 #endif
 
 /* First, we deal with  platform-specific or compiler-specific issues. */
@@ -438,7 +438,7 @@ void yyfree ( void * , yyscan_t yyscanner );
 
 /* Begin user sect3 */
 
-#define dswrap(yyscanner) (/*CONSTCOND*/1)
+#define dsaswrap(yyscanner) (/*CONSTCOND*/1)
 #define YY_SKIP_YYWRAP
 
 #define yytext_ptr yytext_r
@@ -567,154 +567,154 @@ extern int yylex \
 #undef YY_DECL
 #endif
 
-#ifndef ds_create_buffer_ALREADY_DEFINED
+#ifndef dsas_create_buffer_ALREADY_DEFINED
 #undef yy_create_buffer
 #endif
-#ifndef ds_delete_buffer_ALREADY_DEFINED
+#ifndef dsas_delete_buffer_ALREADY_DEFINED
 #undef yy_delete_buffer
 #endif
-#ifndef ds_scan_buffer_ALREADY_DEFINED
+#ifndef dsas_scan_buffer_ALREADY_DEFINED
 #undef yy_scan_buffer
 #endif
-#ifndef ds_scan_string_ALREADY_DEFINED
+#ifndef dsas_scan_string_ALREADY_DEFINED
 #undef yy_scan_string
 #endif
-#ifndef ds_scan_bytes_ALREADY_DEFINED
+#ifndef dsas_scan_bytes_ALREADY_DEFINED
 #undef yy_scan_bytes
 #endif
-#ifndef ds_init_buffer_ALREADY_DEFINED
+#ifndef dsas_init_buffer_ALREADY_DEFINED
 #undef yy_init_buffer
 #endif
-#ifndef ds_flush_buffer_ALREADY_DEFINED
+#ifndef dsas_flush_buffer_ALREADY_DEFINED
 #undef yy_flush_buffer
 #endif
-#ifndef ds_load_buffer_state_ALREADY_DEFINED
+#ifndef dsas_load_buffer_state_ALREADY_DEFINED
 #undef yy_load_buffer_state
 #endif
-#ifndef ds_switch_to_buffer_ALREADY_DEFINED
+#ifndef dsas_switch_to_buffer_ALREADY_DEFINED
 #undef yy_switch_to_buffer
 #endif
-#ifndef dspush_buffer_state_ALREADY_DEFINED
+#ifndef dsaspush_buffer_state_ALREADY_DEFINED
 #undef yypush_buffer_state
 #endif
-#ifndef dspop_buffer_state_ALREADY_DEFINED
+#ifndef dsaspop_buffer_state_ALREADY_DEFINED
 #undef yypop_buffer_state
 #endif
-#ifndef dsensure_buffer_stack_ALREADY_DEFINED
+#ifndef dsasensure_buffer_stack_ALREADY_DEFINED
 #undef yyensure_buffer_stack
 #endif
-#ifndef dslex_ALREADY_DEFINED
+#ifndef dsaslex_ALREADY_DEFINED
 #undef yylex
 #endif
-#ifndef dsrestart_ALREADY_DEFINED
+#ifndef dsasrestart_ALREADY_DEFINED
 #undef yyrestart
 #endif
-#ifndef dslex_init_ALREADY_DEFINED
+#ifndef dsaslex_init_ALREADY_DEFINED
 #undef yylex_init
 #endif
-#ifndef dslex_init_extra_ALREADY_DEFINED
+#ifndef dsaslex_init_extra_ALREADY_DEFINED
 #undef yylex_init_extra
 #endif
-#ifndef dslex_destroy_ALREADY_DEFINED
+#ifndef dsaslex_destroy_ALREADY_DEFINED
 #undef yylex_destroy
 #endif
-#ifndef dsget_debug_ALREADY_DEFINED
+#ifndef dsasget_debug_ALREADY_DEFINED
 #undef yyget_debug
 #endif
-#ifndef dsset_debug_ALREADY_DEFINED
+#ifndef dsasset_debug_ALREADY_DEFINED
 #undef yyset_debug
 #endif
-#ifndef dsget_extra_ALREADY_DEFINED
+#ifndef dsasget_extra_ALREADY_DEFINED
 #undef yyget_extra
 #endif
-#ifndef dsset_extra_ALREADY_DEFINED
+#ifndef dsasset_extra_ALREADY_DEFINED
 #undef yyset_extra
 #endif
-#ifndef dsget_in_ALREADY_DEFINED
+#ifndef dsasget_in_ALREADY_DEFINED
 #undef yyget_in
 #endif
-#ifndef dsset_in_ALREADY_DEFINED
+#ifndef dsasset_in_ALREADY_DEFINED
 #undef yyset_in
 #endif
-#ifndef dsget_out_ALREADY_DEFINED
+#ifndef dsasget_out_ALREADY_DEFINED
 #undef yyget_out
 #endif
-#ifndef dsset_out_ALREADY_DEFINED
+#ifndef dsasset_out_ALREADY_DEFINED
 #undef yyset_out
 #endif
-#ifndef dsget_leng_ALREADY_DEFINED
+#ifndef dsasget_leng_ALREADY_DEFINED
 #undef yyget_leng
 #endif
-#ifndef dsget_text_ALREADY_DEFINED
+#ifndef dsasget_text_ALREADY_DEFINED
 #undef yyget_text
 #endif
-#ifndef dsget_lineno_ALREADY_DEFINED
+#ifndef dsasget_lineno_ALREADY_DEFINED
 #undef yyget_lineno
 #endif
-#ifndef dsset_lineno_ALREADY_DEFINED
+#ifndef dsasset_lineno_ALREADY_DEFINED
 #undef yyset_lineno
 #endif
-#ifndef dsget_column_ALREADY_DEFINED
+#ifndef dsasget_column_ALREADY_DEFINED
 #undef yyget_column
 #endif
-#ifndef dsset_column_ALREADY_DEFINED
+#ifndef dsasset_column_ALREADY_DEFINED
 #undef yyset_column
 #endif
-#ifndef dswrap_ALREADY_DEFINED
+#ifndef dsaswrap_ALREADY_DEFINED
 #undef yywrap
 #endif
-#ifndef dsget_lval_ALREADY_DEFINED
+#ifndef dsasget_lval_ALREADY_DEFINED
 #undef yyget_lval
 #endif
-#ifndef dsset_lval_ALREADY_DEFINED
+#ifndef dsasset_lval_ALREADY_DEFINED
 #undef yyset_lval
 #endif
-#ifndef dsget_lloc_ALREADY_DEFINED
+#ifndef dsasget_lloc_ALREADY_DEFINED
 #undef yyget_lloc
 #endif
-#ifndef dsset_lloc_ALREADY_DEFINED
+#ifndef dsasset_lloc_ALREADY_DEFINED
 #undef yyset_lloc
 #endif
-#ifndef dsalloc_ALREADY_DEFINED
+#ifndef dsasalloc_ALREADY_DEFINED
 #undef yyalloc
 #endif
-#ifndef dsrealloc_ALREADY_DEFINED
+#ifndef dsasrealloc_ALREADY_DEFINED
 #undef yyrealloc
 #endif
-#ifndef dsfree_ALREADY_DEFINED
+#ifndef dsasfree_ALREADY_DEFINED
 #undef yyfree
 #endif
-#ifndef dstext_ALREADY_DEFINED
+#ifndef dsastext_ALREADY_DEFINED
 #undef yytext
 #endif
-#ifndef dsleng_ALREADY_DEFINED
+#ifndef dsasleng_ALREADY_DEFINED
 #undef yyleng
 #endif
-#ifndef dsin_ALREADY_DEFINED
+#ifndef dsasin_ALREADY_DEFINED
 #undef yyin
 #endif
-#ifndef dsout_ALREADY_DEFINED
+#ifndef dsasout_ALREADY_DEFINED
 #undef yyout
 #endif
-#ifndef ds_flex_debug_ALREADY_DEFINED
+#ifndef dsas_flex_debug_ALREADY_DEFINED
 #undef yy_flex_debug
 #endif
-#ifndef dslineno_ALREADY_DEFINED
+#ifndef dsaslineno_ALREADY_DEFINED
 #undef yylineno
 #endif
-#ifndef dstables_fload_ALREADY_DEFINED
+#ifndef dsastables_fload_ALREADY_DEFINED
 #undef yytables_fload
 #endif
-#ifndef dstables_destroy_ALREADY_DEFINED
+#ifndef dsastables_destroy_ALREADY_DEFINED
 #undef yytables_destroy
 #endif
-#ifndef dsTABLES_NAME_ALREADY_DEFINED
+#ifndef dsasTABLES_NAME_ALREADY_DEFINED
 #undef yyTABLES_NAME
 #endif
 
-#line 81 "dsc.l"
+#line 77 "dsas.l"
 
 
 #line 718 "generated/dsc_lexer.h"
-#undef dsIN_HEADER
-#endif /* dsHEADER_H */
+#undef dsasIN_HEADER
+#endif /* dsasHEADER_H */

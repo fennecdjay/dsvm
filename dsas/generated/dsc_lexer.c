@@ -15,225 +15,225 @@
 #endif
 
 #ifdef yy_create_buffer
-#define ds_create_buffer_ALREADY_DEFINED
+#define dsas_create_buffer_ALREADY_DEFINED
 #else
-#define yy_create_buffer ds_create_buffer
+#define yy_create_buffer dsas_create_buffer
 #endif
 
 #ifdef yy_delete_buffer
-#define ds_delete_buffer_ALREADY_DEFINED
+#define dsas_delete_buffer_ALREADY_DEFINED
 #else
-#define yy_delete_buffer ds_delete_buffer
+#define yy_delete_buffer dsas_delete_buffer
 #endif
 
 #ifdef yy_scan_buffer
-#define ds_scan_buffer_ALREADY_DEFINED
+#define dsas_scan_buffer_ALREADY_DEFINED
 #else
-#define yy_scan_buffer ds_scan_buffer
+#define yy_scan_buffer dsas_scan_buffer
 #endif
 
 #ifdef yy_scan_string
-#define ds_scan_string_ALREADY_DEFINED
+#define dsas_scan_string_ALREADY_DEFINED
 #else
-#define yy_scan_string ds_scan_string
+#define yy_scan_string dsas_scan_string
 #endif
 
 #ifdef yy_scan_bytes
-#define ds_scan_bytes_ALREADY_DEFINED
+#define dsas_scan_bytes_ALREADY_DEFINED
 #else
-#define yy_scan_bytes ds_scan_bytes
+#define yy_scan_bytes dsas_scan_bytes
 #endif
 
 #ifdef yy_init_buffer
-#define ds_init_buffer_ALREADY_DEFINED
+#define dsas_init_buffer_ALREADY_DEFINED
 #else
-#define yy_init_buffer ds_init_buffer
+#define yy_init_buffer dsas_init_buffer
 #endif
 
 #ifdef yy_flush_buffer
-#define ds_flush_buffer_ALREADY_DEFINED
+#define dsas_flush_buffer_ALREADY_DEFINED
 #else
-#define yy_flush_buffer ds_flush_buffer
+#define yy_flush_buffer dsas_flush_buffer
 #endif
 
 #ifdef yy_load_buffer_state
-#define ds_load_buffer_state_ALREADY_DEFINED
+#define dsas_load_buffer_state_ALREADY_DEFINED
 #else
-#define yy_load_buffer_state ds_load_buffer_state
+#define yy_load_buffer_state dsas_load_buffer_state
 #endif
 
 #ifdef yy_switch_to_buffer
-#define ds_switch_to_buffer_ALREADY_DEFINED
+#define dsas_switch_to_buffer_ALREADY_DEFINED
 #else
-#define yy_switch_to_buffer ds_switch_to_buffer
+#define yy_switch_to_buffer dsas_switch_to_buffer
 #endif
 
 #ifdef yypush_buffer_state
-#define dspush_buffer_state_ALREADY_DEFINED
+#define dsaspush_buffer_state_ALREADY_DEFINED
 #else
-#define yypush_buffer_state dspush_buffer_state
+#define yypush_buffer_state dsaspush_buffer_state
 #endif
 
 #ifdef yypop_buffer_state
-#define dspop_buffer_state_ALREADY_DEFINED
+#define dsaspop_buffer_state_ALREADY_DEFINED
 #else
-#define yypop_buffer_state dspop_buffer_state
+#define yypop_buffer_state dsaspop_buffer_state
 #endif
 
 #ifdef yyensure_buffer_stack
-#define dsensure_buffer_stack_ALREADY_DEFINED
+#define dsasensure_buffer_stack_ALREADY_DEFINED
 #else
-#define yyensure_buffer_stack dsensure_buffer_stack
+#define yyensure_buffer_stack dsasensure_buffer_stack
 #endif
 
 #ifdef yylex
-#define dslex_ALREADY_DEFINED
+#define dsaslex_ALREADY_DEFINED
 #else
-#define yylex dslex
+#define yylex dsaslex
 #endif
 
 #ifdef yyrestart
-#define dsrestart_ALREADY_DEFINED
+#define dsasrestart_ALREADY_DEFINED
 #else
-#define yyrestart dsrestart
+#define yyrestart dsasrestart
 #endif
 
 #ifdef yylex_init
-#define dslex_init_ALREADY_DEFINED
+#define dsaslex_init_ALREADY_DEFINED
 #else
-#define yylex_init dslex_init
+#define yylex_init dsaslex_init
 #endif
 
 #ifdef yylex_init_extra
-#define dslex_init_extra_ALREADY_DEFINED
+#define dsaslex_init_extra_ALREADY_DEFINED
 #else
-#define yylex_init_extra dslex_init_extra
+#define yylex_init_extra dsaslex_init_extra
 #endif
 
 #ifdef yylex_destroy
-#define dslex_destroy_ALREADY_DEFINED
+#define dsaslex_destroy_ALREADY_DEFINED
 #else
-#define yylex_destroy dslex_destroy
+#define yylex_destroy dsaslex_destroy
 #endif
 
 #ifdef yyget_debug
-#define dsget_debug_ALREADY_DEFINED
+#define dsasget_debug_ALREADY_DEFINED
 #else
-#define yyget_debug dsget_debug
+#define yyget_debug dsasget_debug
 #endif
 
 #ifdef yyset_debug
-#define dsset_debug_ALREADY_DEFINED
+#define dsasset_debug_ALREADY_DEFINED
 #else
-#define yyset_debug dsset_debug
+#define yyset_debug dsasset_debug
 #endif
 
 #ifdef yyget_extra
-#define dsget_extra_ALREADY_DEFINED
+#define dsasget_extra_ALREADY_DEFINED
 #else
-#define yyget_extra dsget_extra
+#define yyget_extra dsasget_extra
 #endif
 
 #ifdef yyset_extra
-#define dsset_extra_ALREADY_DEFINED
+#define dsasset_extra_ALREADY_DEFINED
 #else
-#define yyset_extra dsset_extra
+#define yyset_extra dsasset_extra
 #endif
 
 #ifdef yyget_in
-#define dsget_in_ALREADY_DEFINED
+#define dsasget_in_ALREADY_DEFINED
 #else
-#define yyget_in dsget_in
+#define yyget_in dsasget_in
 #endif
 
 #ifdef yyset_in
-#define dsset_in_ALREADY_DEFINED
+#define dsasset_in_ALREADY_DEFINED
 #else
-#define yyset_in dsset_in
+#define yyset_in dsasset_in
 #endif
 
 #ifdef yyget_out
-#define dsget_out_ALREADY_DEFINED
+#define dsasget_out_ALREADY_DEFINED
 #else
-#define yyget_out dsget_out
+#define yyget_out dsasget_out
 #endif
 
 #ifdef yyset_out
-#define dsset_out_ALREADY_DEFINED
+#define dsasset_out_ALREADY_DEFINED
 #else
-#define yyset_out dsset_out
+#define yyset_out dsasset_out
 #endif
 
 #ifdef yyget_leng
-#define dsget_leng_ALREADY_DEFINED
+#define dsasget_leng_ALREADY_DEFINED
 #else
-#define yyget_leng dsget_leng
+#define yyget_leng dsasget_leng
 #endif
 
 #ifdef yyget_text
-#define dsget_text_ALREADY_DEFINED
+#define dsasget_text_ALREADY_DEFINED
 #else
-#define yyget_text dsget_text
+#define yyget_text dsasget_text
 #endif
 
 #ifdef yyget_lineno
-#define dsget_lineno_ALREADY_DEFINED
+#define dsasget_lineno_ALREADY_DEFINED
 #else
-#define yyget_lineno dsget_lineno
+#define yyget_lineno dsasget_lineno
 #endif
 
 #ifdef yyset_lineno
-#define dsset_lineno_ALREADY_DEFINED
+#define dsasset_lineno_ALREADY_DEFINED
 #else
-#define yyset_lineno dsset_lineno
+#define yyset_lineno dsasset_lineno
 #endif
 
 #ifdef yyget_column
-#define dsget_column_ALREADY_DEFINED
+#define dsasget_column_ALREADY_DEFINED
 #else
-#define yyget_column dsget_column
+#define yyget_column dsasget_column
 #endif
 
 #ifdef yyset_column
-#define dsset_column_ALREADY_DEFINED
+#define dsasset_column_ALREADY_DEFINED
 #else
-#define yyset_column dsset_column
+#define yyset_column dsasset_column
 #endif
 
 #ifdef yywrap
-#define dswrap_ALREADY_DEFINED
+#define dsaswrap_ALREADY_DEFINED
 #else
-#define yywrap dswrap
+#define yywrap dsaswrap
 #endif
 
 #ifdef yyget_lval
-#define dsget_lval_ALREADY_DEFINED
+#define dsasget_lval_ALREADY_DEFINED
 #else
-#define yyget_lval dsget_lval
+#define yyget_lval dsasget_lval
 #endif
 
 #ifdef yyset_lval
-#define dsset_lval_ALREADY_DEFINED
+#define dsasset_lval_ALREADY_DEFINED
 #else
-#define yyset_lval dsset_lval
+#define yyset_lval dsasset_lval
 #endif
 
 #ifdef yyalloc
-#define dsalloc_ALREADY_DEFINED
+#define dsasalloc_ALREADY_DEFINED
 #else
-#define yyalloc dsalloc
+#define yyalloc dsasalloc
 #endif
 
 #ifdef yyrealloc
-#define dsrealloc_ALREADY_DEFINED
+#define dsasrealloc_ALREADY_DEFINED
 #else
-#define yyrealloc dsrealloc
+#define yyrealloc dsasrealloc
 #endif
 
 #ifdef yyfree
-#define dsfree_ALREADY_DEFINED
+#define dsasfree_ALREADY_DEFINED
 #else
-#define yyfree dsfree
+#define yyfree dsasfree
 #endif
 
 /* First, we deal with  platform-specific or compiler-specific issues. */
@@ -539,7 +539,7 @@ void yyfree ( void * , yyscan_t yyscanner );
 
 /* Begin user sect3 */
 
-#define dswrap(yyscanner) (/*CONSTCOND*/1)
+#define dsaswrap(yyscanner) (/*CONSTCOND*/1)
 #define YY_SKIP_YYWRAP
 typedef flex_uint8_t YY_CHAR;
 
@@ -561,8 +561,8 @@ static void yynoreturn yy_fatal_error ( const char* msg , yyscan_t yyscanner );
 	yyg->yy_hold_char = *yy_cp; \
 	*yy_cp = '\0'; \
 	yyg->yy_c_buf_p = yy_cp;
-#define YY_NUM_RULES 44
-#define YY_END_OF_BUFFER 45
+#define YY_NUM_RULES 29
+#define YY_END_OF_BUFFER 30
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -570,16 +570,14 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[73] =
+static const flex_int16_t yy_accept[56] =
     {   0,
-       40,   40,   45,   43,   42,   42,   25,   43,   37,    8,
-       17,    6,    4,    5,   39,    7,   40,   38,   11,   24,
-       13,   41,   19,   41,   41,   41,   41,   18,   26,   42,
-       10,    0,    1,   37,   15,   22,   23,   39,   39,   40,
-       38,   20,   12,    9,   14,   21,   41,    2,   41,   36,
-       41,   41,   41,   16,   41,    3,   41,   41,   27,   29,
-       41,    0,   32,    0,   34,   41,   31,   33,   30,   35,
-       28,    0
+       25,   25,   30,   28,   27,   27,   28,   22,    8,   13,
+        6,    4,    5,   24,    7,   25,   23,    9,   11,   26,
+       15,   26,   26,   26,   26,   14,   27,    0,    1,   22,
+       24,   24,   25,   23,   16,   10,   12,   17,   26,    2,
+       26,   26,   20,   26,   26,   26,   26,    3,   26,   18,
+       21,   26,   26,   19,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -587,17 +585,17 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    2,    4,    1,    5,    6,    7,    8,    1,    1,
-        1,    9,   10,    1,   11,   12,   13,   14,   14,   14,
-       14,   14,   14,   14,   14,   14,   14,   15,    1,   16,
-       17,   18,    1,    1,   19,   19,   19,   19,   19,   19,
-       19,   19,   19,   19,   19,   19,   19,   19,   19,   19,
-       19,   19,   19,   19,   19,   19,   19,   19,   19,   19,
-        1,    1,    1,   20,   19,    1,   21,   19,   22,   19,
+        1,    2,    1,    1,    4,    5,    6,    7,    1,    1,
+        1,    8,    9,    1,   10,   11,   12,   13,   13,   13,
+       13,   13,   13,   13,   13,   13,   13,   14,    1,   15,
+       16,   17,    1,    1,   18,   18,   18,   18,   18,   18,
+       18,   18,   18,   18,   18,   18,   18,   18,   18,   18,
+       18,   18,   18,   18,   18,   18,   18,   18,   18,   18,
+        1,    1,    1,   19,   18,    1,   20,   18,   21,   18,
 
-       23,   24,   19,   19,   25,   26,   19,   27,   28,   29,
-       19,   30,   19,   31,   19,   32,   33,   19,   19,   19,
-       19,   19,    1,   34,    1,   35,    1,    1,    1,    1,
+       22,   23,   24,   18,   25,   18,   18,   26,   27,   28,
+       29,   18,   18,   30,   18,   31,   32,   18,   18,   18,
+       18,   18,    1,   33,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -614,76 +612,68 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[36] =
+static const YY_CHAR yy_meta[34] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    2,    2,    1,    1,    1,    2,    1,
+        1,    1,    2,    2,    1,    1,    1,    2,    1,    2,
         2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    2,    2,    1,    1
+        2,    2,    1
     } ;
 
-static const flex_int16_t yy_base[75] =
+static const flex_int16_t yy_base[58] =
     {   0,
-        0,    0,  110,  111,   34,   36,   92,  105,   93,  111,
-       98,  111,   95,   93,   89,  111,   28,   88,   27,   84,
-       28,   85,  111,   26,   33,   34,   35,   65,  111,   49,
-      111,   95,  111,   83,  111,  111,  111,   82,   81,   41,
-       80,  111,  111,  111,  111,  111,   78,  111,   39,   77,
-       41,   44,   45,  111,   47,   73,   48,   49,   68,   69,
-       50,   63,   62,   59,   54,   60,  111,  111,  111,  111,
-       55,  111,   89,   66
+        0,    0,   94,   95,   32,   34,   90,   79,   95,   95,
+       95,   95,   95,   78,   95,   27,   77,   26,   27,   75,
+       95,   25,   32,   33,   35,   95,   48,   85,   95,   74,
+       73,   68,   41,   66,   95,   95,   95,   95,   64,   95,
+       39,   41,   63,   44,   45,   48,   34,   61,   50,   59,
+       56,   53,   52,   55,   95,   83,   66
     } ;
 
-static const flex_int16_t yy_def[75] =
+static const flex_int16_t yy_def[58] =
     {   0,
-       72,    1,   72,   72,   72,   72,   72,   73,   72,   72,
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   74,   72,   74,   74,   74,   74,   72,   72,   72,
-       72,   73,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   72,   72,   72,   72,   72,   74,   72,   74,   74,
-       74,   74,   74,   72,   74,   74,   74,   74,   74,   74,
-       74,   72,   72,   72,   72,   74,   72,   72,   72,   72,
-       74,    0,   72,   72
+       55,    1,   55,   55,   55,   55,   56,   55,   55,   55,
+       55,   55,   55,   55,   55,   55,   55,   55,   55,   57,
+       55,   57,   57,   57,   57,   55,   55,   56,   55,   55,
+       55,   55,   55,   55,   55,   55,   55,   55,   57,   55,
+       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,    0,   55,   55
     } ;
 
-static const flex_int16_t yy_nxt[147] =
+static const flex_int16_t yy_nxt[129] =
     {   0,
         4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
-       14,   15,   16,   17,   18,   19,   20,   21,   22,   23,
-       22,   24,   22,   22,   25,   26,   22,   22,   22,   22,
-       27,   22,   22,   28,   29,   30,   30,   30,   30,   39,
-       48,   40,   42,   43,   45,   46,   49,   48,   48,   48,
-       30,   30,   39,   48,   40,   48,   50,   53,   48,   48,
-       51,   48,   48,   48,   48,   55,   52,   47,   56,   48,
-       70,   57,   62,   59,   48,   69,   58,   60,   68,   67,
-       66,   61,   48,   48,   63,   64,   65,   48,   71,   32,
-       32,   48,   48,   41,   38,   38,   34,   33,   54,   48,
+       14,   15,   16,   17,   18,    4,   19,   20,   21,   20,
+       22,   20,   20,   23,   24,   20,   20,   20,   20,   25,
+       20,   20,   26,   27,   27,   27,   27,   32,   40,   33,
+       35,   36,   37,   38,   41,   40,   40,   40,   40,   27,
+       27,   32,   40,   33,   40,   43,   45,   40,   40,   44,
+       42,   40,   51,   40,   46,   40,   40,   39,   40,   40,
+       48,   47,   40,   50,   40,   49,   40,   40,   34,   54,
+       31,   52,   53,   28,   28,   31,   30,   29,   40,   34,
+       31,   30,   29,   55,    3,   55,   55,   55,   55,   55,
 
-       44,   41,   38,   37,   36,   35,   34,   33,   31,   72,
-        3,   72,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   72,   72,   72,   72,   72
+       55,   55,   55,   55,   55,   55,   55,   55,   55,   55,
+       55,   55,   55,   55,   55,   55,   55,   55,   55,   55,
+       55,   55,   55,   55,   55,   55,   55,   55
     } ;
 
-static const flex_int16_t yy_chk[147] =
+static const flex_int16_t yy_chk[129] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    5,    5,    6,    6,   17,
-       24,   17,   19,   19,   21,   21,   24,   25,   26,   27,
-       30,   30,   40,   49,   40,   51,   25,   27,   52,   53,
-       25,   55,   57,   58,   61,   49,   26,   74,   51,   71,
-       65,   52,   60,   55,   66,   64,   53,   57,   63,   62,
-       61,   58,   59,   60,   60,   60,   60,   56,   66,   73,
-       73,   50,   47,   41,   39,   38,   34,   32,   28,   22,
+        1,    1,    1,    5,    5,    6,    6,   16,   22,   16,
+       18,   18,   19,   19,   22,   23,   24,   47,   25,   27,
+       27,   33,   41,   33,   42,   24,   25,   44,   45,   24,
+       23,   46,   47,   49,   41,   53,   52,   57,   54,   51,
+       44,   42,   50,   46,   48,   45,   43,   39,   34,   53,
+       32,   49,   52,   56,   56,   31,   30,   28,   20,   17,
+       14,    8,    7,    3,   55,   55,   55,   55,   55,   55,
 
-       20,   18,   15,   14,   13,   11,    9,    8,    7,    3,
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   72,   72,   72,   72,   72
+       55,   55,   55,   55,   55,   55,   55,   55,   55,   55,
+       55,   55,   55,   55,   55,   55,   55,   55,   55,   55,
+       55,   55,   55,   55,   55,   55,   55,   55
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -693,25 +683,22 @@ static const flex_int16_t yy_chk[147] =
 #define yymore() yymore_used_but_not_detected
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
-#line 1 "dsc.l"
-#line 4 "dsc.l"
+#line 1 "dsas.l"
+#line 4 "dsas.l"
 #include <ctype.h>
 #include "ds.h"
-#include "dsc.h"
+#include "dsas.h"
 #include "dsc_parser.h"
 
 #define OP(a)     do { yylval->op = dsop_##a; return DS_OP;  } while(0)
 #define BINOP(a)  do { yylval->op = dsop_##a; return DS_BINOP;  } while(0)
-#define IBINOP(a) do { yylval->op = dsop_##a; return DS_IBINOP; } while(0)
 #define UNOP(a)   do { yylval->op = dsop_##a; return DS_UNOP;   } while(0)
-#define _JUMP()   do { yylval->op = dsop_jump; return DS_JUMP;   } while(0)
-#define JUMP(a)   do { yylval->op = dsop_##a##_jump; return DS_JUMP;   } while(0)
-#define YYSTYPE DSSTYPE
+#define YYSTYPE DSASSTYPE
 #define BUMP_SIZE 4096
 static char* string_alloc(const char *c);
-#line 712 "generated/dsc_lexer.c"
+#line 699 "generated/dsc_lexer.c"
 #define YY_NO_INPUT 1
-#line 714 "generated/dsc_lexer.c"
+#line 701 "generated/dsc_lexer.c"
 
 #define INITIAL 0
 
@@ -983,10 +970,10 @@ YY_DECL
 		}
 
 	{
-#line 24 "dsc.l"
+#line 21 "dsas.l"
 
 
-#line 989 "generated/dsc_lexer.c"
+#line 976 "generated/dsc_lexer.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1013,13 +1000,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 73 )
+				if ( yy_current_state >= 56 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 111 );
+		while ( yy_base[yy_current_state] != 95 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -1046,226 +1033,166 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 26 "dsc.l"
+#line 23 "dsas.l"
 {}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 28 "dsc.l"
+#line 25 "dsas.l"
 { yytext[yyleng-1] = '\0'; yylval->id = string_alloc(yytext); return DS_FUN; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 30 "dsc.l"
+#line 27 "dsas.l"
 { return DS_IMM; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 32 "dsc.l"
+#line 29 "dsas.l"
 { OP(add); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 33 "dsc.l"
+#line 30 "dsas.l"
 { OP(sub); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 34 "dsc.l"
-{ IBINOP(mul); }
+#line 31 "dsas.l"
+{ OP(mul); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 35 "dsc.l"
-{ IBINOP(div); }
+#line 32 "dsas.l"
+{ OP(div); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 36 "dsc.l"
-{ IBINOP(mod); }
+#line 33 "dsas.l"
+{ OP(mod); }
 	YY_BREAK
+/*
+"=="         { BINOP(eq); }
+"!="         { BINOP(ne); }
+*/
 case 9:
 YY_RULE_SETUP
-#line 38 "dsc.l"
-{ BINOP(eq); }
+#line 40 "dsas.l"
+{ BINOP(lt); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 39 "dsc.l"
-{ BINOP(ne); }
+#line 41 "dsas.l"
+{ BINOP(le); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 40 "dsc.l"
-{ BINOP(lt); }
+#line 42 "dsas.l"
+{ BINOP(gt); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 41 "dsc.l"
-{ BINOP(le); }
+#line 43 "dsas.l"
+{ BINOP(ge); }
 	YY_BREAK
+/*
+"&&"         { BINOP(land); }
+"||"         { BINOP(lor);  }
+*/
 case 13:
 YY_RULE_SETUP
-#line 42 "dsc.l"
-{ BINOP(gt); }
+#line 50 "dsas.l"
+{ BINOP(band); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 43 "dsc.l"
-{ BINOP(ge); }
+#line 51 "dsas.l"
+{ BINOP(bor);  }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 45 "dsc.l"
-{ BINOP(land); }
+#line 52 "dsas.l"
+{ BINOP(bxor); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 46 "dsc.l"
-{ BINOP(lor);  }
+#line 53 "dsas.l"
+{ BINOP(shl); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 48 "dsc.l"
-{ BINOP(band); }
+#line 54 "dsas.l"
+{ BINOP(shr);   }
 	YY_BREAK
+/*
+"++"         { UNOP(inc); }
+"--"         { UNOP(dec); }
+"="          { UNOP(mov); }
+"!"          { UNOP(not); }
+"~"          { UNOP(cmp); }
+*/
 case 18:
 YY_RULE_SETUP
-#line 49 "dsc.l"
-{ BINOP(bor);  }
+#line 62 "dsas.l"
+{ return DS_CALL; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 50 "dsc.l"
-{ BINOP(bxor); }
+#line 63 "dsas.l"
+{ return DS_RETURN; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 51 "dsc.l"
-{ BINOP(blshift); }
+#line 65 "dsas.l"
+{ return DS_IF; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 52 "dsc.l"
-{ BINOP(brshift);   }
+#line 66 "dsas.l"
+{ return DS_GOTO; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 54 "dsc.l"
-{ UNOP(inc); }
+#line 68 "dsas.l"
+{ yylval->num  = strtol(yytext + 1, NULL, 10); return DS_REG; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 55 "dsc.l"
-{ UNOP(dec); }
+#line 69 "dsas.l"
+{ yylval->num  = strtol(yytext + 1, NULL, 10); return DS_LABEL; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 56 "dsc.l"
-{ UNOP(mov); }
+#line 70 "dsas.l"
+{ yylval->fnum = strtof(yytext, NULL); return DS_FNUM; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 57 "dsc.l"
-{ UNOP(not); }
+#line 71 "dsas.l"
+{ yylval->num  = strtol(yytext, NULL, 10); return DS_NUM; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 58 "dsc.l"
-{ UNOP(cmp); }
+#line 73 "dsas.l"
+{ yylval->id = string_alloc(yytext); return DS_ID; }
 	YY_BREAK
 case 27:
+/* rule 27 can match eol */
 YY_RULE_SETUP
-#line 60 "dsc.l"
-{ return DS_CALL; }
+#line 75 "dsas.l"
+{}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 61 "dsc.l"
-{ return DS_RETURN; }
+#line 76 "dsas.l"
+{ puts("unexpected character"); return 1; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 63 "dsc.l"
-{ _JUMP(); }
-	YY_BREAK
-case 30:
-YY_RULE_SETUP
-#line 64 "dsc.l"
-{ JUMP(eq); }
-	YY_BREAK
-case 31:
-YY_RULE_SETUP
-#line 65 "dsc.l"
-{ JUMP(ne); }
-	YY_BREAK
-case 32:
-YY_RULE_SETUP
-#line 66 "dsc.l"
-{ JUMP(lt); }
-	YY_BREAK
-case 33:
-YY_RULE_SETUP
-#line 67 "dsc.l"
-{ JUMP(le); }
-	YY_BREAK
-case 34:
-YY_RULE_SETUP
-#line 68 "dsc.l"
-{ JUMP(gt); }
-	YY_BREAK
-case 35:
-YY_RULE_SETUP
-#line 69 "dsc.l"
-{ JUMP(ge); }
-	YY_BREAK
-case 36:
-YY_RULE_SETUP
-#line 70 "dsc.l"
-{ return DS_IF; }
-	YY_BREAK
-case 37:
-YY_RULE_SETUP
-#line 72 "dsc.l"
-{ yylval->num  = strtol(yytext + 1, NULL, 10); return DS_REG; }
-	YY_BREAK
-case 38:
-YY_RULE_SETUP
-#line 73 "dsc.l"
-{ yylval->num  = strtol(yytext + 1, NULL, 10); return DS_LABEL; }
-	YY_BREAK
-case 39:
-YY_RULE_SETUP
-#line 74 "dsc.l"
-{ yylval->fnum = strtof(yytext, NULL); return DS_FNUM; }
-	YY_BREAK
-case 40:
-YY_RULE_SETUP
-#line 75 "dsc.l"
-{ yylval->num  = strtol(yytext, NULL, 10); return DS_NUM; }
-	YY_BREAK
-case 41:
-YY_RULE_SETUP
-#line 77 "dsc.l"
-{ yylval->id = string_alloc(yytext); return DS_ID; }
-	YY_BREAK
-case 42:
-/* rule 42 can match eol */
-YY_RULE_SETUP
-#line 79 "dsc.l"
-{}
-	YY_BREAK
-case 43:
-YY_RULE_SETUP
-#line 80 "dsc.l"
-{ puts("unexpected character"); return 1; }
-	YY_BREAK
-case 44:
-YY_RULE_SETUP
-#line 81 "dsc.l"
+#line 77 "dsas.l"
 ECHO;
 	YY_BREAK
-#line 1268 "generated/dsc_lexer.c"
+#line 1195 "generated/dsc_lexer.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1564,7 +1491,7 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 73 )
+			if ( yy_current_state >= 56 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1593,11 +1520,11 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 73 )
+		if ( yy_current_state >= 56 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 72);
+	yy_is_jam = (yy_current_state == 55);
 
 	(void)yyg;
 	return yy_is_jam ? 0 : yy_current_state;
@@ -2408,7 +2335,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 81 "dsc.l"
+#line 77 "dsas.l"
 
 #define BUMP_SIZE 4096
 static char _data[BUMP_SIZE];
@@ -2423,5 +2350,27 @@ static char* string_alloc(const char *c) {
   if(data - _data >= BUMP_SIZE)exit(3);
   strcpy(data, c);
   return data;
+}
+
+void dsas_init(DsScanner *dsas) {
+  dsaslex_init(&dsas->scanner);
+  dsasset_extra(&dsas, dsas->scanner);
+}
+
+bool dsas_compile(DsScanner *dsas) {
+  dsas->stmts = stmt_start();
+  return dsasparse(dsas);
+}
+
+bool dsas_file(DsScanner *dsas, FILE *file) {
+  dsasset_in(file, dsas->scanner);
+  const bool ret = dsas_compile(dsas);
+  fclose(file);
+  return ret;
+}
+
+bool dsas_filename(DsScanner *dsas, char* path) {
+  FILE *file= path ? fopen(path, "r") : stdin;
+  return file ? dsas_file(dsas, file) :false;
 }
 
