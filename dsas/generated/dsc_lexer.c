@@ -2377,7 +2377,7 @@ bool dsas_file(DsAs *dsas, FILE *file) {
 
 bool dsas_filename(DsAs *dsas, char* path) {
   FILE *file= path ? fopen(path, "r") : stdin;
-  return file ? dsas_file(dsas, file) :false;
+  return file ? dsas_file(dsas, file) : true;
 }
 
 void dsas_destroy(DsAs *const dsas) {

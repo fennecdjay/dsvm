@@ -15,12 +15,42 @@
 	goto *info.addr;\
 } while(0)
 
+#define BINARY_IMM(op) do               \
+{                                   \
+  const DsInfo3j info = *(DsInfo3j*)code;\
+  code += sizeof(DsInfo3j);\
+  reg[info.ptr] = reg[info.lhs] op info.rhs; \
+	goto *info.addr;\
+} while(0)
+
 #define UNARY(op) do                \
 {                                   \
   const DsInfoj info = *(DsInfoj*)code;\
   code += sizeof(DsInfoj);\
   reg[info.rhs] = op reg[info.lhs];          \
   goto *info.addr;\
+} while(0)
+
+#define BINARY_IF(op)  do { \
+  const reg_t lhs  = *(reg_t*)code;\
+  const reg_t rhs  = *(reg_t*)(code + sizeof(reg_t));\
+  dscode_t *const new_code  = *(dscode_t**)(code + sizeof(reg_t)*2);\
+  if(!(reg[lhs] op reg[rhs]))       \
+    code = new_code;            \
+  else\
+    code += 3*sizeof(void*);\
+  DISPATCH();\
+} while(0)
+
+#define BINARY_IF_IMM(op)  do { \
+  const reg_t lhs  = *(reg_t*)code;\
+  const reg_t rhs  = *(reg_t*)(code + sizeof(reg_t));\
+  dscode_t *const new_code  = *(dscode_t**)(code + sizeof(reg_t)*2);\
+  if(!(reg[lhs] op rhs))       \
+    code = new_code;            \
+  else\
+    code += 3*sizeof(void*);\
+  DISPATCH();\
 } while(0)
 /*
 #define BINARYF(op) do               \
@@ -42,12 +72,26 @@ void dsvm_run(DsThread *thread, const dscode_t *next) {
     DISPATCH();
   _dsop_imm:
 {
-  const reg_t lhs = vm_read();
-  const reg_t dest = vm_read();
+//  const reg_t lhs = vm_read();
+//  const reg_t dest = vm_read();
+  const reg_t lhs = *(reg_t*)code;
+  const reg_t dest = *(reg_t*)(code + sizeof(reg_t));
+const void *addr = *(void**)(code + sizeof(reg_t)*2);
+code += sizeof(reg_t) *3;
   reg[dest] = lhs;
+ goto *addr;
+//  DISPATCH();
+}
+/*
+  _dsop_imm_sub:
+{
+  const reg_t lhs = vm_read();
+  const reg_t rhs = vm_read();
+  const reg_t dest = vm_read();
+  reg[dest] = reg[lhs] - rhs;
   DISPATCH();
 }
-
+*/
   _dsop_add:
   BINARY(+);
   _dsop_sub:
@@ -89,6 +133,49 @@ void dsvm_run(DsThread *thread, const dscode_t *next) {
   BINARY(<<);
   _dsop_shr:
   BINARY(>>);
+
+
+  _dsop_add_imm:
+  BINARY_IMM(+);
+  _dsop_sub_imm:
+  BINARY_IMM(-);
+  _dsop_mul_imm:
+  BINARY_IMM(*);
+  _dsop_div_imm:
+  BINARY_IMM(/);
+  _dsop_mod_imm:
+  BINARY_IMM(%);
+
+  _dsop_eq_imm:
+  BINARY_IMM(==);
+  _dsop_ne_imm:
+  BINARY_IMM(!=);
+
+  _dsop_lt_imm:
+  BINARY_IMM(<);
+  _dsop_le_imm:
+  BINARY_IMM(<=);
+  _dsop_gt_imm:
+  BINARY_IMM(>);
+  _dsop_ge_imm:
+  BINARY_IMM(>=);
+
+
+  _dsop_land_imm:
+  BINARY_IMM(&&);
+  _dsop_lor_imm:
+  BINARY_IMM(||);
+
+  _dsop_band_imm:
+  BINARY_IMM(&);
+  _dsop_bor_imm:
+  BINARY_IMM(|);
+  _dsop_bxor_imm:
+  BINARY_IMM(^);
+  _dsop_shl_imm:
+  BINARY_IMM(<<);
+  _dsop_shr_imm:
+  BINARY_IMM(>>);
 /*
   _dsop_inc:
   UNARY(++);
@@ -108,6 +195,12 @@ void dsvm_run(DsThread *thread, const dscode_t *next) {
   _dsop_cmp:
   UNARY(~);
 */
+  _dsop_goto:
+{
+  code = (dscode_t*)vm_read();
+  DISPATCH();
+}
+
   _dsop_if:
 {
   reg_t cond = *(reg_t*)code;
@@ -117,15 +210,94 @@ void dsvm_run(DsThread *thread, const dscode_t *next) {
   DISPATCH();
 }
 
-  _dsop_goto:
-{
-  code = (dscode_t*)vm_read();
-  DISPATCH();
-}
+  _dsop_if_add:
+  BINARY_IF(+);
+  _dsop_if_sub:
+  BINARY_IF(-);
+  _dsop_if_mul:
+  BINARY_IF(&&); // from a gcc suggestion
+  _dsop_if_div:
+  BINARY_IF(/);
+  _dsop_if_mod:
+  BINARY_IF(%);
+
+  _dsop_if_eq:
+  BINARY_IF(==);
+  _dsop_if_ne:
+  BINARY_IF(!=);
+
+  _dsop_if_lt:
+  BINARY_IF(<);
+  _dsop_if_le:
+  BINARY_IF(<=);
+  _dsop_if_gt:
+  BINARY_IF(>);
+  _dsop_if_ge:
+  BINARY_IF(>=);
+
+
+  _dsop_if_land:
+  BINARY_IF(&&);
+  _dsop_if_lor:
+  BINARY_IF(||);
+
+  _dsop_if_band:
+  BINARY_IF(&);
+  _dsop_if_bor:
+  BINARY_IF(|);
+  _dsop_if_bxor:
+  BINARY_IF(^);
+  _dsop_if_shl:
+  BINARY_IF(<<);
+  _dsop_if_shr:
+  BINARY_IF(>>);
+
+  _dsop_if_add_imm:
+  BINARY_IF_IMM(+);
+  _dsop_if_sub_imm:
+  BINARY_IF_IMM(-);
+  _dsop_if_mul_imm:
+  BINARY_IF_IMM(&&); // from a gcc suggestion
+  _dsop_if_div_imm:
+  BINARY_IF_IMM(/);
+  _dsop_if_mod_imm:
+  BINARY_IF_IMM(%);
+
+  _dsop_if_eq_imm:
+  BINARY_IF_IMM(==);
+  _dsop_if_ne_imm:
+  BINARY_IF_IMM(!=);
+
+  _dsop_if_lt_imm:
+  BINARY_IF_IMM(<);
+  _dsop_if_le_imm:
+  BINARY_IF_IMM(<=);
+  _dsop_if_gt_imm:
+  BINARY_IF_IMM(>);
+  _dsop_if_ge_imm:
+  BINARY_IF_IMM(>=);
+
+
+  _dsop_if_land_imm:
+  BINARY_IF_IMM(&&);
+  _dsop_if_lor_imm:
+  BINARY_IF_IMM(||);
+
+  _dsop_if_band_imm:
+  BINARY_IF_IMM(&);
+  _dsop_if_bor_imm:
+  BINARY_IF_IMM(|);
+  _dsop_if_bxor_imm:
+  BINARY_IF_IMM(^);
+  _dsop_if_shl_imm:
+  BINARY_IF_IMM(<<);
+  _dsop_if_shr_imm:
+  BINARY_IF_IMM(>>);
+
   _dsop_call:
 {
   const DsInfo3 info = *(DsInfo3*)code;
-  if(nframe == RVM_SIZE - 1) exit(3);
+  if(nframe == RVM_SIZE - 1) exit(13);
   frames[nframe++] = (DsFrame){ .reg = reg, .code = code + sizeof(DsInfo3), .out = info.rhs };
   reg += info.lhs;
   code = info.code;
@@ -190,10 +362,44 @@ _dsop_end:
      &&__dsop_band, &&__dsop_bor, &&__dsop_bxor,
      &&__dsop_shl, &&__dsop_shr,
 
+     &&__dsop_add_imm, &&__dsop_sub_imm, &&__dsop_mul_imm,
+     &&__dsop_div_imm, &&__dsop_mod_imm,
+
+     &&__dsop_eq_imm, &&__dsop_ne_imm,
+     &&__dsop_lt_imm, &&__dsop_le_imm,
+     &&__dsop_gt_imm, &&__dsop_ge_imm,
+
+     &&__dsop_land_imm, &&__dsop_lor_imm,
+     &&__dsop_band_imm, &&__dsop_bor_imm, &&__dsop_bxor_imm,
+     &&__dsop_shl_imm, &&__dsop_shr_imm,
+
 //     &&__dsop_inc, &&__dsop_dec, &&__dsop_mov,
 //     &&__dsop_neg, &&__dsop_not, &&__dsop_cmp,
 
-     &&__dsop_if, &&__dsop_goto,
+     &&__dsop_goto, &&__dsop_if,
+
+     &&__dsop_if_add, &&__dsop_if_sub, &&__dsop_if_mul,
+     &&__dsop_if_div, &&__dsop_if_mod,
+
+     &&__dsop_if_eq, &&__dsop_if_ne,
+     &&__dsop_if_lt, &&__dsop_if_le,
+     &&__dsop_if_gt, &&__dsop_if_ge,
+
+     &&__dsop_if_land, &&__dsop_if_lor,
+     &&__dsop_if_band, &&__dsop_if_bor, &&__dsop_if_bxor,
+     &&__dsop_if_shl, &&__dsop_if_shr,
+
+     &&__dsop_if_add_imm, &&__dsop_if_sub_imm, &&__dsop_if_mul_imm,
+     &&__dsop_if_div_imm, &&__dsop_if_mod_imm,
+
+     &&__dsop_if_eq_imm, &&__dsop_if_ne_imm,
+     &&__dsop_if_lt_imm, &&__dsop_if_le_imm,
+     &&__dsop_if_gt_imm, &&__dsop_if_ge_imm,
+
+     &&__dsop_if_land_imm, &&__dsop_if_lor_imm,
+     &&__dsop_if_band_imm, &&__dsop_if_bor_imm, &&__dsop_if_bxor_imm,
+     &&__dsop_if_shl_imm, &&__dsop_if_shr_imm,
+
      &&__dsop_call, &&__dsop_return,
 /*
      &&__dsop_immf,
@@ -220,11 +426,48 @@ _dsop_end:
   PREPARE2(band, DsInfo3); PREPARE2(bor, DsInfo3); PREPARE2(bxor, DsInfo3);
   PREPARE2(shl, DsInfo3); PREPARE2(shr, DsInfo3);
 
+  PREPARE2(add_imm, DsInfo3);
+  PREPARE2(sub_imm, DsInfo3); PREPARE2(mul_imm, DsInfo3);
+  PREPARE2(div_imm, DsInfo3); PREPARE2(mod_imm, DsInfo3);
+
+  PREPARE2(eq_imm, DsInfo3); PREPARE2(ne_imm, DsInfo3);
+  PREPARE2(lt_imm, DsInfo3); PREPARE2(le_imm, DsInfo3);
+  PREPARE2(gt_imm, DsInfo3); PREPARE2(ge_imm, DsInfo3);
+
+  PREPARE2(land_imm, DsInfo3); PREPARE2(lor_imm, DsInfo3);
+  PREPARE2(band_imm, DsInfo3); PREPARE2(bor_imm, DsInfo3); PREPARE2(bxor_imm, DsInfo3);
+  PREPARE2(shl_imm, DsInfo3); PREPARE2(shr_imm, DsInfo3);
+
 //  PREPARE(inc, 3); PREPARE(dec, 3); PREPARE(mov, 3);
 //  PREPARE(neg, 3); PREPARE(not, 3); PREPARE(cmp, 3);
 
-  PREPARE(if, 4);
   PREPARE(goto, 2);
+  PREPARE(if, 4);
+
+  PREPARE2(if_add, DsInfo3);
+  PREPARE2(if_sub, DsInfo3); PREPARE2(if_mul, DsInfo3);
+  PREPARE2(if_div, DsInfo3); PREPARE2(if_mod, DsInfo3);
+
+  PREPARE2(if_eq, DsInfo3); PREPARE2(if_ne, DsInfo3);
+  PREPARE2(if_lt, DsInfo3); PREPARE2(if_le, DsInfo3);
+  PREPARE2(if_gt, DsInfo3); PREPARE2(if_ge, DsInfo3);
+
+  PREPARE2(if_land, DsInfo3); PREPARE2(if_lor, DsInfo3);
+  PREPARE2(if_band, DsInfo3); PREPARE2(if_bor, DsInfo3); PREPARE2(if_bxor, DsInfo3);
+  PREPARE2(if_shl, DsInfo3); PREPARE2(if_shr, DsInfo3);
+
+
+  PREPARE2(if_add_imm, DsInfo3);
+  PREPARE2(if_sub_imm, DsInfo3); PREPARE2(if_mul_imm, DsInfo3);
+  PREPARE2(if_div_imm, DsInfo3); PREPARE2(if_mod_imm, DsInfo3);
+
+  PREPARE2(if_eq_imm, DsInfo3); PREPARE2(if_ne_imm, DsInfo3);
+  PREPARE2(if_lt_imm, DsInfo3); PREPARE2(if_le_imm, DsInfo3);
+  PREPARE2(if_gt_imm, DsInfo3); PREPARE2(if_ge_imm, DsInfo3);
+
+  PREPARE2(if_land_imm, DsInfo3); PREPARE2(if_lor_imm, DsInfo3);
+  PREPARE2(if_band_imm, DsInfo3); PREPARE2(if_bor_imm, DsInfo3); PREPARE2(if_bxor_imm, DsInfo3);
+  PREPARE2(if_shl_imm, DsInfo3); PREPARE2(if_shr_imm, DsInfo3);
 
 
   PREPARE2(call, DsInfo3);

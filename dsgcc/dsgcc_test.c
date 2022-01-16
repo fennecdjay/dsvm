@@ -19,9 +19,10 @@ int main(int argc, char **argv) {
 
   DsGcc dsgcc = { .ctx = ctx, };
   dsgcc_compile(&dsgcc, &dsas);
+  const char *name = dsgcc.curr->name;
   if(dsgcc.nfun) {
     gcc_jit_result *result = gcc_jit_context_compile (ctx);
-    long(*_main)(void)  = gcc_jit_result_get_code (result, dsgcc.curr->name);
+    long(*_main)(void)  = gcc_jit_result_get_code (result, name);
     if (!_main) {
       fprintf (stderr, "NULL greet");
       exit (1);

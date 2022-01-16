@@ -4,7 +4,6 @@ typedef enum {
   dsas_binary,
   dsas_unary,
   dsas_imm,
-//  dsas_immf,
   dsas_label,
   dsas_if,
   dsas_goto,

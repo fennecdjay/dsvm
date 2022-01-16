@@ -1,8 +1,9 @@
 CFLAGS += -Wall -Wextra
 #CFLAGS += -Os -flto=full -fomit-frame-pointer -ffast-math
-#CFLAGS += -falign-labels
-CFLAGS += -O3
-#LDFLAGS += -flto=full
+CFLAGS += -falign-labels -fstrict-aliasing -falign-jumps
+CFLAGS += -O2 -ffast-math -fomit-frame-pointer
+#CFLAGS += -flto
+#LDFLAGS += -flto
 
 ifeq ($(shell uname -m), x86_64)
 CFLAGS += -march=native

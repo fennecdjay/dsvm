@@ -18,10 +18,8 @@ static dscode_t *label_data[LABEL_SIZE];
 //static dsct_t type_data[TYPE_SIZE];
 
 static void dsc_emit_binary(Dsc *const dsc, const DsAsStmt *stmt) {
+  // handle type data when we add floats
   (void)dsc;
-//  const ds_opcode op = type_data[stmt->num0] == dsc_num ?
-//    stmt->op : stmt->op + dsop_addf - dsop_add;
-//  dscode_binary(op, stmt->num0, stmt->num1, stmt->dest);
   dscode_binary(stmt->op, stmt->num0, stmt->num1, stmt->dest);
 //  type_data[stmt->dest] = type_data[stmt->num0];
 }
@@ -41,23 +39,21 @@ static void dsc_emit_imm(Dsc *const dsc, const DsAsStmt *stmt) {
   dscode_imm(stmt->num0, stmt->dest);
   //type_data[stmt->dest] = dsc_num;
 }
-/*
-static void dsc_emit_immf(const DsAsStmt *stmt) {
-  (void)dsc;
-  dscode_immf(stmt->fnum0, stmt->dest);
-  //type_data[stmt->dest] = dsc_fnum;
-}
-*/
-static void dsc_emit_if(Dsc *const dsc, const DsAsStmt *stmt) {
-  (void)dsc;
-  if_data[dsc->curr->if_count++] = (DscJump) { .stmt=*stmt, .code=dscode_start() };
-  dscode_if(stmt->num0);
-}
 
 static void dsc_emit_goto(Dsc *const dsc, const DsAsStmt *stmt) {
   (void)dsc;
-  (void)stmt;
-  exit(12);
+  dscode_goto(stmt->dest);
+}
+
+static void dsc_emit_if(Dsc *const dsc, const DsAsStmt *stmt) {
+  (void)dsc;
+  if(stmt->op == dsop_imm) {
+    if_data[dsc->curr->if_count++] = (DscJump) { .stmt=*stmt, .code=dscode_start() };
+    dscode_if(stmt->num0);
+  } else {
+    if_data[dsc->curr->if_count++] = (DscJump) { .stmt=*stmt, .code=dscode_start() };
+    dscode_if_op(stmt->op, stmt->num0, stmt->num1);
+  }
 }
 
 static void dsc_emit_call(Dsc *const dsc, const DsAsStmt *stmt) {
@@ -86,7 +82,6 @@ static const dsc_t functions[dsas_function] = {
   dsc_emit_binary,
   dsc_emit_unary,
   dsc_emit_imm,
-//  dsc_emit_immf,
   dsc_emit_label,
   dsc_emit_if,
   dsc_emit_goto,
@@ -113,9 +108,16 @@ static void scan(Dsc *const dsc, const DsAs *ds) {
 ANN static void set_labels(const DscFun *fun) {
   for(size_t i = 0; i < fun->if_count; i++) {
     DscJump jump = if_data[i];
-    dscode_t *const if_code = jump.code;
-    dscode_set_if(if_code, label_data[jump.stmt.num1]);
-    dscode_set_else(if_code, label_data[jump.stmt.dest]);
+    const DsAsStmt stmt = jump.stmt;
+    dscode_t *const code = jump.code;
+    if(stmt.type == dsas_if) {
+      if(stmt.op == dsop_imm) {
+        dscode_set_if(code, label_data[stmt.num1]);
+        dscode_set_else(code, label_data[stmt.dest]);
+      } else
+        dscode_if_dest(code, label_data[stmt.dest]);
+    } else
+      dscode_set_goto(code, label_data[stmt.dest]);
   }
 }
 

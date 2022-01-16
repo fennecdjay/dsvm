@@ -7,7 +7,8 @@
 
 typedef uintptr_t reg_t;
 typedef uint8_t dscode_t;
-typedef uint32_t dsidx_t;
+//typedef uint32_t dsidx_t;
+typedef uintptr_t dsidx_t;
 
 typedef enum ds_opcode {
   dsop_imm,
@@ -24,15 +25,49 @@ typedef enum ds_opcode {
   dsop_band, dsop_bor, dsop_bxor,
   dsop_shl, dsop_shr,
 
+  dsop_add_imm, dsop_sub_imm, dsop_mul_imm,
+  dsop_div_imm, dsop_mod_imm,
+
+  dsop_eq_imm, dsop_ne_imm,
+  dsop_lt_imm, dsop_le_imm,
+  dsop_gt_imm, dsop_ge_imm,
+
+  dsop_land_imm, dsop_lor_imm,
+
+  dsop_band_imm, dsop_bor_imm, dsop_bxor_imm,
+  dsop_shl_imm, dsop_shr_imm,
+
   /* unary ops */
 //  dsop_neg, dsop_lnot, dsop_bnot, dsop_abs
 
-  dsop_if, dsop_goto,
+  dsop_goto, dsop_if,
+
+  dsop_if_add, dsop_if_sub, dsop_if_mul,
+  dsop_if_div, dsop_if_mod,
+
+  dsop_if_eq, dsop_if_ne,
+  dsop_if_lt, dsop_if_le,
+  dsop_if_gt, dsop_if_ge,
+
+  dsop_if_land, dsop_if_lor,
+
+  dsop_if_band, dsop_if_bor, dsop_if_bxor,
+  dsop_if_shl, dsop_if_shr,
+
+  dsop_if_add_imm, dsop_if_sub_imm, dsop_if_mul_imm,
+  dsop_if_div_imm, dsop_if_mod_imm,
+
+  dsop_if_eq_imm, dsop_if_ne_imm,
+  dsop_if_lt_imm, dsop_if_le_imm,
+  dsop_if_gt_imm, dsop_if_ge_imm,
+
+  dsop_if_land_imm, dsop_if_lor_imm,
+
+  dsop_if_band_imm, dsop_if_bor_imm, dsop_if_bxor_imm,
+  dsop_if_shl_imm, dsop_if_shr_imm,
+
   dsop_call, dsop_return,
 
-//  dsop_immf,
-//  dsop_addf, dsop_subf,
-//  dsop_mulf, dsop_divf,
   dsop_end,
   dsop_max,
 } ds_opcode;
@@ -112,6 +147,14 @@ static inline dscode_t *dscode_binary(const ds_opcode op, const dsidx_t src, con
   return code;
 }
 
+static inline dscode_t *dscode_ibinary(const ds_opcode op, const reg_t lhs, const reg_t rhs, const reg_t dest) {\
+  dscode_t *const code = code_alloc(op, 3);
+  *(reg_t*)(code) = lhs;
+  *(reg_t*)(code + sizeof(reg_t)) = rhs;
+  *(reg_t*)(code + sizeof(reg_t)*2) = dest;
+  return code;
+}
+
 static inline dscode_t *dscode_unary(const ds_opcode op, const reg_t src, const reg_t dest) {
   dscode_t *const code = code_alloc2(op, sizeof(DsInfo));
   *(DsInfo*)code = (DsInfo){ .lhs=src, .rhs=dest };
@@ -131,11 +174,46 @@ ANN static inline void dscode_set_else(dscode_t *const code, const dscode_t *_el
   *(const dscode_t**)(code + sizeof(void*) + sizeof(reg_t) + sizeof(dscode_t*)) = _else;
 }
 
-ANN static inline dscode_t *dscode_goto(const dscode_t *new_code) {
+static inline dscode_t *dscode_goto() {
   dscode_t *const code = code_alloc(dsop_goto, 1);
-  *(const dscode_t**)code = new_code;
   return code;
 }
+
+ANN static inline void dscode_set_goto(dscode_t *const code, const dscode_t *new_code) {
+  *(const dscode_t**)(code + sizeof(void*)) = new_code;
+}
+
+ANN static inline dscode_t *dscode_if_lt(const reg_t lhs, const reg_t rhs /*, const dscode_t*new_code*/) {
+  dscode_t *const code = code_alloc(dsop_if_lt, 3);
+  *(reg_t*)(code) = lhs;
+  *(reg_t*)(code + sizeof(reg_t)) = rhs;
+//  *(dscode_t**)(code) = new_code;
+  return code;
+}
+
+ANN static inline dscode_t *dscode_if_op(const ds_opcode op, const reg_t lhs, const reg_t rhs /*, const dscode_t*new_code*/) {
+  dscode_t *const code = code_alloc(op, 3);
+  *(reg_t*)(code) = lhs;
+  *(reg_t*)(code + sizeof(reg_t)) = rhs;
+//  *(dscode_t**)(code) = new_code;
+  return code;
+}
+
+ANN static inline dscode_t *dscode_if_lt_imm(const reg_t lhs, const reg_t rhs /*, const dscode_t*new_code*/) {
+  dscode_t *const code = code_alloc(dsop_if_lt_imm, 3);
+  *(reg_t*)(code) = lhs;
+  *(reg_t*)(code + sizeof(reg_t)) = rhs;
+//  *(dscode_t**)(code) = new_code;
+  return code;
+}
+
+ANN static inline void dscode_if_dest(dscode_t *const code, const dscode_t *_else) {
+  *(const dscode_t**)(code + sizeof(void*) + sizeof(reg_t)*2) = _else;
+}
+
+//ANN static inline void dscode_set_jump(dscode_t *const code, const dscode_t *_else) {
+//  *(const dscode_t**)(code + sizeof(void*) + sizeof(reg_t)*2 + sizeof(dscode_t*)) = _else;
+//}
 
 /*
 // humm

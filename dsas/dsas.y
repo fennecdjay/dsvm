@@ -20,6 +20,7 @@ void stmt_alloc();
 %}
 
 %union {
+  DsAsStmt stmt;
   char     *id;
   uintptr_t num;
   float     fnum;
@@ -39,26 +40,34 @@ void stmt_alloc();
 %token<id>  DS_ID "<id>" DS_FUN "<function>"
 
 %type<id> argument
+%type<stmt>statement
+
 %%
 
-program:
-  statement | program statement
+functions: function | functions function
+
+function:
+  "<function>" { MAKE_STMT(function, .name = $1); }
+     argument statements
+
+statements:
+  statement | statements statement
 
 statement:
   "<binop>"  "<register>" "<register>" "<register>"
     { MAKE_STMT(binary,  .op = $1, .num0 = $2,  .num1 = $3, .dest=$4); } |
   "<op>" "<register>" "<register>" "<register>"
     { MAKE_STMT(binary,  .op = $1, .num0 = $2,  .num1 = $3, .dest=$4); } |
+  "<binop>"  "<register>" "<integer>" "<register>"
+    { MAKE_STMT(binary,  .op = $1 + dsop_add_imm - dsop_add, .num0 = $2,  .num1 = $3, .dest=$4); } |
+  "<op>" "<register>" "<integer>" "<register>"
+    { MAKE_STMT(binary,  .op = $1 + dsop_add_imm -dsop_add, .num0 = $2,  .num1 = $3, .dest=$4); } |
   "<op>"   "<register>" "<register>"
     { MAKE_STMT(unary,   .op = $1,  .num0 = $2, .dest = $3); } |
   "<unop>"   "<register>" "<register>"
     { MAKE_STMT(unary,   .op = $1,  .num0 = $2, .dest = $3); } |
   "imm"     "<integer>" "<register>"
     { MAKE_STMT(imm,     .num0 = $2,  .dest = $3); } |
-  "immf"     "<float>" "<register>"
-    { /*MAKE_STMT(immf,     .num0 = $2,  .dest = $3); */} |
-  "<function>" { MAKE_STMT(function, .name = $1); }
-     argument |
   "call"    "<id>"    "<register>" "<register>"
     { MAKE_STMT(call,    .name = $2, .num1 = $3,  .dest = $4); } |
   "return"
@@ -68,7 +77,15 @@ statement:
   "<label>"
     { MAKE_STMT(label, .dest = $1); } |
   "if" "<register>" "<label>" "<label>"
-    { MAKE_STMT(if, .num0 = $2, .num1 = $3, .dest = $4); }
+    { MAKE_STMT(if, .op = dsop_imm, .num0 = $2, .num1 = $3, .dest = $4); } |
+  "if" "<op>" "<register>" "<register>" "<label>"
+    { MAKE_STMT(if, .op = $2 + dsop_if_add - dsop_add, .num0 = $3, .num1 = $4, .dest = $5); } |
+  "if" "<binop>" "<register>" "<register>" "<label>"
+    { MAKE_STMT(if, .op = $2 + dsop_if_add - dsop_add, .num0 = $3, .num1 = $4, .dest = $5); } |
+  "if" "<op>" "<register>" "<integer>" "<label>"
+    { MAKE_STMT(if, .op = $2 + dsop_if_add_imm - dsop_add, .num0 = $3, .num1 = $4, .dest = $5); } |
+  "if" "<binop>" "<register>" "<integer>" "<label>"
+    { MAKE_STMT(if, .op = $2 + dsop_if_add_imm - dsop_add, .num0 = $3, .num1 = $4, .dest = $5); }
 
 argument:
   argument "<id>" { stmt_last()->num1 = 1; MAKE_STMT(arg,    .name = $2); } |

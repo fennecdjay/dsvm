@@ -86,12 +86,13 @@ union DSASSTYPE
 {
 #line 22 "dsas.y"
 
+  DsAsStmt stmt;
   char     *id;
   uintptr_t num;
   float     fnum;
   ds_opcode op;
 
-#line 95 "generated/dsc_parser.h"
+#line 96 "generated/dsc_parser.h"
 
 };
 typedef union DSASSTYPE DSASSTYPE;

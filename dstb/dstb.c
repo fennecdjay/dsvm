@@ -51,7 +51,7 @@ static TB_Register get_binary(DsTB *const dstb, const DsAsStmt *stmt, TB_Registe
   switch(stmt->op) {
     case dsop_add:
       if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
-        return tb_inst_add(code, value_data[5], value_data[8], TB_ASSUME_NUW);
+        return tb_inst_add(code, rhs, lhs, TB_ASSUME_NUW);
       return tb_inst_fadd(code, lhs, rhs);
     case dsop_sub:
       if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
@@ -153,7 +153,12 @@ static TB_Register get_binary(DsTB *const dstb, const DsAsStmt *stmt, TB_Registe
 }
 
 static void emit_binary(DsTB *const dstb, const DsAsStmt *stmt) {
-  set(get_binary(dstb, stmt, get_reg(dstb, stmt->num1)), stmt->dest);
+  if(stmt->op >= dsop_add_imm) {
+    const TB_Register reg = tb_inst_sint(dstb->curr->code, TB_TYPE_I64, stmt->num1);
+    DsAsStmt tmp = { .op = stmt->op - dsop_add_imm + dsop_add, .num0 = stmt->num0 };
+    set(get_binary(dstb, &tmp, reg), stmt->dest);
+  } else
+    set(get_binary(dstb, stmt, get_reg(dstb, stmt->num1)), stmt->dest);
 }
 /*
 static TB_Register get_unary(const ds_opcode op, const TB_Register val) {
@@ -191,9 +196,9 @@ static void emit_call(DsTB *const dstb, const DsAsStmt *stmt) {
 }
 
 static void emit_return(DsTB *const dstb, const DsAsStmt *stmt) {
-  if(!stmt->num0)
+  if(!stmt->num0) {
     tb_inst_ret(dstb->curr->code, get_reg(dstb, stmt->dest));
-  else
+  } else
     tb_inst_ret(dstb->curr->code, TB_NULL_REG);
 }
 
@@ -209,7 +214,21 @@ static void emit_label(DsTB *const dstb, const DsAsStmt *stmt) {
 }
 
 static void emit_if(DsTB *const dstb, const DsAsStmt *stmt) {
-  tb_inst_if(dstb->curr->code, get_reg(dstb, stmt->num0), label_data[stmt->num1], label_data[stmt->dest]);
+  if(stmt->op == dsop_imm)
+    tb_inst_if(dstb->curr->code, get_reg(dstb, stmt->num0), label_data[stmt->num1], label_data[stmt->dest]);
+  else {
+    TB_Label label = tb_inst_new_label_id(dstb->curr->code);
+    TB_Register rhs = stmt->op >= dsop_if_add_imm
+      ? tb_inst_sint(dstb->curr->code, TB_TYPE_I64, stmt->num1)
+      : value_data[stmt->num1];
+    const ds_opcode op = stmt->op >= dsop_if_add_imm
+      ? stmt->op - dsop_if_add_imm + dsop_add
+      : stmt->op - dsop_if_add + dsop_add;
+    DsAsStmt tmp = { .op = op, .num1 = stmt->num1 };
+    TB_Register cond = get_binary(dstb, &tmp, rhs);
+    tb_inst_if(dstb->curr->code, cond, label, label_data[stmt->dest]);
+    tb_inst_label(dstb->curr->code, label);
+  }
 }
 
 static void emit_goto(DsTB *const dstb, const DsAsStmt *stmt) {
@@ -222,7 +241,6 @@ static const dsc_t functions[dsas_function] = {
   emit_binary,
   emit_unary,
   emit_imm,
-//  emit_immf,
   emit_label,
   emit_if,
   emit_goto,

@@ -17,26 +17,19 @@ static dscode_t *make_main(const char *arg, const dscode_t *fib) {
 
 static dscode_t *make_fib(void) {
   dscode_t *const code = dscode_start();
-  (void)dscode_imm(2, 1);
-  (void)dscode_binary(dsop_lt, 0, 1, 2);
-
-  dscode_t *const if_code = dscode_start();
-  (void)dscode_if(2);
-
-  dscode_set_if(if_code, dscode_start());
+  dscode_if_op(dsop_if_lt_imm, 0, 2);
   (void)dscode_return(0);
 
-  dscode_set_else(if_code, dscode_start());
-  (void)dscode_imm(1, 3);
-  (void)dscode_binary(dsop_sub, 0, 3, 4);
-  (void)dscode_call(code, 4, 5);
+//  dscode_set_else(code, dscode_start());
+  dscode_if_dest(code, dscode_start());
+  (void)dscode_ibinary(dsop_sub_imm, 0, 1, 2);
+  (void)dscode_call(code, 2, 3);
 
-  (void)dscode_imm(2, 6);
-  (void)dscode_binary(dsop_sub, 0, 6, 7);
-  (void)dscode_call(code, 7, 8);
+  (void)dscode_ibinary(dsop_sub_imm, 0, 2, 4);
+  (void)dscode_call(code, 4, 4);
 
-  (void)dscode_binary(dsop_add, 5, 8, 9);
-  (void)dscode_return(9);
+  (void)dscode_binary(dsop_add, 3, 5, 6);
+  (void)dscode_return(6);
 
   DsThread thread = { .code = code };
   dsvm_run(&thread, dscode_start());

@@ -1,7 +1,7 @@
 CFLAGS += -Wall -Wextra
-CFLAGS += -O3 -flto
+CFLAGS += -O3
 CFLAGS += -I../ds -I../dsas -I.
-LDFLAGS += -flto
+#LDFLAGS += -flto
 
 dsgcc_test: dsgcc_test.o libdsgcc.a ../dsas/libdsas.a
 	${CC} ${CFLAGS} $^ -o $@ ../dsas/libdsas.a -l gccjit

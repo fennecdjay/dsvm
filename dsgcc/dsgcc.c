@@ -33,18 +33,23 @@ static enum gcc_jit_binary_op get_binary(const ds_opcode op) {
 static inline enum gcc_jit_comparison get_comp(const ds_opcode op) {
   return GCC_JIT_COMPARISON_EQ + op - dsop_eq;
 }
-static void actual_emit_binary(DsGcc *const dsgcc, const DsAsStmt *stmt, gcc_jit_rvalue *rhs) {
-  if(stmt->op < dsop_lt || stmt->op > dsop_ge) {
-    dsgcc->value_data[stmt->dest] = gcc_jit_context_new_binary_op (dsgcc->ctx,
+static gcc_jit_rvalue *actual_emit_binary(DsGcc *const dsgcc, const DsAsStmt *stmt, gcc_jit_rvalue *rhs) {
+  const ds_opcode op = stmt->op;
+  if(op < dsop_lt || op > dsop_ge)
+    return gcc_jit_context_new_binary_op (dsgcc->ctx,
         LOC, get_binary(stmt->op), gcc_jit_rvalue_get_type(rhs), dsgcc->value_data[stmt->num0], rhs);
-  } else {
-    dsgcc->value_data[stmt->dest] = gcc_jit_context_new_comparison (dsgcc->ctx,
-        LOC, get_comp(stmt->op), dsgcc->value_data[stmt->num0], rhs);
-  }
+  return gcc_jit_context_new_comparison (dsgcc->ctx,
+      LOC, get_comp(stmt->op), dsgcc->value_data[stmt->num0], rhs);
 }
 
 ANN static void emit_binary(DsGcc *const dsgcc, const DsAsStmt *stmt) {
-  actual_emit_binary(dsgcc, stmt, dsgcc->value_data[stmt->num1]);
+  if(stmt->op < dsop_add_imm)
+    dsgcc->value_data[stmt->dest] = actual_emit_binary(dsgcc, stmt, dsgcc->value_data[stmt->num1]);
+  else {
+    gcc_jit_rvalue *rhs = gcc_jit_context_new_rvalue_from_long (dsgcc->ctx, get_type(dsgcc, 'i'), stmt->num1);
+    DsAsStmt tmp = { .op = stmt->op - dsop_add_imm + dsop_add, .num0 = stmt->num0, .dest = stmt->dest };
+    dsgcc->value_data[stmt->dest] = actual_emit_binary(dsgcc, &tmp, rhs);
+  }
 }
 
 static enum gcc_jit_unary_op  get_unary(const ds_opcode op) {
@@ -96,8 +101,27 @@ ANN static void emit_return(DsGcc *const dsgcc, const DsAsStmt *stmt) {
 
 ANN static void emit_if(DsGcc *const dsgcc, const DsAsStmt *stmt) {
   dsgcc->is_terminated = true;
-  gcc_jit_block_end_with_conditional (dsgcc->block,
+  if(stmt->op == dsop_imm) {
+    gcc_jit_block_end_with_conditional (dsgcc->block,
       LOC, dsgcc->value_data[stmt->num0], dsgcc->label_data[stmt->num1], dsgcc->label_data[stmt->dest]);
+  } else {
+    gcc_jit_block *next = gcc_jit_function_new_block(dsgcc->curr->code, NULL);
+    gcc_jit_rvalue *rhs = stmt->op < dsop_if_add_imm
+      ? dsgcc->value_data[stmt->num1]
+      : gcc_jit_context_new_rvalue_from_long (dsgcc->ctx, get_type(dsgcc, 'i'), stmt->num1);
+    const ds_opcode op = stmt->op < dsop_if_add_imm
+      ? stmt->op - dsop_if_add + dsop_add
+      : stmt->op - dsop_if_add_imm + dsop_add;
+    DsAsStmt tmp = { .op = op, .num0 = stmt->num0 };
+    gcc_jit_rvalue *cond = actual_emit_binary(dsgcc, &tmp, rhs);
+    gcc_jit_type *type = gcc_jit_rvalue_get_type (cond),
+                 *tbool = gcc_jit_context_get_type(dsgcc->ctx, GCC_JIT_TYPE_BOOL);
+    if(type != tbool)
+      cond = gcc_jit_context_new_cast (dsgcc->ctx, LOC, cond, tbool);
+    gcc_jit_block_end_with_conditional (dsgcc->block,
+      LOC, cond, next, dsgcc->label_data[stmt->dest]);
+    dsgcc->block = next;
+  }
 }
 
 ANN static void emit_goto(DsGcc *const dsgcc, const DsAsStmt *stmt) {

@@ -6,11 +6,11 @@
 TB_Function *dstb_compile(TB_Module* module, DsAs *dsas);
 int main(int argc, char **argv) {
 
-  if (argc < 2) exit(EXIT_FAILURE);
+  if (argc < 2) return EXIT_FAILURE;
 
   DsAs dsas = {};
   dsas_init(&dsas);
-  dsas_filename(&dsas, argv[1]);
+  if(dsas_filename(&dsas, argv[1])) return EXIT_FAILURE;
   dsas_destroy(&dsas);
 
   TB_FeatureSet features = {};
