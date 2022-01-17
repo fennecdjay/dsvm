@@ -1,6 +1,7 @@
 #include <libgccjit.h>
 #include "ds.h"
 #include "dsas.h"
+#include "dsc.h"
 #include "dsgcc.h"
 
 int main(int argc, char **argv) {
@@ -14,8 +15,7 @@ int main(int argc, char **argv) {
 
   gcc_jit_context *ctx = gcc_jit_context_acquire();
   gcc_jit_context_set_int_option (ctx,
-        GCC_JIT_INT_OPTION_OPTIMIZATION_LEVEL,
-        3);
+    GCC_JIT_INT_OPTION_OPTIMIZATION_LEVEL, 3);
 
   DsGcc dsgcc = { .ctx = ctx, };
   dsgcc_compile(&dsgcc, &dsas);

@@ -20,12 +20,11 @@ static dscode_t *make_fib(void) {
   dscode_if_op(dsop_if_lt_imm, 0, 2);
   (void)dscode_return(0);
 
-//  dscode_set_else(code, dscode_start());
   dscode_if_dest(code, dscode_start());
-  (void)dscode_ibinary(dsop_sub_imm, 0, 1, 2);
+  (void)dscode_binary(dsop_sub_imm, 0, 1, 2);
   (void)dscode_call(code, 2, 3);
 
-  (void)dscode_ibinary(dsop_sub_imm, 0, 2, 4);
+  (void)dscode_binary(dsop_sub_imm, 0, 2, 4);
   (void)dscode_call(code, 4, 4);
 
   (void)dscode_binary(dsop_add, 3, 5, 6);

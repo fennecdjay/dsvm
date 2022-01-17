@@ -1,10 +1,12 @@
 #include "ds.h"
 #include "dsas.h"
+#include "dsc.h"
 #include "dstb.h"
 
 typedef struct {
   char  *name;
   TB_Function *code;
+  TB_Function *trampoline;
   TB_DataType ret_type;
   uint32_t narg;
 } Fun;
@@ -21,7 +23,7 @@ TB_Register value_data[VALUE_SIZE];
 
 typedef struct DsTB {
   Fun *curr;
-  TB_Module *module;
+  TB_Module *const module;
 } DsTB;
 
 static inline void set(const TB_Register reg, const uint32_t n) {
@@ -39,10 +41,18 @@ static TB_Register get_reg(DsTB *const dstb, const uint32_t reg) {
 #define NOT_FLOAT(code, reg)  !TB_IS_FLOAT_TYPE(tb_node_get_data_type(code, reg).type)
 
 static TB_Register tb_not(TB_Function *code, const TB_Register reg) {
-return /*  const TB_Register zero = */TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, reg).type)
+  const TB_Register zero = TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, reg).type)
     ? tb_inst_sint(code, TB_TYPE_I64, 0)
     : tb_inst_float(code, TB_TYPE_F32, 0);
 //  return tb_inst_cmp_ne(code, reg, zero);
+  return tb_inst_cmp_eq(code, reg, zero);
+}
+
+static TB_Register tb_is(TB_Function *code, const TB_Register reg) {
+  const TB_Register zero = TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, reg).type)
+    ? tb_inst_sint(code, TB_TYPE_I64, 0)
+    : tb_inst_float(code, TB_TYPE_F32, 0);
+  return tb_inst_cmp_ne(code, reg, zero);
 }
 
 static TB_Register get_binary(DsTB *const dstb, const DsAsStmt *stmt, TB_Register rhs) {
@@ -63,35 +73,34 @@ static TB_Register get_binary(DsTB *const dstb, const DsAsStmt *stmt, TB_Registe
       return tb_inst_fmul(code, lhs, rhs);
     case dsop_div:
       if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
-        return tb_inst_div(code, lhs, rhs, TB_ASSUME_NUW);
+        return tb_inst_div(code, lhs, rhs, true);
       return tb_inst_fdiv(code, lhs, rhs);
     case dsop_mod:
-      return tb_inst_mod(code, lhs, rhs, TB_ASSUME_NUW);
-
+      return tb_inst_mod(code, lhs, rhs, true);
     case dsop_eq:
       return tb_inst_cmp_eq(code, lhs, rhs);
     case dsop_ne:
       return tb_inst_cmp_ne(code, lhs, rhs);
     case dsop_lt:
       if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
-        return tb_inst_cmp_ilt(code, lhs, rhs, TB_ASSUME_NUW);
+        return tb_inst_cmp_ilt(code, lhs, rhs, true);
       return tb_inst_cmp_flt(code, lhs, rhs);
     case dsop_le:
       if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
-        return tb_inst_cmp_ile(code, lhs, rhs, TB_ASSUME_NUW);
+        return tb_inst_cmp_ile(code, lhs, rhs, true);
       return tb_inst_cmp_fle(code, lhs, rhs);
     case dsop_gt:
       if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
-        return tb_inst_cmp_igt(code, lhs, rhs, TB_ASSUME_NUW);
+        return tb_inst_cmp_igt(code, lhs, rhs, true);
       return tb_inst_cmp_fgt(code, lhs, rhs);
     case dsop_ge:
       if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
-        return tb_inst_cmp_ige(code, lhs, rhs, TB_ASSUME_NUW);
+        return tb_inst_cmp_ige(code, lhs, rhs, true);
       return tb_inst_cmp_fge(code, lhs, rhs);
 
     case dsop_land:
 {
-  TB_Register ret;
+//  TB_Register ret;
   TB_Label ok0 = tb_inst_new_label_id(code),
            ok1 = tb_inst_new_label_id(code),
            nok = tb_inst_new_label_id(code),
@@ -101,41 +110,49 @@ static TB_Register get_binary(DsTB *const dstb, const DsAsStmt *stmt, TB_Registe
   tb_inst_if(code, ret0, ok0, nok);
 
   tb_inst_label(code, ok0);
-  TB_Register ret1 = tb_not(code, stmt->num1);
+  TB_Register ret1 = tb_not(code, value_data[stmt->num1]);
   tb_inst_if(code, ret1, ok1, nok);
 
   tb_inst_label(code, ok1);
-  ret = tb_inst_bool(code, true);
+//  ret = tb_inst_bool(code, true);
+  TB_Register r_true = tb_inst_bool(code, true);
   tb_inst_goto(code, end);
 
   tb_inst_label(code, nok);
-  ret = tb_inst_bool(code, false);
+//  ret = tb_inst_bool(code, false);
+  TB_Register r_false = tb_inst_bool(code, false);
   tb_inst_label(code, end);
 
-  return ret;
+return tb_inst_phi2(code, ok1, r_true, nok, r_false);
+  //return ret;
 }
       break;
     case dsop_lor:
 {
-  TB_Register ret;
-  TB_Label ok0 = tb_inst_new_label_id(code),
-           nok = tb_inst_new_label_id(code),
+/*
+  TB_Label nok = tb_inst_new_label_id(code),
+           ok0 = tb_inst_new_label_id(code),
            end = tb_inst_new_label_id(code);
+*/
+//  tb_inst_label(code, );
+  // beware type!!!!
+  TB_Register zero = tb_inst_sint(code, TB_TYPE_I64, 0);
+  return tb_inst_cmp_eq(code, lhs, zero);
+/*
+  TB_Register fst_nz = tb_inst_cmp_ne(code, lhs, zero);
 
-  TB_Register ret0 = tb_not(code, value_data[stmt->num0]);
-
-  tb_inst_if(code, ret0, ok0, nok);
+  tb_inst_if(code, fst_nz, ok0, nok);
 
   tb_inst_label(code, nok);
-  ret = tb_inst_bool(code, false);
-  tb_inst_label(code, end);
-
-  tb_inst_label(code, ok0);
-  ret =tb_inst_bool(code, true);
+  TB_Register snd_nz = tb_inst_cmp_ne(code, rhs, zero);
   tb_inst_goto(code, end);
 
+  tb_inst_label(code, ok0);
+  TB_Register is_nz = tb_inst_bool(code, 1);
   tb_inst_label(code, end);
-  return ret;
+  return tb_inst_phi2(code, ok0, is_nz, nok, snd_nz);
+*/
+//  return tb_inst_phi2(code, nok, snd_nz, ok0, is_nz);
 }
   break;
     case dsop_band:
@@ -177,13 +194,6 @@ static void emit_imm(DsTB *const dstb, const DsAsStmt *stmt) {
   set(reg, stmt->dest);
 }
 
-/*
-static void dsjit_emit_immf(const DsAsStmt *stmt) {
-  const TB_Register reg = tb_inst_float(code, TB_TYPE_F32 , stmt->fnum0);
-  set(reg, stmt->dest);
-}
-*/
-
 static void emit_call(DsTB *const dstb, const DsAsStmt *stmt) {
   for(uint32_t i =0; i < fun_count; i++) {
     if(stmt->name == fun_data[i].name) {
@@ -196,15 +206,16 @@ static void emit_call(DsTB *const dstb, const DsAsStmt *stmt) {
 }
 
 static void emit_return(DsTB *const dstb, const DsAsStmt *stmt) {
-  if(!stmt->num0) {
+  if(!stmt->num0)
     tb_inst_ret(dstb->curr->code, get_reg(dstb, stmt->dest));
-  } else
+  else
     tb_inst_ret(dstb->curr->code, TB_NULL_REG);
 }
 
 static TB_DataType get_type(const char c) {
   if(c == 'v') return TB_TYPE_VOID;
   if(c == 'i') return TB_TYPE_I64;
+  if(c == 'b') return TB_TYPE_BOOL;
   if(c == 'f') return TB_TYPE_F32;
   exit(34);
 }
@@ -256,7 +267,28 @@ ANN static void compile(DsTB *const dstb, DsAsStmt *stmts, uint32_t start, uint3
   tb_module_compile_func(dstb->module, dstb->curr->code);
 }
 
-static void first_pass(DsTB *const dstb, DsAs *dsas) {
+ANN static void mk_trampoline(const DsTB *dstb, Fun *fun, const char *name) {
+  TB_FunctionPrototype* proto = tb_prototype_create(dstb->module, TB_STDCALL, TB_TYPE_I64, 1, false);
+  TB_DataType param_data[1] = { TB_TYPE_PTR };
+  tb_prototype_add_params(proto, 1, param_data);
+  TB_Function *code = tb_prototype_build(dstb->module, proto, strdup("test__trampoline"), TB_LINKAGE_PUBLIC);
+  TB_Register reg = tb_inst_param(code, 0);
+  TB_Register args[PARAM_SIZE];
+  for(uint32_t i = 0; i < fun->narg; i++) {
+    TB_Register index = tb_inst_sint(code, TB_TYPE_I32, i);
+    TB_Register addr = tb_inst_member_access(code, reg, index);
+//    TB_Register src = tb_inst_load(code, TB_TYPE_I64, addr, sizeof(uint64_t)); // check align
+//    TB_Register src = tb_inst_load(code, TB_TYPE_I64, addr, 16); // check align
+    args[i] = addr; //src;//tb_inst_ptr2int(code, addr, TB_TYPE_I64);
+  }
+  TB_Register ret = tb_inst_call(code, fun->ret_type, fun->code, fun->narg, args);
+  tb_inst_ret(code, ret);
+  tb_module_compile_func(dstb->module, dstb->curr->code);
+  fun->trampoline = code;
+}
+
+//Avoid dstb_compile(TB_Module* module, const DsAs *dsas) {
+ANN void first_pass(DsTB *const dstb, const DsAs *dsas) {
   uint32_t start = 0;
   Fun *fun = NULL;
   for(size_t i = 0; i < dsas->n; i++) {
@@ -264,8 +296,12 @@ static void first_pass(DsTB *const dstb, DsAs *dsas) {
     if(stmt.type == dsas_function) {
       fun = &fun_data[fun_count];
       fun_data[fun_count].name = stmt.name;
-      if(start)
+      if(start) {
         compile(dstb, dsas->stmts, start, i);
+        tb_function_print(dstb->curr->code, tb_default_print_callback, stdout);
+        mk_trampoline(dstb, dstb->curr, "trampoline");
+        tb_function_print(dstb->curr->trampoline, tb_default_print_callback, stdout);
+      }
     } else if(stmt.type == dsas_arg) {
       const TB_DataType t = get_type(*stmt.name);
       if(stmt.num1)
@@ -286,8 +322,39 @@ static void first_pass(DsTB *const dstb, DsAs *dsas) {
   compile(dstb, dsas->stmts, start, dsas->n);
 }
 
-TB_Function *dstb_compile(TB_Module* module, DsAs *dsas) {
+TB_Function *dstb_compile(TB_Module* module, const DsAs *dsas) {
   DsTB dstb = { .module = module };
   first_pass(&dstb, dsas);
   return dstb.curr->code;
+}
+
+ANN int tb_launch_jit(void *data) {
+  const Jitter *jitter = (Jitter*)data;
+  Dsc *const dsc = jitter->dsc;
+  const DsAs *dsas = jitter->dsas;
+  TB_FeatureSet features = {};
+#if _WIN32
+  TB_Module *module = tb_module_create(TB_ARCH_X86_64, TB_SYSTEM_WINDOWS, &features);
+#else
+  TB_Module *module = tb_module_create(TB_ARCH_X86_64, TB_SYSTEM_LINUX, &features);
+#endif
+//  DsTB dstb = { .module = module };
+//  TB_Function *code = dstb_compile(&dstb, dsas);
+puts("pre dstb compile");
+  TB_Function *code = dstb_compile(module, dsas);
+puts("pre compile");
+  tb_module_compile(module);
+//  tb_function_optimize(module, 1);
+puts("post compile");
+  tb_module_export_jit(module);
+puts("post export");
+  for(size_t i = 0; i < dsc->fun_count - 1; i++) {
+    DscFun *fun = &dsc->fun_data[i];
+//tb_function_print(fun_data[i].code, tb_default_print_callback, stdout);
+
+printf("%s %p %p\n", fun->name, fun_data[i].code, tb_module_get_jit_func(module, fun_data[i].trampoline));
+    *(void**)(fun->code + sizeof(void*)) = tb_module_get_jit_func(module, fun_data[i].trampoline);
+  }
+//  tb_module_destroy(module);
+  return EXIT_SUCCESS;
 }

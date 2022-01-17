@@ -33,7 +33,7 @@ typedef struct DsAs {
   void *scanner;
   DsAsStmt *stmts;
   uint32_t n;
-  uint32_t cap;
+  uint32_t nfun;
 } DsAs;
 
 

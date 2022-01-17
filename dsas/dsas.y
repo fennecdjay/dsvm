@@ -47,7 +47,7 @@ void stmt_alloc();
 functions: function | functions function
 
 function:
-  "<function>" { MAKE_STMT(function, .name = $1); }
+  "<function>" { MAKE_STMT(function, .name = $1); arg->nfun++; }
      argument statements
 
 statements:

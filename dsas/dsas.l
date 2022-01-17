@@ -29,13 +29,14 @@ static char* string_alloc(const char *c);
 "+"          { OP(add); }
 "-"          { OP(sub); }
 "*"          { OP(mul); }
-"/"          { OP(div); }
-"%"          { OP(mod); }
+"&"          { OP(band); }
+"/"          { BINOP(div); }
+"%"          { BINOP(mod); }
 
-%{/*
+
 "=="         { BINOP(eq); }
 "!="         { BINOP(ne); }
-*/%}
+
 
 "<"          { BINOP(lt); }
 "<="         { BINOP(le); }
@@ -45,16 +46,14 @@ static char* string_alloc(const char *c);
 "&&"         { BINOP(land); }
 "||"         { BINOP(lor);  }
 
-"&"          { BINOP(band); }
 "|"          { BINOP(bor);  }
 "^"          { BINOP(bxor); }
 "<<"         { BINOP(shl); }
 ">>"         { BINOP(shr);   }
-%{/*
-"++"         { UNOP(inc); }
-"--"         { UNOP(dec); }
+
 "="          { UNOP(mov); }
 "!"          { UNOP(not); }
+%{/*
 "~"          { UNOP(cmp); }
 */%}
 "call"       { return DS_CALL; }
@@ -65,8 +64,8 @@ static char* string_alloc(const char *c);
 
 "$"{NUM}*      { yylval->num  = strtol(yytext + 1, NULL, 10); return DS_REG; }
 ":"{NUM}*      { yylval->num  = strtol(yytext + 1, NULL, 10); return DS_LABEL; }
-{NUM}*\.{NUM}* { yylval->fnum = strtof(yytext, NULL); return DS_FNUM; }
-{NUM}*         { yylval->num  = strtol(yytext, NULL, 10); return DS_NUM; }
+-{0,1}{NUM}*\.{NUM}* { yylval->fnum = strtof(yytext, NULL); return DS_FNUM; }
+-{0,1}{NUM}*         { yylval->num  = strtol(yytext, NULL, 10); return DS_NUM; }
 
 [a-zA-Z_][a-zA-Z_0-9]* { yylval->id = string_alloc(yytext); return DS_ID; }
 

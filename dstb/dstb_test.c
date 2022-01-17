@@ -3,7 +3,6 @@
 #include "dsas.h"
 #include "dstb.h"
 
-TB_Function *dstb_compile(TB_Module* module, DsAs *dsas);
 int main(int argc, char **argv) {
 
   if (argc < 2) return EXIT_FAILURE;
@@ -20,6 +19,7 @@ int main(int argc, char **argv) {
   TB_Module *module = tb_module_create(TB_ARCH_X86_64, TB_SYSTEM_LINUX, &features);
 #endif
   TB_Function *code = dstb_compile(module, &dsas);
+//  dstb_compile(&dstb, &dsas);
   tb_module_compile(module);
 //  tb_function_optimize(module, 1);
   tb_module_export_jit(module);

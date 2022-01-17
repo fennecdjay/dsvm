@@ -1,4 +1,6 @@
 *.o
 *.a
 ds/ds_test
-dsc/dsc
+dsc/dsc_nojit
+dsc/dsc_gcc
+dsc/dsc_tb

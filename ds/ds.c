@@ -176,25 +176,7 @@ code += sizeof(reg_t) *3;
   BINARY_IMM(<<);
   _dsop_shr_imm:
   BINARY_IMM(>>);
-/*
-  _dsop_inc:
-  UNARY(++);
-  _dsop_dec:
-  UNARY(--);
-  _dsop_mov:
-{
-  const reg_t lhs = vm_read();
-  const reg_t dest = vm_read();
-  reg[dest] = reg[lhs];
-  DISPATCH();
-}
-  _dsop_neg:
-  UNARY(-);
-  _dsop_not:
-  UNARY(!);
-  _dsop_cmp:
-  UNARY(~);
-*/
+
   _dsop_goto:
 {
   code = (dscode_t*)vm_read();
@@ -248,7 +230,7 @@ code += sizeof(reg_t) *3;
   _dsop_if_bxor:
   BINARY_IF(^);
   _dsop_if_shl:
-  BINARY_IF(<<);
+  BINARY_IF(<); // from a gcc suggestion
   _dsop_if_shr:
   BINARY_IF(>>);
 
@@ -290,9 +272,29 @@ code += sizeof(reg_t) *3;
   _dsop_if_bxor_imm:
   BINARY_IF_IMM(^);
   _dsop_if_shl_imm:
-  BINARY_IF_IMM(<<);
+  BINARY_IF_IMM(<); // from a gcc suggestion
   _dsop_if_shr_imm:
   BINARY_IF_IMM(>>);
+
+  _dsop_neg:
+  UNARY(-);
+  _dsop_not:
+  UNARY(!);
+  _dsop_cmp:
+  UNARY(~);
+  _dsop_abs:
+{
+  const DsInfoj info = *(DsInfoj*)code;
+  code += sizeof(DsInfoj);
+  reg[info.rhs] = labs(reg[info.lhs]); // arch
+  goto *info.addr;
+}
+  _dsop_mov:
+  UNARY();
+  _dsop_deref:
+  UNARY(*(reg_t*));
+  _dsop_addr:
+  UNARY((reg_t)&);
 
   _dsop_call:
 {
@@ -331,6 +333,23 @@ code += sizeof(reg_t) *3;
 */
 _dsop_end:
   return;
+_dsop_jit:
+{
+  typedef reg_t (*jitfun_t)(reg_t*);
+  jitfun_t trampoline = *(jitfun_t*)code;
+  if(trampoline) {
+    const reg_t out = trampoline(reg);
+    const DsFrame frame = frames[--nframe];
+    code = frame.code;
+    reg = frame.reg;
+    reg[frame.out] = out;
+    DISPATCH();
+  } else {
+    void *addr = *(void**)(code + sizeof(jitfun_t*));
+    code += sizeof(jitfun_t*) + sizeof(void*);
+    goto *addr;
+  }
+}
 }
 
   // prepare code
@@ -373,9 +392,6 @@ _dsop_end:
      &&__dsop_band_imm, &&__dsop_bor_imm, &&__dsop_bxor_imm,
      &&__dsop_shl_imm, &&__dsop_shr_imm,
 
-//     &&__dsop_inc, &&__dsop_dec, &&__dsop_mov,
-//     &&__dsop_neg, &&__dsop_not, &&__dsop_cmp,
-
      &&__dsop_goto, &&__dsop_if,
 
      &&__dsop_if_add, &&__dsop_if_sub, &&__dsop_if_mul,
@@ -400,6 +416,9 @@ _dsop_end:
      &&__dsop_if_band_imm, &&__dsop_if_bor_imm, &&__dsop_if_bxor_imm,
      &&__dsop_if_shl_imm, &&__dsop_if_shr_imm,
 
+&&__dsop_neg, &&__dsop_not, &&__dsop_cmp, &&__dsop_abs,
+&&__dsop_mov, &&__dsop_deref, &&__dsop_addr,
+
      &&__dsop_call, &&__dsop_return,
 /*
      &&__dsop_immf,
@@ -407,7 +426,8 @@ _dsop_end:
      &&__dsop_addf, &&__dsop_subf,
      &&__dsop_mulf, &&__dsop_divf,
 */
-    &&__dsop_end
+    &&__dsop_end,
+&&__dsop_jit
   };
 
   goto *dispatch[*(reg_t*)code];
@@ -438,9 +458,6 @@ _dsop_end:
   PREPARE2(band_imm, DsInfo3); PREPARE2(bor_imm, DsInfo3); PREPARE2(bxor_imm, DsInfo3);
   PREPARE2(shl_imm, DsInfo3); PREPARE2(shr_imm, DsInfo3);
 
-//  PREPARE(inc, 3); PREPARE(dec, 3); PREPARE(mov, 3);
-//  PREPARE(neg, 3); PREPARE(not, 3); PREPARE(cmp, 3);
-
   PREPARE(goto, 2);
   PREPARE(if, 4);
 
@@ -470,6 +487,14 @@ _dsop_end:
   PREPARE2(if_shl_imm, DsInfo3); PREPARE2(if_shr_imm, DsInfo3);
 
 
+  PREPARE2(neg, DsInfo);
+  PREPARE2(not, DsInfo);
+  PREPARE2(cmp, DsInfo);
+  PREPARE2(abs, DsInfo);
+  PREPARE2(mov, DsInfo);
+  PREPARE2(deref, DsInfo);
+  PREPARE2(addr, DsInfo);
+
   PREPARE2(call, DsInfo3);
   PREPARE(return, 2);
 
@@ -478,6 +503,7 @@ _dsop_end:
 //  PREPARE(mulf, 4); PREPARE(divf, 4);
 
   PREPARE(end, 1);
+  PREPARE(jit, 2);
 }
 
 #define BUMP_SIZE 4096

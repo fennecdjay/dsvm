@@ -1,10 +1,11 @@
 CFLAGS += -Wall -Wextra
 CFLAGS += -O3
 CFLAGS += -I../ds -I../dsas -I.
-#LDFLAGS += -flto
 
-dsgcc_test: dsgcc_test.o libdsgcc.a ../dsas/libdsas.a
-	${CC} ${CFLAGS} $^ -o $@ ../dsas/libdsas.a -l gccjit
+CFLAGS += -I../dsc
+
+dsgcc_test: dsgcc_test.o dsgcc.c ../dsas/libdsas.a
+	${CC} ${CFLAGS} -D DS_NOJIT $^ -o $@ ../dsas/libdsas.a -l gccjit
 
 libdsgcc.a: dsgcc.o
 	ar rcs $@ $^

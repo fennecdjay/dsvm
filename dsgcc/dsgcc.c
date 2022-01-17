@@ -1,12 +1,14 @@
 #include <libgccjit.h>
 #include "ds.h"
 #include "dsas.h"
+#include "dsc.h"
 #include "dsgcc.h"
 
 ANN static enum gcc_jit_types _get_type(const char c) {
   if(c == 'v') return GCC_JIT_TYPE_VOID;
   if(c == 'i') return GCC_JIT_TYPE_LONG;
   if(c == 'f') return GCC_JIT_TYPE_FLOAT;
+  printf("unknown type %c\n", c);
   exit(12);
 }
 
@@ -35,7 +37,7 @@ static inline enum gcc_jit_comparison get_comp(const ds_opcode op) {
 }
 static gcc_jit_rvalue *actual_emit_binary(DsGcc *const dsgcc, const DsAsStmt *stmt, gcc_jit_rvalue *rhs) {
   const ds_opcode op = stmt->op;
-  if(op < dsop_lt || op > dsop_ge)
+  if(op < dsop_eq || op > dsop_ge)
     return gcc_jit_context_new_binary_op (dsgcc->ctx,
         LOC, get_binary(stmt->op), gcc_jit_rvalue_get_type(rhs), dsgcc->value_data[stmt->num0], rhs);
   return gcc_jit_context_new_comparison (dsgcc->ctx,
@@ -52,7 +54,25 @@ ANN static void emit_binary(DsGcc *const dsgcc, const DsAsStmt *stmt) {
   }
 }
 
-static enum gcc_jit_unary_op  get_unary(const ds_opcode op) {
+ANN static gcc_jit_rvalue *unary(gcc_jit_context *ctx, enum gcc_jit_unary_op op,
+    gcc_jit_rvalue* val) {
+  return gcc_jit_context_new_unary_op (ctx,
+        LOC, op, gcc_jit_rvalue_get_type(val), val);
+}
+static gcc_jit_rvalue *get_unary(gcc_jit_context *ctx, const ds_opcode op,
+    gcc_jit_rvalue* val) {
+  if(op == dsop_sub) return unary(ctx, GCC_JIT_UNARY_OP_MINUS, val);
+  if(op == dsop_not) return unary(ctx, GCC_JIT_UNARY_OP_LOGICAL_NEGATE, val);
+  if(op == dsop_cmp) return unary(ctx, GCC_JIT_UNARY_OP_BITWISE_NEGATE, val);
+  if(op == dsop_add) return unary(ctx, GCC_JIT_UNARY_OP_ABS, val);
+
+// we need lvalues
+
+//  if(op == dsop_mov) return GCC_JIT_UNARY_OP_ABS; ???
+  if(op == dsop_mul) return gcc_jit_lvalue_as_rvalue(gcc_jit_rvalue_dereference(val, LOC));
+//  if(op == dsop_mul) return gcc_jit_lvalue_get_address(val, LOC);
+
+//GCC_JIT_UNARY_OP_ABS;
 //  if(op == dsop_inc) exit(3)
 //  if(op == dsop_dec) exit(4);
 //  if(op == dsop_mov) exit(5); // ??
@@ -60,13 +80,13 @@ static enum gcc_jit_unary_op  get_unary(const ds_opcode op) {
 //  if(op == dsop_not) return GCC_JIT_UNARY_OP_LOGICAL_NEGATE;
 //  if(op == dsop_cmp) return GCC_JIT_UNARY_OP_BITWISE_NEGATE;
   //  if(op == dsop_add)
-  return GCC_JIT_UNARY_OP_ABS;
+  exit(12);
 }
 
 ANN static void emit_unary(DsGcc *const dsgcc, const DsAsStmt *stmt) {
   gcc_jit_rvalue *const val = dsgcc->value_data[stmt->num0];
-  dsgcc->value_data[stmt->dest] = gcc_jit_context_new_unary_op (dsgcc->ctx,
-        LOC, get_unary(stmt->op), gcc_jit_rvalue_get_type(val), val);
+//  dsgcc->value_data[stmt->dest] = gcc_jit_context_new_unary_op (dsgcc->ctx,
+//        LOC, get_unary(stmt->op), gcc_jit_rvalue_get_type(val), val);
 }
 
 ANN static void emit_imm(DsGcc *const dsgcc, const DsAsStmt *stmt) {
@@ -149,12 +169,30 @@ static const dsc_t functions[dsas_function] = {
   emit_return
 };
 
-ANN void dsgcc_compile(DsGcc *const dsgcc, DsAs *dsas) {
+#define PARAM_SIZE 16
+
+ANN static void mk_trampoline(const DsGcc *dsgcc, Fun *fun, const char *name) {
+  gcc_jit_context *const ctx = dsgcc->ctx;
+  gcc_jit_param *const param = gcc_jit_context_new_param (ctx, LOC, gcc_jit_type_get_pointer (gcc_jit_context_get_type(ctx, GCC_JIT_TYPE_LONG)), "reg");
+  gcc_jit_param *params[1] = { param };
+  gcc_jit_function *const code = gcc_jit_context_new_function(ctx, LOC, GCC_JIT_FUNCTION_EXPORTED,
+    fun->ret_type, name, 1, params, 0);
+  gcc_jit_block *block = gcc_jit_function_new_block (code, NULL);
+  gcc_jit_rvalue *reg = gcc_jit_param_as_rvalue(param);
+  gcc_jit_rvalue *args[PARAM_SIZE];
+  for(uint32_t i = 0; i < fun->narg; i++) {
+    gcc_jit_rvalue *const index = gcc_jit_context_new_rvalue_from_int(ctx, gcc_jit_context_get_type(ctx, GCC_JIT_TYPE_UNSIGNED_INT), i);
+    args[i] = gcc_jit_lvalue_as_rvalue(gcc_jit_context_new_array_access(ctx, LOC, reg, index));
+  }
+  gcc_jit_rvalue *ret = gcc_jit_context_new_call(ctx, LOC, fun->code, fun->narg, args);
+  gcc_jit_block_end_with_return(block, LOC, ret);
+}
+
+ANN void dsgcc_compile(DsGcc *const dsgcc, const DsAs *dsas) {
   char *name = NULL;
   uint32_t narg = 0;
   uint32_t start = 0;
   Fun fun = {};
-  #define PARAM_SIZE 16
   gcc_jit_param *param_data[PARAM_SIZE];
   for(uint32_t i = 0; i < dsas->n; i++) {
     const DsAsStmt stmt = dsas->stmts[i];
@@ -164,16 +202,22 @@ ANN void dsgcc_compile(DsGcc *const dsgcc, DsAs *dsas) {
         const DsAsStmt stmt = dsas->stmts[j];
         functions[stmt.type](dsgcc, &stmt);
       }
+      if(dsgcc->dsc && dsgcc->curr) {
+        mk_trampoline(dsgcc, dsgcc->curr, dsgcc->dsc->fun_data[dsgcc->nfun - 1].trampoline_name);
+        if(dsgcc->nfun == dsgcc->dsc->fun_count - 1) break;
+      }
     } else if(stmt.type == dsas_arg) {
       gcc_jit_type *const t = get_type(dsgcc, *stmt.name);
       if(stmt.num1) {
-        gcc_jit_param *const param = param_data[narg] = gcc_jit_context_new_param (dsgcc->ctx, NULL, t,  "arg");
+        char c[256];
+        sprintf(c, "arg%u", narg);
+        gcc_jit_param *const param = param_data[narg] = gcc_jit_context_new_param (dsgcc->ctx, LOC, t, c);
         dsgcc->value_data[narg] = gcc_jit_param_as_rvalue(param);
         narg++;
       } else {
-        gcc_jit_function *const code = gcc_jit_context_new_function (dsgcc->ctx, NULL, GCC_JIT_FUNCTION_EXPORTED,
+        gcc_jit_function *const code = gcc_jit_context_new_function (dsgcc->ctx, LOC, GCC_JIT_FUNCTION_EXPORTED,
             t, name, narg, param_data, 0);
-        fun = dsgcc->fun_data[dsgcc->nfun++] = (Fun) { .name=name, .code=code, .narg=narg };
+        fun = dsgcc->fun_data[dsgcc->nfun++] = (Fun) { .name=name, .code=code, .narg=narg, .ret_type = t };
         narg = 0;
           dsgcc->block = gcc_jit_function_new_block (fun.code, "start");
         start = i + 1;
@@ -185,8 +229,28 @@ ANN void dsgcc_compile(DsGcc *const dsgcc, DsAs *dsas) {
       dsgcc->label_data[stmt.dest] = gcc_jit_function_new_block (dsgcc->fun_data[dsgcc->nfun-1].code, c);
     }
   }
-  for(size_t j = start; j < dsas->n; j++) {
-    const DsAsStmt stmt = dsas->stmts[j];
-    functions[stmt.type](dsgcc, &stmt);
+  if(!dsgcc->dsc) {
+    for(size_t j = start; j < dsas->n; j++) {
+      const DsAsStmt stmt = dsas->stmts[j];
+      functions[stmt.type](dsgcc, &stmt);
+    }
   }
 }
+
+#ifndef DS_NOJIT
+ANN int gcc_launch_jit(void *data) {
+  const Jitter *jitter = (Jitter*)data;
+  Dsc *const dsc = jitter->dsc;
+  const DsAs *dsas = jitter->dsas;
+  gcc_jit_context *ctx = gcc_jit_context_acquire();
+  gcc_jit_context_set_int_option (ctx, GCC_JIT_INT_OPTION_OPTIMIZATION_LEVEL, 3);
+  DsGcc dsgcc = { .ctx = ctx, .dsc = dsc };
+  dsgcc_compile(&dsgcc, dsas);
+  gcc_jit_result *result = gcc_jit_context_compile (ctx);
+  for(size_t i = 0; i < dsc->fun_count - 1; i++) {
+    DscFun *fun = dsgcc.curr = &dsc->fun_data[i];
+    *(void**)(fun->code + sizeof(void*)) = gcc_jit_result_get_code (result, fun->trampoline_name);
+  }
+  thrd_exit(EXIT_SUCCESS);
+}
+#endif

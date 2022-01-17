@@ -1136,7 +1136,7 @@ yyreduce:
     {
   case 4: /* $@1: %empty  */
 #line 50 "dsas.y"
-               { MAKE_STMT(function, .name = (yyvsp[0].id)); }
+               { MAKE_STMT(function, .name = (yyvsp[0].id)); arg->nfun++; }
 #line 1141 "generated/dsc_parser.c"
     break;
 
