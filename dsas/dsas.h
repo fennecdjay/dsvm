@@ -45,4 +45,3 @@ bool dsas_filename(DsAs *dsas, char* path);
 void dsas_destroy(DsAs *const dsas);
 DsAsStmt *stmt_start(void);
 //void stmt_release(const unsigned int n);
-#define YYSTYPE DSASSTYPE

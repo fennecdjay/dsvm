@@ -73,7 +73,7 @@
 #define yynerrs         dsasnerrs
 
 /* First part of user prologue.  */
-#line 6 "dsas.y"
+#line 5 "dsas.y"
 
 #include <stdint.h>
 #include "ds.h"
@@ -146,11 +146,12 @@ typedef enum yysymbol_kind_t yysymbol_kind_t;
 
 
 /* Second part of user prologue.  */
-#line 30 "dsas.y"
+#line 29 "dsas.y"
 
+#include "dsc_parser.h"
 #include "dsc_lexer.h"
 
-#line 154 "generated/dsc_parser.c"
+#line 155 "generated/dsc_parser.c"
 
 
 #ifdef short
@@ -1137,119 +1138,119 @@ yyreduce:
   case 4: /* $@1: %empty  */
 #line 50 "dsas.y"
                { MAKE_STMT(function, .name = (yyvsp[0].id)); arg->nfun++; }
-#line 1141 "generated/dsc_parser.c"
+#line 1142 "generated/dsc_parser.c"
     break;
 
   case 8: /* statement: "<binop>" "<register>" "<register>" "<register>"  */
 #line 58 "dsas.y"
     { MAKE_STMT(binary,  .op = (yyvsp[-3].op), .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
-#line 1147 "generated/dsc_parser.c"
+#line 1148 "generated/dsc_parser.c"
     break;
 
   case 9: /* statement: "<op>" "<register>" "<register>" "<register>"  */
 #line 60 "dsas.y"
     { MAKE_STMT(binary,  .op = (yyvsp[-3].op), .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
-#line 1153 "generated/dsc_parser.c"
+#line 1154 "generated/dsc_parser.c"
     break;
 
   case 10: /* statement: "<binop>" "<register>" "<integer>" "<register>"  */
 #line 62 "dsas.y"
     { MAKE_STMT(binary,  .op = (yyvsp[-3].op) + dsop_add_imm - dsop_add, .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
-#line 1159 "generated/dsc_parser.c"
+#line 1160 "generated/dsc_parser.c"
     break;
 
   case 11: /* statement: "<op>" "<register>" "<integer>" "<register>"  */
 #line 64 "dsas.y"
     { MAKE_STMT(binary,  .op = (yyvsp[-3].op) + dsop_add_imm -dsop_add, .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
-#line 1165 "generated/dsc_parser.c"
+#line 1166 "generated/dsc_parser.c"
     break;
 
   case 12: /* statement: "<op>" "<register>" "<register>"  */
 #line 66 "dsas.y"
     { MAKE_STMT(unary,   .op = (yyvsp[-2].op),  .num0 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1171 "generated/dsc_parser.c"
+#line 1172 "generated/dsc_parser.c"
     break;
 
   case 13: /* statement: "<unop>" "<register>" "<register>"  */
 #line 68 "dsas.y"
     { MAKE_STMT(unary,   .op = (yyvsp[-2].op),  .num0 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1177 "generated/dsc_parser.c"
+#line 1178 "generated/dsc_parser.c"
     break;
 
   case 14: /* statement: "imm" "<integer>" "<register>"  */
 #line 70 "dsas.y"
     { MAKE_STMT(imm,     .num0 = (yyvsp[-1].num),  .dest = (yyvsp[0].num)); }
-#line 1183 "generated/dsc_parser.c"
+#line 1184 "generated/dsc_parser.c"
     break;
 
   case 15: /* statement: "call" "<id>" "<register>" "<register>"  */
 #line 72 "dsas.y"
     { MAKE_STMT(call,    .name = (yyvsp[-2].id), .num1 = (yyvsp[-1].num),  .dest = (yyvsp[0].num)); }
-#line 1189 "generated/dsc_parser.c"
+#line 1190 "generated/dsc_parser.c"
     break;
 
   case 16: /* statement: "return"  */
 #line 74 "dsas.y"
     { MAKE_STMT(return, .num0 = 1); }
-#line 1195 "generated/dsc_parser.c"
+#line 1196 "generated/dsc_parser.c"
     break;
 
   case 17: /* statement: "return" "<register>"  */
 #line 76 "dsas.y"
     { MAKE_STMT(return, .dest = (yyvsp[0].num)); }
-#line 1201 "generated/dsc_parser.c"
+#line 1202 "generated/dsc_parser.c"
     break;
 
   case 18: /* statement: "<label>"  */
 #line 78 "dsas.y"
     { MAKE_STMT(label, .dest = (yyvsp[0].num)); }
-#line 1207 "generated/dsc_parser.c"
+#line 1208 "generated/dsc_parser.c"
     break;
 
   case 19: /* statement: "if" "<register>" "<label>" "<label>"  */
 #line 80 "dsas.y"
     { MAKE_STMT(if, .op = dsop_imm, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1213 "generated/dsc_parser.c"
+#line 1214 "generated/dsc_parser.c"
     break;
 
   case 20: /* statement: "if" "<op>" "<register>" "<register>" "<label>"  */
 #line 82 "dsas.y"
     { MAKE_STMT(if, .op = (yyvsp[-3].op) + dsop_if_add - dsop_add, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1219 "generated/dsc_parser.c"
+#line 1220 "generated/dsc_parser.c"
     break;
 
   case 21: /* statement: "if" "<binop>" "<register>" "<register>" "<label>"  */
 #line 84 "dsas.y"
     { MAKE_STMT(if, .op = (yyvsp[-3].op) + dsop_if_add - dsop_add, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1225 "generated/dsc_parser.c"
+#line 1226 "generated/dsc_parser.c"
     break;
 
   case 22: /* statement: "if" "<op>" "<register>" "<integer>" "<label>"  */
 #line 86 "dsas.y"
     { MAKE_STMT(if, .op = (yyvsp[-3].op) + dsop_if_add_imm - dsop_add, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1231 "generated/dsc_parser.c"
+#line 1232 "generated/dsc_parser.c"
     break;
 
   case 23: /* statement: "if" "<binop>" "<register>" "<integer>" "<label>"  */
 #line 88 "dsas.y"
     { MAKE_STMT(if, .op = (yyvsp[-3].op) + dsop_if_add_imm - dsop_add, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1237 "generated/dsc_parser.c"
+#line 1238 "generated/dsc_parser.c"
     break;
 
   case 24: /* argument: argument "<id>"  */
 #line 91 "dsas.y"
                   { stmt_last()->num1 = 1; MAKE_STMT(arg,    .name = (yyvsp[0].id)); }
-#line 1243 "generated/dsc_parser.c"
+#line 1244 "generated/dsc_parser.c"
     break;
 
   case 25: /* argument: "<id>"  */
 #line 92 "dsas.y"
          { MAKE_STMT(arg,    .name = (yyvsp[0].id));}
-#line 1249 "generated/dsc_parser.c"
+#line 1250 "generated/dsc_parser.c"
     break;
 
 
-#line 1253 "generated/dsc_parser.c"
+#line 1254 "generated/dsc_parser.c"
 
       default: break;
     }

@@ -84,7 +84,7 @@ extern int dsasdebug;
 #if ! defined DSASSTYPE && ! defined DSASSTYPE_IS_DECLARED
 union DSASSTYPE
 {
-#line 22 "dsas.y"
+#line 21 "dsas.y"
 
   DsAsStmt stmt;
   char     *id;

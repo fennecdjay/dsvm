@@ -17,6 +17,7 @@ typedef struct DsGcc {
   Fun *curr;
   Dsc *dsc;
   gcc_jit_rvalue* value_data[DSGCC_VALUE_SIZE];
+  gcc_jit_lvalue* lvalue_data[DSGCC_VALUE_SIZE];
   Fun fun_data[DSGCC_FUN_SIZE];
   gcc_jit_block *label_data[DSGCC_LABEL_SIZE];
   gcc_jit_block* block;

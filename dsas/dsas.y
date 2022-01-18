@@ -2,7 +2,6 @@
 %define api.prefix {dsas}
 %parse-param { DsAs* arg }
 %lex-param   { void *scan }
-
 %{
 #include <stdint.h>
 #include "ds.h"
@@ -28,6 +27,7 @@ void stmt_alloc();
 };
 
 %{
+#include "dsc_parser.h"
 #include "dsc_lexer.h"
 %}
 

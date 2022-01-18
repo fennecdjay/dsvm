@@ -54,39 +54,22 @@ ANN static void emit_binary(DsGcc *const dsgcc, const DsAsStmt *stmt) {
   }
 }
 
-ANN static gcc_jit_rvalue *unary(gcc_jit_context *ctx, enum gcc_jit_unary_op op,
-    gcc_jit_rvalue* val) {
-  return gcc_jit_context_new_unary_op (ctx,
-        LOC, op, gcc_jit_rvalue_get_type(val), val);
-}
-static gcc_jit_rvalue *get_unary(gcc_jit_context *ctx, const ds_opcode op,
-    gcc_jit_rvalue* val) {
-  if(op == dsop_sub) return unary(ctx, GCC_JIT_UNARY_OP_MINUS, val);
-  if(op == dsop_not) return unary(ctx, GCC_JIT_UNARY_OP_LOGICAL_NEGATE, val);
-  if(op == dsop_cmp) return unary(ctx, GCC_JIT_UNARY_OP_BITWISE_NEGATE, val);
-  if(op == dsop_add) return unary(ctx, GCC_JIT_UNARY_OP_ABS, val);
-
-// we need lvalues
-
-//  if(op == dsop_mov) return GCC_JIT_UNARY_OP_ABS; ???
-  if(op == dsop_mul) return gcc_jit_lvalue_as_rvalue(gcc_jit_rvalue_dereference(val, LOC));
-//  if(op == dsop_mul) return gcc_jit_lvalue_get_address(val, LOC);
-
-//GCC_JIT_UNARY_OP_ABS;
-//  if(op == dsop_inc) exit(3)
-//  if(op == dsop_dec) exit(4);
-//  if(op == dsop_mov) exit(5); // ??
-//  if(op == dsop_neg) return GCC_JIT_UNARY_OP_MINUS;
-//  if(op == dsop_not) return GCC_JIT_UNARY_OP_LOGICAL_NEGATE;
-//  if(op == dsop_cmp) return GCC_JIT_UNARY_OP_BITWISE_NEGATE;
-  //  if(op == dsop_add)
-  exit(12);
+ANN static gcc_jit_rvalue *unary(DsGcc *const dsgcc, enum gcc_jit_unary_op op, const reg_t idx) {
+  gcc_jit_rvalue *const val = dsgcc->value_data[idx];
+  return gcc_jit_context_new_unary_op (dsgcc->ctx, LOC, op, gcc_jit_rvalue_get_type(val), val);
 }
 
 ANN static void emit_unary(DsGcc *const dsgcc, const DsAsStmt *stmt) {
-  gcc_jit_rvalue *const val = dsgcc->value_data[stmt->num0];
-//  dsgcc->value_data[stmt->dest] = gcc_jit_context_new_unary_op (dsgcc->ctx,
-//        LOC, get_unary(stmt->op), gcc_jit_rvalue_get_type(val), val);
+  const ds_opcode op = stmt->op;
+  if(op == dsop_sub)      dsgcc->value_data[stmt->dest] = unary(dsgcc, GCC_JIT_UNARY_OP_MINUS, stmt->num0);
+  else if(op == dsop_not) dsgcc->value_data[stmt->dest] = unary(dsgcc, GCC_JIT_UNARY_OP_LOGICAL_NEGATE, stmt->num0);
+  else if(op == dsop_cmp) dsgcc->value_data[stmt->dest] = unary(dsgcc, GCC_JIT_UNARY_OP_BITWISE_NEGATE, stmt->num0);
+  else if(op == dsop_add) dsgcc->value_data[stmt->dest] = unary(dsgcc, GCC_JIT_UNARY_OP_ABS, stmt->num0);
+  else if(op == dsop_mov) gcc_jit_block_add_assignment (dsgcc->block, LOC, dsgcc->lvalue_data[stmt->dest], dsgcc->value_data[stmt->num0]);
+  else if(op == dsop_mul) dsgcc->value_data[stmt->dest] = gcc_jit_lvalue_as_rvalue(
+          gcc_jit_rvalue_dereference(dsgcc->value_data[stmt->num0], LOC));
+  else if(op == dsop_mul) dsgcc->value_data[stmt->dest] = gcc_jit_lvalue_get_address(dsgcc->lvalue_data[stmt->num0], LOC);
+  exit(14);
 }
 
 ANN static void emit_imm(DsGcc *const dsgcc, const DsAsStmt *stmt) {
@@ -156,9 +139,9 @@ ANN static void emit_label(DsGcc *const dsgcc, const DsAsStmt *stmt) {
   dsgcc->is_terminated = 0;
 }
 
-typedef void (*dsc_t)(DsGcc *const dsgcc, const DsAsStmt*);
+typedef void (*dsgcc_t)(DsGcc *const dsgcc, const DsAsStmt*);
 
-static const dsc_t functions[dsas_function] = {
+static const dsgcc_t functions[dsas_function] = {
   emit_binary,
   emit_unary,
   emit_imm,
