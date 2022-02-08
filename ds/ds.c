@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "ds.h"
 
+#include <emmintrin.h>
+
 #define RVM_SIZE 256
 
 #define DISPATCH() { void *next = *(void**)code; code+= sizeof(void*); goto *next;}
@@ -15,8 +17,10 @@
 	goto *info.addr;\
 } while(0)
 
+
 #define BINARY_IMM(op) do               \
 {                                   \
+__builtin_prefetch(&code[sizeof(DsInfo3j)], 0, 0);\
   const DsInfo3j info = *(DsInfo3j*)code;\
   code += sizeof(DsInfo3j);\
   reg[info.ptr] = reg[info.lhs] op info.rhs; \
@@ -46,21 +50,14 @@
   const reg_t lhs  = *(reg_t*)code;\
   const reg_t rhs  = *(reg_t*)(code + sizeof(reg_t));\
   dscode_t *const new_code  = *(dscode_t**)(code + sizeof(reg_t)*2);\
-  if(!(reg[lhs] op rhs))       \
+  if(!(reg[lhs] op rhs)) { \
     code = new_code;            \
-  else\
-    code += 3*sizeof(void*);\
+    DISPATCH();\
+  }\
+  code += 3*sizeof(void*);\
   DISPATCH();\
 } while(0)
-/*
-#define BINARYF(op) do               \
-{                                   \
-  const DsInfo3j info = *(DsInfo3j*)code;\
-  code += sizeof(DsInfo3j);\
-  *(float*)(reg + info.ptr) = *(float*)(reg + info.lhs) op *(float*)(reg + info.rhs); \
-  goto *info.addr;\
-} while(0)
-*/
+
 __attribute__((nonnull(1)))
 void dsvm_run(DsThread *thread, const dscode_t *next) {
   dscode_t *code = thread->code;
@@ -72,26 +69,13 @@ void dsvm_run(DsThread *thread, const dscode_t *next) {
     DISPATCH();
   _dsop_imm:
 {
-//  const reg_t lhs = vm_read();
-//  const reg_t dest = vm_read();
   const reg_t lhs = *(reg_t*)code;
   const reg_t dest = *(reg_t*)(code + sizeof(reg_t));
-const void *addr = *(void**)(code + sizeof(reg_t)*2);
-code += sizeof(reg_t) *3;
+  const void *addr = *(void**)(code + sizeof(reg_t)*2);
+  code += sizeof(reg_t) *3;
   reg[dest] = lhs;
- goto *addr;
-//  DISPATCH();
+  goto *addr;
 }
-/*
-  _dsop_imm_sub:
-{
-  const reg_t lhs = vm_read();
-  const reg_t rhs = vm_read();
-  const reg_t dest = vm_read();
-  reg[dest] = reg[lhs] - rhs;
-  DISPATCH();
-}
-*/
   _dsop_add:
   BINARY(+);
   _dsop_sub:
@@ -179,7 +163,7 @@ code += sizeof(reg_t) *3;
 
   _dsop_goto:
 {
-  code = (dscode_t*)vm_read();
+  code = *(dscode_t**)code;
   DISPATCH();
 }
 
@@ -336,7 +320,7 @@ _dsop_end:
 _dsop_jit:
 {
   typedef reg_t (*jitfun_t)(reg_t*);
-  jitfun_t trampoline = *(jitfun_t*)code;
+  jitfun_t trampoline = *(volatile jitfun_t*)code;
   if(trampoline) {
     const reg_t out = trampoline(reg);
     const DsFrame frame = frames[--nframe];
@@ -344,12 +328,12 @@ _dsop_jit:
     reg = frame.reg;
     reg[frame.out] = out;
     DISPATCH();
-  } else {
-    void *addr = *(void**)(code + sizeof(jitfun_t*));
-    code += sizeof(jitfun_t*) + sizeof(void*);
-    goto *addr;
   }
+  void *addr = *(void**)(code + sizeof(jitfun_t*)*2);
+  code += sizeof(jitfun_t*) + sizeof(void*) *2;
+  goto *addr;
 }
+
 }
 
   // prepare code
@@ -496,6 +480,7 @@ _dsop_jit:
   PREPARE2(addr, DsInfo);
 
   PREPARE2(call, DsInfo3);
+
   PREPARE(return, 2);
 
 //  PREPARE(immf, 3);
@@ -503,7 +488,7 @@ _dsop_jit:
 //  PREPARE(mulf, 4); PREPARE(divf, 4);
 
   PREPARE(end, 1);
-  PREPARE(jit, 2);
+  PREPARE(jit, 3);
 }
 
 #define BUMP_SIZE 4096

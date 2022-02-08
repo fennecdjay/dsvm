@@ -4,6 +4,8 @@ CFLAGS += -I../ds -I../dsas -I.
 
 CFLAGS += -I../dsc
 
+all: dsgcc_test libdsgcc.a
+
 dsgcc_test: dsgcc_test.o dsgcc.c ../dsas/libdsas.a
 	${CC} ${CFLAGS} -D DS_NOJIT $^ -o $@ ../dsas/libdsas.a -l gccjit
 

@@ -3,29 +3,31 @@ typedef struct DscJump {
   dscode_t *code;
 } DscJump;
 
+#define DSC_LABEL_SIZE 128
 typedef struct DscFun {
   char  *name;
   dscode_t *code;
   char  trampoline_name[256];
+  DscJump if_data[DSC_LABEL_SIZE];
+  dscode_t *label_data[DSC_LABEL_SIZE];
+//  DscJump   call_data[DSC_LABEL_SIZE];
   uint32_t n;
-  uint32_t if_count;
+  uint32_t nif;
+  uint32_t ncall;
   uint32_t start;
 } DscFun;
 
-#define DSC_LABEL_SIZE 256
 typedef struct Dsc {
   DscFun fun_data[256];
   DscFun *curr;
-  DscJump if_data[DSC_LABEL_SIZE];
-  dscode_t *label_data[DSC_LABEL_SIZE];
-  uint32_t fun_count;
+  uint32_t nfun;
+//  uint32_t cap
 } Dsc;
 #undef DSC_LABEL_SIZE
 
-void dsc_compile(Dsc *const dsc, const DsAs *ds);
-
+void dsc_compile(Dsc *const dsc, DsAs *const ds);
 
 typedef struct Jitter {
-  Dsc *const dsc;
-  const DsAs *dsas;
+  Dsc *dsc;
+  DsAs *dsas;
 } Jitter;

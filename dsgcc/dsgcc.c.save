@@ -139,7 +139,7 @@ ANN static void emit_label(DsGcc *const dsgcc, const DsAsStmt *stmt) {
   dsgcc->is_terminated = 0;
 }
 
-typedef void (*dsgcc_t)(DsGcc *const dsgcc, const DsAsStmt*);
+typedef void (*dsgcc_t)(DsGcc *const, const DsAsStmt*);
 
 static const dsgcc_t functions[dsas_function] = {
   emit_binary,
@@ -187,7 +187,7 @@ ANN void dsgcc_compile(DsGcc *const dsgcc, const DsAs *dsas) {
       }
       if(dsgcc->dsc && dsgcc->curr) {
         mk_trampoline(dsgcc, dsgcc->curr, dsgcc->dsc->fun_data[dsgcc->nfun - 1].trampoline_name);
-        if(dsgcc->nfun == dsgcc->dsc->nfun - 1) break;
+        if(dsgcc->nfun == dsgcc->dsc->fun_count - 1) break;
       }
     } else if(stmt.type == dsas_arg) {
       gcc_jit_type *const t = get_type(dsgcc, *stmt.name);
@@ -221,22 +221,27 @@ ANN void dsgcc_compile(DsGcc *const dsgcc, const DsAs *dsas) {
 }
 
 #ifndef DS_NOJIT
-#include <threads.h>
 ANN int gcc_launch_jit(void *data) {
+puts("here");
   const Jitter *jitter = (Jitter*)data;
   Dsc *const dsc = jitter->dsc;
   const DsAs *dsas = jitter->dsas;
   gcc_jit_context *ctx = gcc_jit_context_acquire();
   gcc_jit_context_set_int_option (ctx, GCC_JIT_INT_OPTION_OPTIMIZATION_LEVEL, 3);
   DsGcc dsgcc = { .ctx = ctx, .dsc = dsc };
+puts("compile here");
   dsgcc_compile(&dsgcc, dsas);
+puts("here before");
   gcc_jit_result *result = gcc_jit_context_compile (ctx);
-puts(__func__);
-  for(size_t i = 0; i < dsc->nfun - 1; i++) {
-    DscFun *fun = &dsc->fun_data[i];
-    *(void**)(fun->code + sizeof(void*)) = gcc_jit_result_get_code (result, fun->trampoline_name);
-    *(void**)(fun->code + sizeof(void*) *2) = gcc_jit_result_get_code (result, fun->name);
+puts("after here");
+  for(size_t i = 0; i < dsc->fun_count - 1; i++) {
+    DscFun *fun = /*dsgcc.curr = */&dsc->fun_data[i];
+puts("here");
+//    *(void**)(fun->code + sizeof(void*)) = gcc_jit_result_get_code (result, fun->trampoline_name);
+//    *(void**)(fun->code + sizeof(void*) *2) = gcc_jit_result_get_code (result, fun->name);
+//printf("gcc code %p\n", *(void**)(fun->code + sizeof(void*) *2));
   }
+puts("end gcc");
   thrd_exit(EXIT_SUCCESS);
 }
 #endif

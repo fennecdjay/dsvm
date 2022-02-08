@@ -62,6 +62,8 @@ typedef enum ds_opcode {
   dsop_if_band_imm, dsop_if_bor_imm, dsop_if_bxor_imm,
   dsop_if_shl_imm, dsop_if_shr_imm,
 
+//  dsop_i2f, dsopf2i,
+
   dsop_neg, dsop_not, dsop_cmp, dsop_abs,
   dsop_mov, dsop_deref, dsop_addr,
 
@@ -135,6 +137,11 @@ ANN static inline dscode_t *dscode_call(const dscode_t *func, const dsidx_t offs
   return code;
 }
 
+ANN static inline void dscode_set_call(const dscode_t *code, const dscode_t *func) {
+  const DsInfo3 info = *(DsInfo3*)(code + sizeof(void*));
+  *(DsInfo3*)code = (DsInfo3){ .ptr = (reg_t)func, .lhs = info.lhs, .rhs = info.rhs };
+}
+
 static inline dscode_t *dscode_return(const reg_t dest) {
   dscode_t *const code = code_alloc(dsop_return, 1);
   *(reg_t*)code = dest;
@@ -205,7 +212,7 @@ static inline dscode_t *dscode_end(void) {
 }
 
 static inline dscode_t *dscode_jit(void) {
-  return code_alloc(dsop_jit, 1);
+  return code_alloc(dsop_jit, 2);// 1
 }
 
 dscode_t *dscode_start(void);

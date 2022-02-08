@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 
   Dsc dsc = {};
   dsc_compile(&dsc, &ds);
-  if(dsc.fun_count) {
+  if(dsc.nfun) {
     reg_t reg[256] = {};
     DsFrame frames[256] = {};
     reg_t end_code[2] = { dsop_end };
@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     dsvm_run(&_thread, (dscode_t*)(end_code + 1));
 
     DsThread thread = {
-      .code = dsc.fun_data[dsc.fun_count-1].code,
+      .code = dsc.fun_data[dsc.nfun-1].code,
       .reg = reg,
       .frames = frames,
       .nframe = 1

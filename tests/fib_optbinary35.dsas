@@ -1,0 +1,17 @@
+fib: int int
+  < $0 2 $2
+  if $2 :0 :1
+  :0
+  return $0
+  :1
+  - $0 1 $4
+  call fib $4 $5
+  - $0 2 $7
+  call fib $7 $8
+  + $5 $8 $9
+  return $9
+
+main: int
+  imm 35 $0
+  call fib $0 $0
+  return $0

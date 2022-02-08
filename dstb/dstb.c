@@ -13,7 +13,7 @@ typedef struct {
 
 #define FUN_SIZE 2
 static Fun fun_data[FUN_SIZE];
-static uint32_t fun_count;
+static uint32_t nfun;
 
 #define LABEL_SIZE 2
 TB_Label label_data[LABEL_SIZE];
@@ -55,13 +55,13 @@ static TB_Register tb_is(TB_Function *code, const TB_Register reg) {
   return tb_inst_cmp_ne(code, reg, zero);
 }
 
-static TB_Register get_binary(DsTB *const dstb, const DsAsStmt *stmt, TB_Register rhs) {
+static TB_Register binary(DsTB *const dstb, const DsAsStmt *stmt, TB_Register rhs) {
   TB_Function *code = dstb->curr->code;
   const TB_Register lhs = get_reg(dstb, stmt->num0);
   switch(stmt->op) {
     case dsop_add:
       if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
-        return tb_inst_add(code, rhs, lhs, TB_ASSUME_NUW);
+        return tb_inst_add(code, lhs, rhs, TB_ASSUME_NUW);
       return tb_inst_fadd(code, lhs, rhs);
     case dsop_sub:
       if(TB_IS_INTEGER_TYPE(tb_node_get_data_type(code, lhs).type))
@@ -169,13 +169,17 @@ return tb_inst_phi2(code, ok1, r_true, nok, r_false);
   }
 }
 
-static void emit_binary(DsTB *const dstb, const DsAsStmt *stmt) {
+static TB_Register get_binary(DsTB *const dstb, const DsAsStmt *stmt) {
   if(stmt->op >= dsop_add_imm) {
     const TB_Register reg = tb_inst_sint(dstb->curr->code, TB_TYPE_I64, stmt->num1);
     DsAsStmt tmp = { .op = stmt->op - dsop_add_imm + dsop_add, .num0 = stmt->num0 };
-    set(get_binary(dstb, &tmp, reg), stmt->dest);
-  } else
-    set(get_binary(dstb, stmt, get_reg(dstb, stmt->num1)), stmt->dest);
+    return binary(dstb, &tmp, reg);
+  }
+  return binary(dstb, stmt, get_reg(dstb, stmt->num1));
+}
+
+static void emit_binary(DsTB *const dstb, const DsAsStmt *stmt) {
+  set(get_binary(dstb, stmt), stmt->dest);
 }
 /*
 static TB_Register get_unary(const ds_opcode op, const TB_Register val) {
@@ -195,10 +199,10 @@ static void emit_imm(DsTB *const dstb, const DsAsStmt *stmt) {
 }
 
 static void emit_call(DsTB *const dstb, const DsAsStmt *stmt) {
-  for(uint32_t i =0; i < fun_count; i++) {
+  for(uint32_t i =0; i < nfun; i++) {
     if(stmt->name == fun_data[i].name) {
       Fun fun = fun_data[i];
-      set(tb_inst_call(dstb->curr->code, fun.ret_type, fun.code, fun.narg, (TB_Register[]){value_data[stmt->num1]}), stmt->dest);
+      set(tb_inst_call(dstb->curr->code, fun.ret_type, fun.code, fun.narg, value_data + stmt->num1), stmt->dest);
       return;
    }
   }
@@ -229,14 +233,9 @@ static void emit_if(DsTB *const dstb, const DsAsStmt *stmt) {
     tb_inst_if(dstb->curr->code, get_reg(dstb, stmt->num0), label_data[stmt->num1], label_data[stmt->dest]);
   else {
     TB_Label label = tb_inst_new_label_id(dstb->curr->code);
-    TB_Register rhs = stmt->op >= dsop_if_add_imm
-      ? tb_inst_sint(dstb->curr->code, TB_TYPE_I64, stmt->num1)
-      : value_data[stmt->num1];
-    const ds_opcode op = stmt->op >= dsop_if_add_imm
-      ? stmt->op - dsop_if_add_imm + dsop_add
-      : stmt->op - dsop_if_add + dsop_add;
-    DsAsStmt tmp = { .op = op, .num1 = stmt->num1 };
-    TB_Register cond = get_binary(dstb, &tmp, rhs);
+    const ds_opcode op = stmt->op - dsop_if_add + dsop_add;
+    DsAsStmt tmp = { .op = op, .num0 = stmt->num0, .num1 = stmt->num1 };
+    TB_Register cond = get_binary(dstb, &tmp);
     tb_inst_if(dstb->curr->code, cond, label, label_data[stmt->dest]);
     tb_inst_label(dstb->curr->code, label);
   }
@@ -268,22 +267,22 @@ ANN static void compile(DsTB *const dstb, DsAsStmt *stmts, uint32_t start, uint3
 }
 
 ANN static void mk_trampoline(const DsTB *dstb, Fun *fun, const char *name) {
-  TB_FunctionPrototype* proto = tb_prototype_create(dstb->module, TB_STDCALL, TB_TYPE_I64, 1, false);
-  TB_DataType param_data[1] = { TB_TYPE_PTR };
+  TB_FunctionPrototype* proto = tb_prototype_create(dstb->module, TB_STDCALL, fun->ret_type, 1, false);
+  TB_DataType t = tb_vector_type(TB_I64, 1);
+  TB_DataType param_data[1] = { t };
   tb_prototype_add_params(proto, 1, param_data);
-  TB_Function *code = tb_prototype_build(dstb->module, proto, strdup("test__trampoline"), TB_LINKAGE_PUBLIC);
+  TB_Function *code = tb_prototype_build(dstb->module, proto, name, TB_LINKAGE_PUBLIC);
   TB_Register reg = tb_inst_param(code, 0);
+
   TB_Register args[PARAM_SIZE];
   for(uint32_t i = 0; i < fun->narg; i++) {
     TB_Register index = tb_inst_sint(code, TB_TYPE_I32, i);
-    TB_Register addr = tb_inst_member_access(code, reg, index);
-//    TB_Register src = tb_inst_load(code, TB_TYPE_I64, addr, sizeof(uint64_t)); // check align
-//    TB_Register src = tb_inst_load(code, TB_TYPE_I64, addr, 16); // check align
-    args[i] = addr; //src;//tb_inst_ptr2int(code, addr, TB_TYPE_I64);
+    TB_Register data = tb_inst_member_access(code, reg, i);
+    args[i] = tb_inst_load(code, TB_TYPE_I64, data, 0);
   }
-  TB_Register ret = tb_inst_call(code, fun->ret_type, fun->code, fun->narg, args);
+  TB_Register ret = tb_inst_call(code, fun->ret_type, fun->code, 1, args);
   tb_inst_ret(code, ret);
-  tb_module_compile_func(dstb->module, dstb->curr->code);
+  tb_module_compile_func(dstb->module, code);
   fun->trampoline = code;
 }
 
@@ -294,13 +293,14 @@ ANN void first_pass(DsTB *const dstb, const DsAs *dsas) {
   for(size_t i = 0; i < dsas->n; i++) {
     const DsAsStmt stmt = dsas->stmts[i];
     if(stmt.type == dsas_function) {
-      fun = &fun_data[fun_count];
-      fun_data[fun_count].name = stmt.name;
+      fun = &fun_data[nfun];
+      fun_data[nfun].name = stmt.name;
       if(start) {
+//        mk_trampoline(dstb, dstb->curr, "trampoline");
         compile(dstb, dsas->stmts, start, i);
-        tb_function_print(dstb->curr->code, tb_default_print_callback, stdout);
         mk_trampoline(dstb, dstb->curr, "trampoline");
-        tb_function_print(dstb->curr->trampoline, tb_default_print_callback, stdout);
+//        tb_function_print(dstb->curr->code, tb_default_print_callback, stdout);
+//        tb_function_print(dstb->curr->trampoline, tb_default_print_callback, stdout);
       }
     } else if(stmt.type == dsas_arg) {
       const TB_DataType t = get_type(*stmt.name);
@@ -313,7 +313,7 @@ ANN void first_pass(DsTB *const dstb, const DsAs *dsas) {
         fun->code =
           tb_prototype_build(dstb->module, proto, fun->name, TB_LINKAGE_PUBLIC);
         fun->ret_type = t;
-        fun_count++;
+        nfun++;
         start = i + 1;
       }
     } else if(stmt.type == dsas_label)
@@ -338,21 +338,11 @@ ANN int tb_launch_jit(void *data) {
 #else
   TB_Module *module = tb_module_create(TB_ARCH_X86_64, TB_SYSTEM_LINUX, &features);
 #endif
-//  DsTB dstb = { .module = module };
-//  TB_Function *code = dstb_compile(&dstb, dsas);
-puts("pre dstb compile");
-  TB_Function *code = dstb_compile(module, dsas);
-puts("pre compile");
+  /*TB_Function *code = */dstb_compile(module, dsas);
   tb_module_compile(module);
-//  tb_function_optimize(module, 1);
-puts("post compile");
   tb_module_export_jit(module);
-puts("post export");
-  for(size_t i = 0; i < dsc->fun_count - 1; i++) {
+  for(size_t i = 0; i < dsc->nfun - 1; i++) {
     DscFun *fun = &dsc->fun_data[i];
-//tb_function_print(fun_data[i].code, tb_default_print_callback, stdout);
-
-printf("%s %p %p\n", fun->name, fun_data[i].code, tb_module_get_jit_func(module, fun_data[i].trampoline));
     *(void**)(fun->code + sizeof(void*)) = tb_module_get_jit_func(module, fun_data[i].trampoline);
   }
 //  tb_module_destroy(module);

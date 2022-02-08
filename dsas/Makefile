@@ -1,13 +1,13 @@
 CFLAGS += -Wall -Wextra
 CFLAGS += -fPIC -I. -Igenerated -I../ds
-CFLAGS += -O2 -fomit-frame-pointer -ffast-math
-#CFLAGS += -flto
+CFLAGS += -O3 -fomit-frame-pointer -ffast-math
+CFLAGS += -flto
 
 ifeq ($(shell uname -m), x86_64)
 CFLAGS += -march=native
 endif
 
-#LDFLAGS += -flto
+LDFLAGS += -flto
 
 libdsas.a: generated/dsc_parser.o generated/dsc_lexer.o
 	ar rcs $@ $^
