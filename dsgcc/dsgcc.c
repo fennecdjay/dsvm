@@ -231,7 +231,6 @@ ANN int gcc_launch_jit(void *data) {
   DsGcc dsgcc = { .ctx = ctx, .dsc = dsc };
   dsgcc_compile(&dsgcc, dsas);
   gcc_jit_result *result = gcc_jit_context_compile (ctx);
-puts(__func__);
   for(size_t i = 0; i < dsc->nfun - 1; i++) {
     DscFun *fun = &dsc->fun_data[i];
     *(void**)(fun->code + sizeof(void*)) = gcc_jit_result_get_code (result, fun->trampoline_name);

@@ -1,0 +1,15 @@
+fib: int int
+  if < $0 2 :0
+  return $0
+  :0
+  - $0 1 $1
+  call fib $1 $1
+  - $0 2 $2
+  call fib $2 $2
+  + $1 $2 $3
+  return $3
+
+main: int
+  imm 30 $0
+  call fib $0 $0
+  return $0

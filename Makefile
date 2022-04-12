@@ -15,6 +15,9 @@ dstb: dsas
 dsgcc: dsas
 	${MAKE} -C dsgcc
 
+dsjit: dsas
+	${MAKE} -C dsjit
+
 clean:
 	${MAKE} -C ds    clean
 	${MAKE} -C dsc   clean

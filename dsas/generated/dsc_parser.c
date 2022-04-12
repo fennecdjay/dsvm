@@ -135,13 +135,12 @@ enum yysymbol_kind_t
   YYSYMBOL_DS_ID = 15,                     /* "<id>"  */
   YYSYMBOL_DS_FUN = 16,                    /* "<function>"  */
   YYSYMBOL_YYACCEPT = 17,                  /* $accept  */
-  YYSYMBOL_program = 18,                   /* program  */
-  YYSYMBOL_functions = 19,                 /* functions  */
-  YYSYMBOL_function = 20,                  /* function  */
-  YYSYMBOL_21_1 = 21,                      /* $@1  */
-  YYSYMBOL_statements = 22,                /* statements  */
-  YYSYMBOL_statement = 23,                 /* statement  */
-  YYSYMBOL_argument = 24                   /* argument  */
+  YYSYMBOL_functions = 18,                 /* functions  */
+  YYSYMBOL_function = 19,                  /* function  */
+  YYSYMBOL_20_1 = 20,                      /* $@1  */
+  YYSYMBOL_statements = 21,                /* statements  */
+  YYSYMBOL_statement = 22,                 /* statement  */
+  YYSYMBOL_argument = 23                   /* argument  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -152,7 +151,7 @@ typedef enum yysymbol_kind_t yysymbol_kind_t;
 #include "dsc_parser.h"
 #include "dsc_lexer.h"
 
-#line 156 "generated/dsc_parser.c"
+#line 155 "generated/dsc_parser.c"
 
 
 #ifdef short
@@ -462,18 +461,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  6
+#define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   66
+#define YYLAST   57
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  17
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  8
+#define YYNNTS  7
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  27
+#define YYNRULES  25
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  56
+#define YYNSTATES  54
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   271
@@ -524,9 +523,9 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    47,    47,    47,    49,    49,    52,    52,    56,    56,
-      59,    61,    63,    65,    67,    69,    71,    73,    75,    77,
-      79,    81,    83,    85,    87,    89,    93,    94
+       0,    47,    47,    47,    50,    50,    54,    54,    57,    59,
+      61,    63,    65,    67,    69,    71,    73,    75,    77,    79,
+      81,    83,    85,    87,    91,    92
 };
 #endif
 
@@ -545,8 +544,8 @@ static const char *const yytname[] =
   "\"end of file\"", "error", "\"invalid token\"", "\"imm\"", "\"call\"",
   "\"return\"", "\"if\"", "\"goto\"", "\"<binop>\"", "\"<unop>\"",
   "\"<op>\"", "\"<integer>\"", "\"<register>\"", "\"<label>\"",
-  "\"<float>\"", "\"<id>\"", "\"<function>\"", "$accept", "program",
-  "functions", "function", "$@1", "statements", "statement", "argument", YY_NULLPTR
+  "\"<float>\"", "\"<id>\"", "\"<function>\"", "$accept", "functions",
+  "function", "$@1", "statements", "statement", "argument", YY_NULLPTR
 };
 
 static const char *
@@ -566,7 +565,7 @@ static const yytype_int16 yytoknum[] =
 };
 #endif
 
-#define YYPACT_NINF (-17)
+#define YYPACT_NINF (-12)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -580,12 +579,12 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -11,   -17,     9,    -2,   -17,    -5,   -17,    14,     5,    12,
-      30,    15,    21,    25,   -17,   -17,    26,   -17,   -17,    13,
-      29,    37,   -17,    38,    39,    40,     1,    42,    32,   -17,
-     -17,    26,   -17,    43,    34,    36,    44,    46,    47,   -17,
-      48,    49,   -17,    50,    51,    52,    53,   -17,   -17,   -17,
-     -17,   -17,   -17,   -17,   -17,   -17
+     -11,   -12,     0,   -12,    -6,   -12,   -12,   -12,    -2,     4,
+       6,    13,     2,    24,    25,    26,   -12,   -12,    14,   -12,
+      27,    28,   -12,    29,    30,    31,    17,    33,    19,   -12,
+     -12,    34,    21,    23,    35,    37,    38,   -12,    39,    40,
+     -12,    41,    42,    43,    44,   -12,   -12,   -12,   -12,   -12,
+     -12,   -12,   -12,   -12
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -593,24 +592,24 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     6,     0,     3,     4,     0,     1,     0,     0,    18,
-       0,     0,     0,     0,    20,     5,     2,     8,    27,     0,
-       0,     0,    19,     0,     0,     0,     0,     0,     0,     9,
-      26,     7,    16,     0,     0,     0,     0,     0,     0,    15,
-       0,    14,    17,     0,     0,     0,     0,    21,    12,    10,
-      13,    11,    25,    23,    24,    22
+       0,     4,     0,     2,     0,     1,     3,    25,     0,     0,
+       0,    16,     0,     0,     0,     0,    18,    24,     5,     6,
+       0,     0,    17,     0,     0,     0,     0,     0,     0,     7,
+      14,     0,     0,     0,     0,     0,     0,    13,     0,    12,
+      15,     0,     0,     0,     0,    19,    10,     8,    11,     9,
+      23,    21,    22,    20
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -17,   -17,   -17,    59,   -17,    33,   -16,   -17
+     -12,   -12,    45,   -12,   -12,     8,   -12
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,     4,     5,    16,    17,    19
+      -1,     2,     3,     4,    18,    19,     8
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -618,52 +617,50 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      29,     7,     8,     9,    10,     1,    11,    12,    13,     6,
-      18,    14,    37,    38,     1,    29,     7,     8,     9,    10,
-      21,    11,    12,    13,    22,    20,    14,    26,    30,     7,
-       8,     9,    10,    27,    11,    12,    13,    28,    23,    14,
-      24,    32,    25,    40,    41,    43,    44,    45,    46,    33,
-      34,    35,    31,    36,    39,    42,     0,    47,    48,    49,
-      50,    51,    15,    52,    53,    54,    55
+       5,     9,    10,    11,    12,     1,    13,    14,    15,     7,
+      23,    16,    24,    17,    25,    20,     1,     9,    10,    11,
+      12,    21,    13,    14,    15,    22,    29,    16,    35,    36,
+      38,    39,    41,    42,    43,    44,    26,    27,    28,    30,
+      31,    32,    33,     0,    34,    37,    40,     6,    45,    46,
+      47,    48,    49,     0,    50,    51,    52,    53
 };
 
 static const yytype_int8 yycheck[] =
 {
-      16,     3,     4,     5,     6,    16,     8,     9,    10,     0,
-      15,    13,    11,    12,    16,    31,     3,     4,     5,     6,
-      15,     8,     9,    10,    12,    11,    13,    12,    15,     3,
-       4,     5,     6,    12,     8,     9,    10,    12,     8,    13,
-      10,    12,    12,    11,    12,    11,    12,    11,    12,    12,
-      12,    12,    19,    13,    12,    12,    -1,    13,    12,    12,
-      12,    12,     3,    13,    13,    13,    13
+       0,     3,     4,     5,     6,    16,     8,     9,    10,    15,
+       8,    13,    10,    15,    12,    11,    16,     3,     4,     5,
+       6,    15,     8,     9,    10,    12,    18,    13,    11,    12,
+      11,    12,    11,    12,    11,    12,    12,    12,    12,    12,
+      12,    12,    12,    -1,    13,    12,    12,     2,    13,    12,
+      12,    12,    12,    -1,    13,    13,    13,    13
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    16,    18,    19,    20,    21,     0,     3,     4,     5,
-       6,     8,     9,    10,    13,    20,    22,    23,    15,    24,
-      11,    15,    12,     8,    10,    12,    12,    12,    12,    23,
-      15,    22,    12,    12,    12,    12,    13,    11,    12,    12,
-      11,    12,    12,    11,    12,    11,    12,    13,    12,    12,
-      12,    12,    13,    13,    13,    13
+       0,    16,    18,    19,    20,     0,    19,    15,    23,     3,
+       4,     5,     6,     8,     9,    10,    13,    15,    21,    22,
+      11,    15,    12,     8,    10,    12,    12,    12,    12,    22,
+      12,    12,    12,    12,    13,    11,    12,    12,    11,    12,
+      12,    11,    12,    11,    12,    13,    12,    12,    12,    12,
+      13,    13,    13,    13
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    17,    18,    18,    19,    19,    21,    20,    22,    22,
-      23,    23,    23,    23,    23,    23,    23,    23,    23,    23,
-      23,    23,    23,    23,    23,    23,    24,    24
+       0,    17,    18,    18,    20,    19,    21,    21,    22,    22,
+      22,    22,    22,    22,    22,    22,    22,    22,    22,    22,
+      22,    22,    22,    22,    23,    23
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     2,     1,     1,     2,     0,     4,     1,     2,
-       4,     4,     4,     4,     3,     3,     3,     4,     1,     2,
-       1,     4,     5,     5,     5,     5,     2,     1
+       0,     2,     1,     2,     0,     4,     1,     2,     4,     4,
+       4,     4,     3,     3,     3,     4,     1,     2,     1,     4,
+       5,     5,     5,     5,     2,     1
 };
 
 
@@ -1138,122 +1135,122 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 6: /* $@1: %empty  */
-#line 52 "dsas.y"
+  case 4: /* $@1: %empty  */
+#line 50 "dsas.y"
                { MAKE_STMT(function, .name = (yyvsp[0].id)); arg->nfun++; }
-#line 1145 "generated/dsc_parser.c"
+#line 1142 "generated/dsc_parser.c"
     break;
 
-  case 10: /* statement: "<binop>" "<register>" "<register>" "<register>"  */
+  case 8: /* statement: "<binop>" "<register>" "<register>" "<register>"  */
+#line 58 "dsas.y"
+    { MAKE_STMT(binary,  .op = (yyvsp[-3].op), .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
+#line 1148 "generated/dsc_parser.c"
+    break;
+
+  case 9: /* statement: "<op>" "<register>" "<register>" "<register>"  */
 #line 60 "dsas.y"
     { MAKE_STMT(binary,  .op = (yyvsp[-3].op), .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
-#line 1151 "generated/dsc_parser.c"
+#line 1154 "generated/dsc_parser.c"
     break;
 
-  case 11: /* statement: "<op>" "<register>" "<register>" "<register>"  */
+  case 10: /* statement: "<binop>" "<register>" "<integer>" "<register>"  */
 #line 62 "dsas.y"
-    { MAKE_STMT(binary,  .op = (yyvsp[-3].op), .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
-#line 1157 "generated/dsc_parser.c"
-    break;
-
-  case 12: /* statement: "<binop>" "<register>" "<integer>" "<register>"  */
-#line 64 "dsas.y"
     { MAKE_STMT(binary,  .op = (yyvsp[-3].op) + dsop_add_imm - dsop_add, .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
-#line 1163 "generated/dsc_parser.c"
+#line 1160 "generated/dsc_parser.c"
     break;
 
-  case 13: /* statement: "<op>" "<register>" "<integer>" "<register>"  */
-#line 66 "dsas.y"
+  case 11: /* statement: "<op>" "<register>" "<integer>" "<register>"  */
+#line 64 "dsas.y"
     { MAKE_STMT(binary,  .op = (yyvsp[-3].op) + dsop_add_imm -dsop_add, .num0 = (yyvsp[-2].num),  .num1 = (yyvsp[-1].num), .dest=(yyvsp[0].num)); }
-#line 1169 "generated/dsc_parser.c"
+#line 1166 "generated/dsc_parser.c"
     break;
 
-  case 14: /* statement: "<op>" "<register>" "<register>"  */
+  case 12: /* statement: "<op>" "<register>" "<register>"  */
+#line 66 "dsas.y"
+    { MAKE_STMT(unary,   .op = (yyvsp[-2].op),  .num0 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
+#line 1172 "generated/dsc_parser.c"
+    break;
+
+  case 13: /* statement: "<unop>" "<register>" "<register>"  */
 #line 68 "dsas.y"
     { MAKE_STMT(unary,   .op = (yyvsp[-2].op),  .num0 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1175 "generated/dsc_parser.c"
+#line 1178 "generated/dsc_parser.c"
     break;
 
-  case 15: /* statement: "<unop>" "<register>" "<register>"  */
+  case 14: /* statement: "imm" "<integer>" "<register>"  */
 #line 70 "dsas.y"
-    { MAKE_STMT(unary,   .op = (yyvsp[-2].op),  .num0 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1181 "generated/dsc_parser.c"
-    break;
-
-  case 16: /* statement: "imm" "<integer>" "<register>"  */
-#line 72 "dsas.y"
     { MAKE_STMT(imm,     .num0 = (yyvsp[-1].num),  .dest = (yyvsp[0].num)); }
-#line 1187 "generated/dsc_parser.c"
+#line 1184 "generated/dsc_parser.c"
     break;
 
-  case 17: /* statement: "call" "<id>" "<register>" "<register>"  */
-#line 74 "dsas.y"
+  case 15: /* statement: "call" "<id>" "<register>" "<register>"  */
+#line 72 "dsas.y"
     { MAKE_STMT(call,    .name = (yyvsp[-2].id), .num1 = (yyvsp[-1].num),  .dest = (yyvsp[0].num)); }
-#line 1193 "generated/dsc_parser.c"
+#line 1190 "generated/dsc_parser.c"
     break;
 
-  case 18: /* statement: "return"  */
-#line 76 "dsas.y"
+  case 16: /* statement: "return"  */
+#line 74 "dsas.y"
     { MAKE_STMT(return, .num0 = 1); }
-#line 1199 "generated/dsc_parser.c"
+#line 1196 "generated/dsc_parser.c"
     break;
 
-  case 19: /* statement: "return" "<register>"  */
-#line 78 "dsas.y"
+  case 17: /* statement: "return" "<register>"  */
+#line 76 "dsas.y"
     { MAKE_STMT(return, .dest = (yyvsp[0].num)); }
-#line 1205 "generated/dsc_parser.c"
+#line 1202 "generated/dsc_parser.c"
     break;
 
-  case 20: /* statement: "<label>"  */
-#line 80 "dsas.y"
+  case 18: /* statement: "<label>"  */
+#line 78 "dsas.y"
     { MAKE_STMT(label, .dest = (yyvsp[0].num)); }
-#line 1211 "generated/dsc_parser.c"
+#line 1208 "generated/dsc_parser.c"
     break;
 
-  case 21: /* statement: "if" "<register>" "<label>" "<label>"  */
-#line 82 "dsas.y"
+  case 19: /* statement: "if" "<register>" "<label>" "<label>"  */
+#line 80 "dsas.y"
     { MAKE_STMT(if, .op = dsop_imm, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1217 "generated/dsc_parser.c"
+#line 1214 "generated/dsc_parser.c"
     break;
 
-  case 22: /* statement: "if" "<op>" "<register>" "<register>" "<label>"  */
+  case 20: /* statement: "if" "<op>" "<register>" "<register>" "<label>"  */
+#line 82 "dsas.y"
+    { MAKE_STMT(if, .op = (yyvsp[-3].op) + dsop_if_add - dsop_add, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
+#line 1220 "generated/dsc_parser.c"
+    break;
+
+  case 21: /* statement: "if" "<binop>" "<register>" "<register>" "<label>"  */
 #line 84 "dsas.y"
     { MAKE_STMT(if, .op = (yyvsp[-3].op) + dsop_if_add - dsop_add, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1223 "generated/dsc_parser.c"
+#line 1226 "generated/dsc_parser.c"
     break;
 
-  case 23: /* statement: "if" "<binop>" "<register>" "<register>" "<label>"  */
+  case 22: /* statement: "if" "<op>" "<register>" "<integer>" "<label>"  */
 #line 86 "dsas.y"
-    { MAKE_STMT(if, .op = (yyvsp[-3].op) + dsop_if_add - dsop_add, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1229 "generated/dsc_parser.c"
+    { MAKE_STMT(if, .op = (yyvsp[-3].op) + dsop_if_add_imm - dsop_add, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
+#line 1232 "generated/dsc_parser.c"
     break;
 
-  case 24: /* statement: "if" "<op>" "<register>" "<integer>" "<label>"  */
+  case 23: /* statement: "if" "<binop>" "<register>" "<integer>" "<label>"  */
 #line 88 "dsas.y"
     { MAKE_STMT(if, .op = (yyvsp[-3].op) + dsop_if_add_imm - dsop_add, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1235 "generated/dsc_parser.c"
+#line 1238 "generated/dsc_parser.c"
     break;
 
-  case 25: /* statement: "if" "<binop>" "<register>" "<integer>" "<label>"  */
-#line 90 "dsas.y"
-    { MAKE_STMT(if, .op = (yyvsp[-3].op) + dsop_if_add_imm - dsop_add, .num0 = (yyvsp[-2].num), .num1 = (yyvsp[-1].num), .dest = (yyvsp[0].num)); }
-#line 1241 "generated/dsc_parser.c"
-    break;
-
-  case 26: /* argument: argument "<id>"  */
-#line 93 "dsas.y"
+  case 24: /* argument: argument "<id>"  */
+#line 91 "dsas.y"
                   { stmt_last()->num1 = 1; MAKE_STMT(arg,    .name = (yyvsp[0].id)); }
-#line 1247 "generated/dsc_parser.c"
+#line 1244 "generated/dsc_parser.c"
     break;
 
-  case 27: /* argument: "<id>"  */
-#line 94 "dsas.y"
+  case 25: /* argument: "<id>"  */
+#line 92 "dsas.y"
          { MAKE_STMT(arg,    .name = (yyvsp[0].id));}
-#line 1253 "generated/dsc_parser.c"
+#line 1250 "generated/dsc_parser.c"
     break;
 
 
-#line 1257 "generated/dsc_parser.c"
+#line 1254 "generated/dsc_parser.c"
 
       default: break;
     }
@@ -1447,7 +1444,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 96 "dsas.y"
+#line 94 "dsas.y"
 
 
 #define BUMP_SIZE 4096
